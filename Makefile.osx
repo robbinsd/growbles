@@ -1,0 +1,22 @@
+CXXFLAGS = -I/opt/local/include -Wall
+
+LIBS = -framework sfml-audio \
+	-framework sfml-network \
+	-framework sfml-window \
+	-framework sfml-graphics \
+	-framework sfml-system \
+	-framework GLUT \
+	-framework OpenGL \
+	-L/opt/local/lib -lassimp
+
+OBJS = Main.o Shader.o Scene.o Context.o Texture.o Material.o DepthRenderTarget.o \
+       Vector.o Matrix.o SceneGraph.o
+
+%.o: %.cpp *.h
+	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $< -o $@
+
+main: $(OBJS)
+	g++ $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+clean:
+	rm -rf main *.o

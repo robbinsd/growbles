@@ -1,0 +1,24 @@
+CXXFLAGS = -g -Wall -Ilinux/include -I/usr/class/cs248/include
+LIBS = -Llinux/lib64 -Llinux/lib \
+	-lsfml-network \
+	-lsfml-window \
+	-lsfml-graphics \
+	-lsfml-system \
+	-lassimp \
+    -lGLU \
+    -lGLEW
+
+OBJS = Main.o Shader.o Scene.o Context.o Texture.o Material.o DepthRenderTarget.o \
+       Vector.o Matrix.o SceneGraph.o
+
+%.o: %.cpp *.h
+	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $< -o $@
+
+main: $(OBJS)
+	g++ $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+run: main
+	LD_LIBRARY_PATH=/usr/class/cs248/lib:linux/lib64:linux/lib ./main
+
+clean:
+	rm -rf main *.o
