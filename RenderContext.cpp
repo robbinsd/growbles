@@ -1,5 +1,7 @@
 #include "RenderContext.h"
 
+using std::vector;
+
 RenderContext::RenderContext() : mShadowTarget(SHADOW_TEXTURE_WIDTH,
                                                SHADOW_TEXTURE_HEIGHT)
                                , mDoingShadowPass(false)
@@ -32,6 +34,14 @@ RenderContext::RenderContext() : mShadowTarget(SHADOW_TEXTURE_WIDTH,
     mCameraPos.x = -17.0f;
     mPitch = -30.0;
     mYaw = 90.0;
+}
+
+RenderContext::~RenderContext()
+{
+    // Destroy the materials
+    for (vector<Material>::iterator it = materials.begin();
+         it != materials.end(); ++it)
+        it->Destroy();
 }
 
 void

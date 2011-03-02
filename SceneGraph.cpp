@@ -48,8 +48,8 @@ SceneMesh::Render()
 
 
     // Enable the mesh material
-    assert(mMaterial < mSceneGraph->materials.size());
-    mSceneGraph->materials[mMaterial].SetEnabled(true);
+    assert(mMaterial < mSceneGraph->context->materials.size());
+    mSceneGraph->context->materials[mMaterial].SetEnabled(true);
 
     // Grab the positions of our attributes
     GLint positionPos, texcoordPos, normalPos, tangentPos, bitangentPos;
@@ -92,7 +92,7 @@ SceneMesh::Render()
     GL_CHECK(glDisableVertexAttribArray(bitangentPos));
 
     // Disable the material
-    mSceneGraph->materials[mMaterial].SetEnabled(false);
+    mSceneGraph->context->materials[mMaterial].SetEnabled(false);
 
     // Disable any environment mapping
     SET_UNIFORM(mSceneGraph->context, 1i, "mapEnvironment", 0);
@@ -269,12 +269,12 @@ SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
     mDoingEnvMap = false;
 
     // Generate our own material
-    mSceneGraph->materials.push_back(Material(*mSceneGraph->context));
-    mMaterial = mSceneGraph->materials.size() - 1;
-    mSceneGraph->materials[mMaterial].mDiffuse.Set(1.0, 1.0, 0.6, 1.0);
-    mSceneGraph->materials[mMaterial].mSpecular.Set(1.0, 1.0, 0.6, 1.0);
-    mSceneGraph->materials[mMaterial].mAmbient.Set(1.0, 1.0, 1.0, 1.0);
-    mSceneGraph->materials[mMaterial].mShininess = 500.0;
+    mSceneGraph->context->materials.push_back(Material(*mSceneGraph->context));
+    mMaterial = mSceneGraph->context->materials.size() - 1;
+    mSceneGraph->context->materials[mMaterial].mDiffuse.Set(1.0, 1.0, 0.6, 1.0);
+    mSceneGraph->context->materials[mMaterial].mSpecular.Set(1.0, 1.0, 0.6, 1.0);
+    mSceneGraph->context->materials[mMaterial].mAmbient.Set(1.0, 1.0, 1.0, 1.0);
+    mSceneGraph->context->materials[mMaterial].mShininess = 500.0;
 }
 
 /*
@@ -418,10 +418,6 @@ SceneGraph::SceneGraph() : rootNode(this, Matrix(), "248_SCENEGRAPH_ROOT")
 
 SceneGraph::~SceneGraph()
 {
-    // Destroy the materials
-    for (vector<Material>::iterator it = materials.begin();
-         it != materials.end(); ++it)
-        it->Destroy();
 }
 
 void
@@ -464,12 +460,12 @@ SceneGraph::LoadScene(const char* path, const char* sceneName, SceneNode* parent
     // mesh indices. Since we can load multiple aiScenes, we need to determine
     // the offset relative to which the aiScene indices are valid.
     unsigned meshOffset = meshes.size();
-    unsigned materialOffset = materials.size();
+    unsigned materialOffset = context->materials.size();
 
     // Load the materials
     for (unsigned i = 0; i < scene->mNumMaterials; ++i) {
-        materials.push_back(Material(*context));
-        materials.back().InitWithMaterial(scene->mMaterials[i]);
+        context->materials.push_back(Material(*context));
+        context->materials.back().InitWithMaterial(scene->mMaterials[i]);
     }
 
     // Load the meshes

@@ -6,6 +6,7 @@
 #include "DepthRenderTarget.h"
 #include "SceneGraph.h"
 #include "Shader.h"
+#include <vector>
 
 /*
  * General parameters.
@@ -58,6 +59,11 @@ public:
     RenderContext();
 
     /*
+     * Destructor.
+     */
+    ~RenderContext();
+
+    /*
      * Initialize the rendering context.
      */
     void Init();
@@ -106,6 +112,10 @@ public:
      * Gets the window.
      */
     sf::RenderWindow* GetWindow() { return &mWindow; };
+
+    // Publicly accessible vector of the materials loaded for this rendering
+    // context.
+    std::vector<Material> materials;
 
 protected:
 

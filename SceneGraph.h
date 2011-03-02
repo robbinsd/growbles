@@ -160,9 +160,6 @@ struct SceneGraph {
     // A vector of our meshes
     std::vector<SceneMesh> meshes;
 
-    // A vector of our materials
-    std::vector<Material> materials;
-
     /*
      * Constructor.
      */
