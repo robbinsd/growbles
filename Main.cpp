@@ -20,9 +20,8 @@ int main(int argc, char** argv) {
     RenderContext renderContext;
     renderContext.Init();
 
-    // Declare and initialize our scenegraph
+    // Declare an empty scenegraph
     SceneGraph sceneGraph;
-    sceneGraph.Init(renderContext);
 
     // Declare and initialize our world model
     WorldModel world;
@@ -33,8 +32,10 @@ int main(int argc, char** argv) {
     // callbacks.
     //
     // We preserve the old cathedral functionality for the time being:
-    sceneGraph.LoadScene(CATHEDRAL_PATH, "Cathedral", &sceneGraph.rootNode);
-    sceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", &sceneGraph.rootNode);
+    sceneGraph.LoadScene(renderContext, CATHEDRAL_PATH, "Cathedral",
+                         &sceneGraph.rootNode);
+    sceneGraph.LoadScene(renderContext, ARMADILLO_PATH, "Armadillo",
+                         &sceneGraph.rootNode);
     Vector emapPos(0.0, 3.0, 0.0, 1.0);
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
 

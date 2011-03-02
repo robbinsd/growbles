@@ -39,7 +39,7 @@ class SceneMesh {
     /*
      * Renders a Mesh.
      */
-    void Render();
+    void Render(RenderContext& renderContext);
 
     /*
      * Add a triangle to the mesh.
@@ -120,7 +120,7 @@ class SceneNode {
      * Renders the node, starting from the coordinates
      * induced by the base matrix.
      */
-    void Render(Matrix base);
+    void Render(RenderContext& renderContext, Matrix base);
 
     /*
      * Stores the geometry of this node in worldspace.
@@ -151,9 +151,6 @@ struct SceneGraph {
      * Publicly accessible members.
      */
 
-    // The rendering context associated with this scene graph
-    RenderContext* context;
-
     // The root node in the scene graph
     SceneNode rootNode;
 
@@ -171,20 +168,16 @@ struct SceneGraph {
     ~SceneGraph();
 
     /*
-     * Initializer.
-     */
-    void Init(RenderContext& c);
-
-    /*
      * Adds an aiScene, descending from the given node.
      */
-    void LoadScene(const char* filename, const char* sceneName,
+    void LoadScene(RenderContext& renderContext,
+                   const char* filename, const char* sceneName,
                    SceneNode* parent);
 
     /*
      * Renders the scene graph.
      */
-    void Render();
+    void Render(RenderContext& renderContext);
 
     /*
      * Finds a mesh with the given name. NULL if not found.

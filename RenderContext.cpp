@@ -105,7 +105,7 @@ RenderContext::Render(SceneGraph& sceneGraph)
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, mShadowTarget.textureID()));
 
     // Render our scenegraph
-    sceneGraph.Render();
+    sceneGraph.Render(*this);
 
     // Unbind the shadow texture
     GL_CHECK(glActiveTexture(SHADOW_TEXTURE_UNIT));
@@ -131,7 +131,7 @@ RenderContext::ShadowPass(SceneGraph& sceneGraph)
     GL_CHECK(glViewport(0, 0, SHADOW_TEXTURE_WIDTH, SHADOW_TEXTURE_HEIGHT));
 
     // Render the models
-    sceneGraph.Render();
+    sceneGraph.Render(*this);
 
     // Reset the viewport (and, incidentally, the projection matrix)
     SetViewportAndProjection();

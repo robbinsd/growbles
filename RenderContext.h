@@ -200,21 +200,21 @@ protected:
 
 #define SET_UNIFORM(context, suffix, name, val) {\
     GLint location; \
-    GL_CHECK(location = glGetUniformLocation(context->GetShaderID(), name)); \
+    GL_CHECK(location = glGetUniformLocation((context)->GetShaderID(), name)); \
     assert(location >= 0); \
     GL_CHECK(glUniform##suffix(location, val)); \
 }
 
 #define SET_UNIFORMV(context, suffix, name, val) {\
     GLint location; \
-    GL_CHECK(location = glGetUniformLocation(context->GetShaderID(), name)); \
+    GL_CHECK(location = glGetUniformLocation((context)->GetShaderID(), name)); \
     assert(location >= 0); \
     GL_CHECK(glUniform##suffix(location, 1, val)); \
 }
 
 #define SET_UNIFORMMATV(context, suffix, name, val) {\
     GLint location; \
-    GL_CHECK(location = glGetUniformLocation(context->GetShaderID(), name)); \
+    GL_CHECK(location = glGetUniformLocation((context)->GetShaderID(), name)); \
     assert(location >= 0); \
     GL_CHECK(glUniformMatrix##suffix(location, 1, GL_FALSE, val)); \
 }

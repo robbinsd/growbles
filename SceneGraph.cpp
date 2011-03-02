@@ -28,7 +28,7 @@ float sUpDirections[][3] = { {0.0, -1.0, 0.0}, {0.0, -1.0, 0.0},
                              {0.0, -1.0, 0.0}, {0.0, -1.0, 0.0} };
 
 void
-SceneMesh::Render()
+SceneMesh::Render(RenderContext& renderContext)
 {
     // If we're environment mapping this node and its descendants, we don't
     // want to render them.
@@ -43,17 +43,17 @@ SceneMesh::Render()
         GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, mCubeTextureID));
 
         // Set the flag
-        SET_UNIFORM(mSceneGraph->context, 1i, "mapEnvironment", 1);
+        SET_UNIFORM(&renderContext, 1i, "mapEnvironment", 1);
     }
 
 
     // Enable the mesh material
-    assert(mMaterial < mSceneGraph->context->materials.size());
-    mSceneGraph->context->materials[mMaterial].SetEnabled(true);
+    assert(mMaterial < renderContext.materials.size());
+    renderContext.materials[mMaterial].SetEnabled(true);
 
     // Grab the positions of our attributes
     GLint positionPos, texcoordPos, normalPos, tangentPos, bitangentPos;
-    GLint shaderID = mSceneGraph->context->GetShaderID();
+    GLint shaderID = renderContext.GetShaderID();
 
     GL_CHECK(positionPos = glGetAttribLocation(shaderID, "positionIn"));
     GL_CHECK(texcoordPos = glGetAttribLocation(shaderID, "texcoordIn"));
@@ -92,10 +92,10 @@ SceneMesh::Render()
     GL_CHECK(glDisableVertexAttribArray(bitangentPos));
 
     // Disable the material
-    mSceneGraph->context->materials[mMaterial].SetEnabled(false);
+    renderContext.materials[mMaterial].SetEnabled(false);
 
     // Disable any environment mapping
-    SET_UNIFORM(mSceneGraph->context, 1i, "mapEnvironment", 0);
+    SET_UNIFORM(&renderContext, 1i, "mapEnvironment", 0);
 }
 
 void
@@ -263,18 +263,18 @@ SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
     renderContext.SetViewToCamera();
 
     // Reset the projection matrix and viewport
-    mSceneGraph->context->SetViewportAndProjection();
+    renderContext.SetViewportAndProjection();
 
     // All done
     mDoingEnvMap = false;
 
     // Generate our own material
-    mSceneGraph->context->materials.push_back(Material(*mSceneGraph->context));
-    mMaterial = mSceneGraph->context->materials.size() - 1;
-    mSceneGraph->context->materials[mMaterial].mDiffuse.Set(1.0, 1.0, 0.6, 1.0);
-    mSceneGraph->context->materials[mMaterial].mSpecular.Set(1.0, 1.0, 0.6, 1.0);
-    mSceneGraph->context->materials[mMaterial].mAmbient.Set(1.0, 1.0, 1.0, 1.0);
-    mSceneGraph->context->materials[mMaterial].mShininess = 500.0;
+    renderContext.materials.push_back(Material(renderContext));
+    mMaterial = renderContext.materials.size() - 1;
+    renderContext.materials[mMaterial].mDiffuse.Set(1.0, 1.0, 0.6, 1.0);
+    renderContext.materials[mMaterial].mSpecular.Set(1.0, 1.0, 0.6, 1.0);
+    renderContext.materials[mMaterial].mAmbient.Set(1.0, 1.0, 1.0, 1.0);
+    renderContext.materials[mMaterial].mShininess = 500.0;
 }
 
 /*
@@ -361,7 +361,7 @@ SceneNode::FindNode(const string& name)
 }
 
 void
-SceneNode::Render(Matrix base)
+SceneNode::Render(RenderContext& renderContext, Matrix base)
 {
     // Generate our transformation matrix
     Matrix trans = base.MMProduct(mTransform);
@@ -374,12 +374,12 @@ SceneNode::Render(Matrix base)
     GL_CHECK(glMultMatrixf(modelMat));
 
     // Write it separately to the shader as well (for shadow mapping)
-    SET_UNIFORMMATV(mSceneGraph->context, 4fv, "modelMatrix", modelMat);
+    SET_UNIFORMMATV(&renderContext, 4fv, "modelMatrix", modelMat);
 
     // Draw the meshes at this node
     for (list<unsigned>::iterator it = mMeshes.begin();
          it != mMeshes.end(); ++it)
-        mSceneGraph->meshes[*it].Render();
+        mSceneGraph->meshes[*it].Render(renderContext);
 
     // Get rid of the model matrix, leaving GL with just the view matrix
     GL_CHECK(glMatrixMode(GL_MODELVIEW));
@@ -388,7 +388,7 @@ SceneNode::Render(Matrix base)
     // Draw child nodes
     for (list<SceneNode*>::iterator it = mChildren.begin();
          it != mChildren.end(); ++it)
-        (*it)->Render(trans);
+        (*it)->Render(renderContext, trans);
 }
 
 /*
@@ -421,15 +421,9 @@ SceneGraph::~SceneGraph()
 }
 
 void
-SceneGraph::Init(RenderContext& c)
+SceneGraph::Render(RenderContext& renderContext)
 {
-    context = &c;
-}
-
-void
-SceneGraph::Render()
-{
-    rootNode.Render(Matrix());
+    rootNode.Render(renderContext, Matrix());
 }
 
 SceneMesh*
@@ -442,7 +436,9 @@ SceneGraph::FindMesh(const string& name)
 }
 
 void
-SceneGraph::LoadScene(const char* path, const char* sceneName, SceneNode* parent)
+SceneGraph::LoadScene(RenderContext& renderContext,
+                      const char* path, const char* sceneName,
+                      SceneNode* parent)
 {
     // Import the scene
     Assimp::Importer importer;
@@ -460,12 +456,12 @@ SceneGraph::LoadScene(const char* path, const char* sceneName, SceneNode* parent
     // mesh indices. Since we can load multiple aiScenes, we need to determine
     // the offset relative to which the aiScene indices are valid.
     unsigned meshOffset = meshes.size();
-    unsigned materialOffset = context->materials.size();
+    unsigned materialOffset = renderContext.materials.size();
 
     // Load the materials
     for (unsigned i = 0; i < scene->mNumMaterials; ++i) {
-        context->materials.push_back(Material(*context));
-        context->materials.back().InitWithMaterial(scene->mMaterials[i]);
+        renderContext.materials.push_back(Material(renderContext));
+        renderContext.materials.back().InitWithMaterial(scene->mMaterials[i]);
     }
 
     // Load the meshes
