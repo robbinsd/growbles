@@ -152,6 +152,9 @@ protected:
 
     // Doing a shadow pass?
     bool mDoingShadowPass;
+
+    // Need a shadow pass before re-rendering?
+    bool mShadowsDirty;
 };
 
 #endif /* SCENE_H */

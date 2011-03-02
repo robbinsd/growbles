@@ -7,6 +7,7 @@
 Scene::Scene() : mContext(NULL)
                , mShadowTarget(SHADOW_TEXTURE_WIDTH, SHADOW_TEXTURE_HEIGHT)
                , mDoingShadowPass(false)
+               , mShadowsDirty(true)
 {
     /*
      * Lighting Defaults.
@@ -63,6 +64,10 @@ Scene::Init(Context& context)
 void
 Scene::Render()
 {
+    // If our shadow buffer is dirty, do a shadow pass
+    if (mShadowsDirty)
+        ShadowPass();
+
     // Clear the buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -107,6 +112,9 @@ Scene::ShadowPass()
 
     // Unbind the render target
     mShadowTarget.unbind();
+
+    // Our shadows are now valid
+    mShadowsDirty = false;
 }
 
 void
@@ -163,8 +171,8 @@ Scene::LightingChanged()
     // Generate the lighting matrix for the shaders
     RegenerateLightMatrix();
 
-    // Generate our shadow texture
-    ShadowPass();
+    // Flag that our shadow texture is invalid
+    mShadowsDirty = true;
 }
 
 void
