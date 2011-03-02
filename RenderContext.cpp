@@ -1,10 +1,13 @@
 #include "RenderContext.h"
 
-RenderContext::RenderContext() : mContext(NULL)
-                               , mShadowTarget(SHADOW_TEXTURE_WIDTH,
+RenderContext::RenderContext() : mShadowTarget(SHADOW_TEXTURE_WIDTH,
                                                SHADOW_TEXTURE_HEIGHT)
                                , mDoingShadowPass(false)
                                , mShadowsDirty(true)
+                               , mWindowSettings(24, 8, 2)
+                               , mWindow(sf::VideoMode(800, 600), "Growbles",
+                                         sf::Style::Close, mWindowSettings)
+                               , mShader(SHADER_PATH)
 {
     /*
      * Lighting Defaults.
@@ -32,10 +35,40 @@ RenderContext::RenderContext() : mContext(NULL)
 }
 
 void
-RenderContext::Init(Context& context)
+RenderContext::Init()
 {
-    // Save the context
-    mContext = &context;
+    // Initialize GLEW on Windows, to make sure that OpenGL 2.0 is loaded
+#ifdef FRAMEWORK_USE_GLEW
+    GLint error = glewInit();
+    if (GLEW_OK != error) {
+        std::cerr << glewGetErrorString(error) << std::endl;
+        exit(-1);
+    }
+    if (!GLEW_VERSION_2_0) {
+        std::cerr << "This program requires OpenGL 2.0" << std::endl;
+        exit(-1);
+    }
+#endif
+
+    // Common defaults
+    GL_CHECK(glClearDepth(1.0f));
+    GL_CHECK(glClearColor(0.6f, 0.56f, 1.0f, 1.0f));
+    GL_CHECK(glEnable(GL_DEPTH_TEST));
+
+    // Initialize and use our shaders
+    mShader.Init();
+    GL_CHECK(glUseProgram(mShader.programID()));
+
+    // Setup the view system
+    SetViewportAndProjection();
+
+    // Set up the shader
+    SET_UNIFORM(this, 1i, "spriteMap", SPRITE_TEXTURE_SAMPLER);
+    SET_UNIFORM(this, 1i, "diffuseMap", DIFFUSE_TEXTURE_SAMPLER);
+    SET_UNIFORM(this, 1i, "specularMap", SPECULAR_TEXTURE_SAMPLER);
+    SET_UNIFORM(this, 1i, "normalMap", NORMAL_TEXTURE_SAMPLER);
+    SET_UNIFORM(this, 1i, "shadowMap", SHADOW_TEXTURE_SAMPLER);
+    SET_UNIFORM(this, 1i, "envMap", ENV_TEXTURE_SAMPLER);
 
     // Make sure the shadow pass starts disabled
     SetShadowPassEnabled(false);
@@ -91,7 +124,7 @@ RenderContext::ShadowPass(SceneGraph& sceneGraph)
     sceneGraph.Render();
 
     // Reset the viewport (and, incidentally, the projection matrix)
-    mContext->SetupView();
+    SetViewportAndProjection();
 
     // Disable the shadow pass
     SetShadowPassEnabled(false);
@@ -149,6 +182,21 @@ RenderContext::MoveLight(float x, float z)
 }
 
 void
+RenderContext::SetViewportAndProjection()
+{
+    GL_CHECK(glViewport(0, 0, mWindow.GetWidth(), mWindow.GetHeight()));
+    GL_CHECK(glMatrixMode(GL_PROJECTION));
+    GL_CHECK(glLoadIdentity());
+    GL_CHECK(gluPerspective(90.0,
+                            ((GLfloat)mWindow.GetWidth()) /
+                            ((GLfloat)mWindow.GetHeight()),
+                            CAMERA_NEAR, CAMERA_FAR));
+
+    // Make sure to pass the viewport size to the shader
+    SET_UNIFORM(this, 1f, "viewportWidth", mWindow.GetWidth());
+}
+
+void
 RenderContext::LightingChanged()
 {
     // Apply the lighting to OpenGL
@@ -165,7 +213,7 @@ void
 RenderContext::SetShadowPassEnabled(bool enabled)
 {
     mDoingShadowPass = enabled;
-    SET_UNIFORM(mContext, 1i, "shadowPass", enabled ? 1 : 0);
+    SET_UNIFORM(this, 1i, "shadowPass", enabled ? 1 : 0);
 }
 
 void
@@ -209,7 +257,7 @@ RenderContext::SetView(Matrix& view)
     // Generate the inverse upper-3x3 view matrix for the shader.
     GLfloat invView[9];
     view.Inverse().Get3x3(invView);
-    SET_UNIFORMMATV(mContext, 3fv, "inverseViewMatrix", invView);
+    SET_UNIFORMMATV(this, 3fv, "inverseViewMatrix", invView);
 
     // Reset the lighting using the new view matrix
     SetLighting();
@@ -287,7 +335,7 @@ RenderContext::RegenerateLightMatrix()
     // Store the light-space matrix to the shader
     GLfloat lightMatArray[16];
     lightMat.Get(lightMatArray);
-    SET_UNIFORMMATV(mContext, 4fv, "lightMatrix", lightMatArray);
+    SET_UNIFORMMATV(this, 4fv, "lightMatrix", lightMatArray);
 }
 
 void
@@ -327,7 +375,7 @@ RenderContext::RenderShadowQuad()
     GL_CHECK(glDisable(GL_TEXTURE_2D));
 
     // Reenable the shader
-    GL_CHECK(glUseProgram(mContext->shader.programID()));
+    GL_CHECK(glUseProgram(GetShaderID()));
 
     // Restore our old matrices
     GL_CHECK(glMatrixMode(GL_MODELVIEW));

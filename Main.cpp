@@ -1,6 +1,5 @@
 #include "Framework.h"
 #include "Shader.h"
-#include "Context.h"
 #include "RenderContext.h"
 #include "SceneGraph.h"
 #include <stdlib.h>
@@ -10,41 +9,37 @@
 #define SPHERE_PATH "scene/sphere.3ds"
 
 
-void handleInput(Context& context, RenderContext& rContext);
+void handleInput(RenderContext& rContext);
 
 int main(int argc, char** argv) {
 
     // Random seed
     srandom(123456);
 
-    // Declare our context and initialize OpenGL.
-    // A lot goes on in this constructor.
-    Context context;
-
     // Declare and initialize our rendering context
     RenderContext renderContext;
-    renderContext.Init(context);
+    renderContext.Init();
 
     // Declare and initialize our scenegraph
     SceneGraph sceneGraph;
-    sceneGraph.Init(context);
+    sceneGraph.Init(renderContext);
     sceneGraph.LoadScene(CATHEDRAL_PATH, "Cathedral", &sceneGraph.rootNode);
     sceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", &sceneGraph.rootNode);
     Vector emapPos(0.0, 3.0, 0.0, 1.0);
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
 
     // Put your game loop here (i.e., render with OpenGL, update animation)
-    while (context.window.IsOpened()) {
+    while (renderContext.GetWindow()->IsOpened()) {
 
-        handleInput(context, renderContext);
+        handleInput(renderContext);
         renderContext.Render(sceneGraph);
-        context.window.Display();
+        renderContext.GetWindow()->Display();
     }
 
     return 0;
 }
 
-void handleInput(Context& context, RenderContext& rContext) {
+void handleInput(RenderContext& rContext) {
 
     static int sLastMouseX = 0;
     static int sLastMouseY = 0;
@@ -53,17 +48,17 @@ void handleInput(Context& context, RenderContext& rContext) {
     // Event loop, for processing user input, etc.  For more info, see:
     // http://www.sfml-dev.org/tutorials/1.6/window-events.php
     sf::Event evt;
-    while (context.window.GetEvent(evt)) {
+    while (rContext.GetWindow()->GetEvent(evt)) {
         switch (evt.Type) {
         case sf::Event::Closed:
             // Close the window.  This will cause the game loop to exit,
             // because the IsOpened() function will no longer return true.
-            context.window.Close();
+            rContext.GetWindow()->Close();
             break;
         case sf::Event::Resized:
             // If the window is resized, then we need to change the perspective
             // transformation and viewport
-            context.SetupView();
+            rContext.SetViewportAndProjection();
             break;
 
         case sf::Event::KeyPressed:

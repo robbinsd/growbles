@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "RenderContext.h"
 #include <string>
 #include <fstream>
 #include <assert.h>
@@ -8,8 +9,8 @@ using std::ifstream;
 
 #define SHININESS_DEFAULT 127 // From Piazzza
 
-Material::Material(Context& context) : mShininess(SHININESS_DEFAULT)
-                                     , mContext(&context)
+Material::Material(RenderContext& context) : mShininess(SHININESS_DEFAULT)
+                                           , mContext(&context)
 {
 }
 
@@ -97,5 +98,5 @@ Material::TryLoadTexture(const char* prefix, TextureType type)
     // If the file exists, initialize the appropriate texture
     ifstream file(fullPath.c_str(), ifstream::in);
     if (file)
-        mTextures[type].Init(*mContext, fullPath);
+        mTextures[type].Init(fullPath);
 }

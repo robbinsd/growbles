@@ -53,7 +53,7 @@ SceneMesh::Render()
 
     // Grab the positions of our attributes
     GLint positionPos, texcoordPos, normalPos, tangentPos, bitangentPos;
-    GLint shaderID = mSceneGraph->context->shader.programID();
+    GLint shaderID = mSceneGraph->context->GetShaderID();
 
     GL_CHECK(positionPos = glGetAttribLocation(shaderID, "positionIn"));
     GL_CHECK(texcoordPos = glGetAttribLocation(shaderID, "texcoordIn"));
@@ -263,7 +263,7 @@ SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
     renderContext.SetViewToCamera();
 
     // Reset the projection matrix and viewport
-    mSceneGraph->context->SetupView();
+    mSceneGraph->context->SetViewportAndProjection();
 
     // All done
     mDoingEnvMap = false;
@@ -425,7 +425,7 @@ SceneGraph::~SceneGraph()
 }
 
 void
-SceneGraph::Init(Context& c)
+SceneGraph::Init(RenderContext& c)
 {
     context = &c;
 }

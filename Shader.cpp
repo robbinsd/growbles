@@ -8,7 +8,7 @@
  */
 
 #include "Shader.h"
-#include "Context.h"
+#include "Framework.h"
 #include <fstream>
 
 #define ERROR_BUFSIZE 1024

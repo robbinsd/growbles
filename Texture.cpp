@@ -6,11 +6,8 @@ using std::string;
 using sf::Image;
 
 void
-Texture::Init(Context& context, const string& path)
+Texture::Init(const string& path)
 {
-    // Save our parameters
-    mContext = &context;
-
     // Read in the image
     Image image;
 #ifndef NDEBUG
@@ -36,7 +33,6 @@ void
 Texture::Destroy()
 {
     if (mInitialized) {
-        mContext = NULL;
         GL_CHECK(glDeleteTextures(1, &mTextureID));
         mInitialized = false;
     }

@@ -5,9 +5,34 @@
 #include "Matrix.h"
 #include "DepthRenderTarget.h"
 #include "SceneGraph.h"
+#include "Shader.h"
+
+/*
+ * General parameters.
+ */
+
+#define SHADER_PATH "shaders/phong"
+
+#define CAMERA_NEAR 0.1
+#define CAMERA_FAR 80.0
 
 #define SHADOW_TEXTURE_WIDTH 3000
 #define SHADOW_TEXTURE_HEIGHT 3000
+
+// We use fixed texture samplers for the various samplers we use
+// in our fragment shader
+#define SPRITE_TEXTURE_SAMPLER 0
+#define SPRITE_TEXTURE_UNIT GL_TEXTURE0
+#define DIFFUSE_TEXTURE_SAMPLER 1
+#define DIFFUSE_TEXTURE_UNIT GL_TEXTURE1
+#define SPECULAR_TEXTURE_SAMPLER 2
+#define SPECULAR_TEXTURE_UNIT GL_TEXTURE2
+#define NORMAL_TEXTURE_SAMPLER 3
+#define NORMAL_TEXTURE_UNIT GL_TEXTURE3
+#define SHADOW_TEXTURE_SAMPLER 4
+#define SHADOW_TEXTURE_UNIT GL_TEXTURE4
+#define ENV_TEXTURE_SAMPLER 5
+#define ENV_TEXTURE_UNIT GL_TEXTURE5
 
 struct LightInfo {
 
@@ -33,23 +58,14 @@ public:
     RenderContext();
 
     /*
-     * Destructor.
+     * Initialize the rendering context.
      */
-    ~RenderContext()
-    {
-        mContext = NULL;
-    }
-
-    /*
-     * Initialize the scene.
-     */
-    void Init(Context& context);
+    void Init();
 
     /*
      * Render the scene.
      */
     void Render(SceneGraph& sceneGraph);
-
 
     /*
      * Camera Movement.
@@ -75,6 +91,21 @@ public:
      * Sets the view matrix to the camera view.
      */
     void SetViewToCamera();
+
+    /*
+     * Sets up the viewport and projection.
+     */
+    void SetViewportAndProjection();
+
+    /*
+     * Gets the shader program ID.
+     */
+    GLint GetShaderID() { return mShader.programID(); };
+
+    /*
+     * Gets the window.
+     */
+    sf::RenderWindow* GetWindow() { return &mWindow; };
 
 protected:
 
@@ -129,11 +160,6 @@ protected:
      */
     void RenderShadowQuad();
 
-    /*
-     * Instance variables.
-     */
-    Context* mContext;
-
     // Lighting
     LightInfo mLights[SCENELIGHT_COUNT];
 
@@ -149,6 +175,39 @@ protected:
 
     // Need a shadow pass before re-rendering?
     bool mShadowsDirty;
+
+    // Window state
+    sf::WindowSettings mWindowSettings;
+    sf::RenderWindow mWindow;
+
+    // Shader
+    Shader mShader;
 };
+
+/*
+ * Macros to set uniforms.
+ */
+
+#define SET_UNIFORM(context, suffix, name, val) {\
+    GLint location; \
+    GL_CHECK(location = glGetUniformLocation(context->GetShaderID(), name)); \
+    assert(location >= 0); \
+    GL_CHECK(glUniform##suffix(location, val)); \
+}
+
+#define SET_UNIFORMV(context, suffix, name, val) {\
+    GLint location; \
+    GL_CHECK(location = glGetUniformLocation(context->GetShaderID(), name)); \
+    assert(location >= 0); \
+    GL_CHECK(glUniform##suffix(location, 1, val)); \
+}
+
+#define SET_UNIFORMMATV(context, suffix, name, val) {\
+    GLint location; \
+    GL_CHECK(location = glGetUniformLocation(context->GetShaderID(), name)); \
+    assert(location >= 0); \
+    GL_CHECK(glUniformMatrix##suffix(location, 1, GL_FALSE, val)); \
+}
+
 
 #endif /* RENDERCONTEXT_H */

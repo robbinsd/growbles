@@ -32,5 +32,35 @@
 
 #include <memory>
 #include <iostream>
+#include <assert.h>
+
+/*
+ * Useful macros.
+ */
+
+#define GL_CHECK(f) {\
+    (f); \
+    GLenum error = glGetError(); \
+    if (GL_NO_ERROR != error) {\
+        printf("GL Error - %s:%d - %s\n", __FILE__, __LINE__,  gluErrorString(error)); \
+        exit(-1); \
+    } \
+}
+
+#ifndef MAX
+#define MAX(a,b) (a > b ? a : b)
+#endif
+#ifndef MIN
+#define MIN(a,b) (a > b ? b : a)
+#endif
+
+#ifndef MAX3
+#define MAX3(a,b,c) MAX(MAX(a,b),c)
+#endif
+#ifndef MIN3
+#define MIN3(a,b,c) MIN(MIN(a,b),c)
+#endif
+
+#define IN_RANGE(val, low, high) ((low <= val) && (val <= high))
 
 #endif

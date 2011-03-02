@@ -2,8 +2,10 @@
 #define MATERIAL_H
 
 #include "Texture.h"
-#include "Context.h"
 #include "Framework.h"
+#include "Vector.h"
+
+class RenderContext;
 
 /*
  * Enumeration of the different types of textures we can have.
@@ -23,7 +25,7 @@ class Material {
 
 public:
 
-    Material(Context& context);
+    Material(RenderContext& context);
 
     void InitWithMaterial(const aiMaterial* material);
 
@@ -49,8 +51,8 @@ protected:
 
     void TryLoadTexture(const char* prefix, TextureType type);
 
-    // Our global context
-    Context* mContext;
+    // Our rendering context
+    RenderContext* mContext;
 
     // Our array of textures. We only initialize the ones we find.
     Texture mTextures[TEXTURETYPE_COUNT];

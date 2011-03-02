@@ -1,5 +1,4 @@
 #include "DepthRenderTarget.h"
-#include "Context.h"
 #include <assert.h>
 
 DepthRenderTarget::DepthRenderTarget(unsigned int width, unsigned int height) {

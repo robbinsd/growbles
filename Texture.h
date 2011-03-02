@@ -2,8 +2,9 @@
 #define TEXTURE_H
 
 #include "Framework.h"
-#include "Context.h"
 #include <string>
+
+class RenderContext;
 
 class Texture {
 
@@ -12,14 +13,13 @@ public:
     /*
      * Constructor.
      */
-    Texture() : mContext(NULL)
-              , mTextureID(0)
+    Texture() : mTextureID(0)
               , mInitialized(false) {}
 
     /*
      * Initializes us with a texture.
      */
-    void Init(Context& context, const std::string& path);
+    void Init(const std::string& path);
 
     /*
      * Frees resources.
@@ -39,7 +39,6 @@ public:
     bool IsInitialized() { return mInitialized; }
 
 protected:
-    Context* mContext;
     GLuint mTextureID;
     bool mInitialized;
 };

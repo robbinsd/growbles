@@ -151,8 +151,8 @@ struct SceneGraph {
      * Publicly accessible members.
      */
 
-    // The context structure associated with this scene graph
-    Context* context;
+    // The rendering context associated with this scene graph
+    RenderContext* context;
 
     // The root node in the scene graph
     SceneNode rootNode;
@@ -176,7 +176,7 @@ struct SceneGraph {
     /*
      * Initializer.
      */
-    void Init(Context& c);
+    void Init(RenderContext& c);
 
     /*
      * Adds an aiScene, descending from the given node.
