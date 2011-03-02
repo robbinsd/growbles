@@ -1,13 +1,10 @@
-#include "Scene.h"
+#include "RenderContext.h"
 
-#define ARMADILLO_PATH "scene/armadillo.3ds"
-#define CATHEDRAL_PATH "scene/cathedral.3ds"
-#define SPHERE_PATH "scene/sphere.3ds"
-
-Scene::Scene() : mContext(NULL)
-               , mShadowTarget(SHADOW_TEXTURE_WIDTH, SHADOW_TEXTURE_HEIGHT)
-               , mDoingShadowPass(false)
-               , mShadowsDirty(true)
+RenderContext::RenderContext() : mContext(NULL)
+                               , mShadowTarget(SHADOW_TEXTURE_WIDTH,
+                                               SHADOW_TEXTURE_HEIGHT)
+                               , mDoingShadowPass(false)
+                               , mShadowsDirty(true)
 {
     /*
      * Lighting Defaults.
@@ -35,17 +32,10 @@ Scene::Scene() : mContext(NULL)
 }
 
 void
-Scene::Init(Context& context)
+RenderContext::Init(Context& context)
 {
     // Save the context
     mContext = &context;
-
-    // Initialize the scene graph
-    mSceneGraph.Init(context);
-
-    // Add the models to the scene graph
-    mSceneGraph.LoadScene(CATHEDRAL_PATH, "Cathedral", &mSceneGraph.rootNode);
-    mSceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", &mSceneGraph.rootNode);
 
     // Make sure the shadow pass starts disabled
     SetShadowPassEnabled(false);
@@ -53,20 +43,16 @@ Scene::Init(Context& context)
     // Bootstrap our light situation
     LightingChanged();
 
-    // Environment-map the armadillo
-    Vector emapPos(0.0, 3.0, 0.0, 1.0);
-    mSceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(*this, emapPos);
-
     // Apply the camera
     SetViewToCamera();
 }
 
 void
-Scene::Render()
+RenderContext::Render(SceneGraph& sceneGraph)
 {
     // If our shadow buffer is dirty, do a shadow pass
     if (mShadowsDirty)
-        ShadowPass();
+        ShadowPass(sceneGraph);
 
     // Clear the buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,7 +62,7 @@ Scene::Render()
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, mShadowTarget.textureID()));
 
     // Render our scenegraph
-    mSceneGraph.Render();
+    sceneGraph.Render();
 
     // Unbind the shadow texture
     GL_CHECK(glActiveTexture(SHADOW_TEXTURE_UNIT));
@@ -87,7 +73,7 @@ Scene::Render()
 }
 
 void
-Scene::ShadowPass()
+RenderContext::ShadowPass(SceneGraph& sceneGraph)
 {
     // Bind the framebuffer
     mShadowTarget.bind();
@@ -102,7 +88,7 @@ Scene::ShadowPass()
     GL_CHECK(glViewport(0, 0, SHADOW_TEXTURE_WIDTH, SHADOW_TEXTURE_HEIGHT));
 
     // Render the models
-    mSceneGraph.Render();
+    sceneGraph.Render();
 
     // Reset the viewport (and, incidentally, the projection matrix)
     mContext->SetupView();
@@ -118,7 +104,7 @@ Scene::ShadowPass()
 }
 
 void
-Scene::MoveCamera(float forward, float right)
+RenderContext::MoveCamera(float forward, float right)
 {
     // Looking down the -z axis, right is +x and forward is -z
     Vector direction(right, 0.0, -forward, 1.0);
@@ -141,7 +127,7 @@ static void ClampDegrees(float& input)
 }
 
 void
-Scene::PanCamera(float plusPitch, float plusYaw)
+RenderContext::PanCamera(float plusPitch, float plusYaw)
 {
     mPitch += plusPitch;
     mYaw += plusYaw;
@@ -154,7 +140,7 @@ Scene::PanCamera(float plusPitch, float plusYaw)
 }
 
 void
-Scene::MoveLight(float x, float z)
+RenderContext::MoveLight(float x, float z)
 {
     mLights[SCENELIGHT_DIRECTIONAL].position.x += x;
     mLights[SCENELIGHT_DIRECTIONAL].position.z += z;
@@ -163,7 +149,7 @@ Scene::MoveLight(float x, float z)
 }
 
 void
-Scene::LightingChanged()
+RenderContext::LightingChanged()
 {
     // Apply the lighting to OpenGL
     SetLighting();
@@ -176,14 +162,14 @@ Scene::LightingChanged()
 }
 
 void
-Scene::SetShadowPassEnabled(bool enabled)
+RenderContext::SetShadowPassEnabled(bool enabled)
 {
     mDoingShadowPass = enabled;
     SET_UNIFORM(mContext, 1i, "shadowPass", enabled ? 1 : 0);
 }
 
 void
-Scene::SetLighting()
+RenderContext::SetLighting()
 {
     // First light (directional)
     glEnable(GL_LIGHT0);
@@ -209,7 +195,7 @@ Scene::SetLighting()
 }
 
 void
-Scene::SetView(Matrix& view)
+RenderContext::SetView(Matrix& view)
 {
     // Read the matrix out in OpenGL format
     GLfloat viewArray[16];
@@ -230,7 +216,7 @@ Scene::SetView(Matrix& view)
 }
 
 void
-Scene::SetViewToCamera()
+RenderContext::SetViewToCamera()
 {
     // Set the view matrix
     Matrix cameraMatrix = GenerateCameraMatrix();
@@ -238,7 +224,7 @@ Scene::SetViewToCamera()
 }
 
 Matrix
-Scene::GenerateCameraMatrix()
+RenderContext::GenerateCameraMatrix()
 {
     // Start with the pan matrix
     Matrix rv = GeneratePanMatrix();
@@ -251,7 +237,7 @@ Scene::GenerateCameraMatrix()
 }
 
 Vector
-Scene::GetCameraDirection()
+RenderContext::GetCameraDirection()
 {
     Vector direction;
     double factor = M_PI / 180.0;
@@ -262,7 +248,7 @@ Scene::GetCameraDirection()
 }
 
 Matrix
-Scene::GeneratePanMatrix()
+RenderContext::GeneratePanMatrix()
 {
     // Start with the identity
     Matrix rv;
@@ -284,7 +270,7 @@ Scene::GeneratePanMatrix()
 }
 
 void
-Scene::RegenerateLightMatrix()
+RenderContext::RegenerateLightMatrix()
 {
     // Start with the identity
     Matrix lightMat;
@@ -305,7 +291,7 @@ Scene::RegenerateLightMatrix()
 }
 
 void
-Scene::RenderShadowQuad()
+RenderContext::RenderShadowQuad()
 {
     // Sanitize our matricies
     GL_CHECK(glMatrixMode(GL_MODELVIEW));

@@ -1,10 +1,16 @@
 #include "Framework.h"
 #include "Shader.h"
 #include "Context.h"
-#include "Scene.h"
+#include "RenderContext.h"
+#include "SceneGraph.h"
 #include <stdlib.h>
 
-void handleInput(Context& context, Scene& scene);
+#define ARMADILLO_PATH "scene/armadillo.3ds"
+#define CATHEDRAL_PATH "scene/cathedral.3ds"
+#define SPHERE_PATH "scene/sphere.3ds"
+
+
+void handleInput(Context& context, RenderContext& rContext);
 
 int main(int argc, char** argv) {
 
@@ -15,22 +21,30 @@ int main(int argc, char** argv) {
     // A lot goes on in this constructor.
     Context context;
 
-    // Declare and initialize our Scene
-    Scene scene;
-    scene.Init(context);
+    // Declare and initialize our rendering context
+    RenderContext renderContext;
+    renderContext.Init(context);
+
+    // Declare and initialize our scenegraph
+    SceneGraph sceneGraph;
+    sceneGraph.Init(context);
+    sceneGraph.LoadScene(CATHEDRAL_PATH, "Cathedral", &sceneGraph.rootNode);
+    sceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", &sceneGraph.rootNode);
+    Vector emapPos(0.0, 3.0, 0.0, 1.0);
+    sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
 
     // Put your game loop here (i.e., render with OpenGL, update animation)
     while (context.window.IsOpened()) {
 
-        handleInput(context, scene);
-        scene.Render();
+        handleInput(context, renderContext);
+        renderContext.Render(sceneGraph);
         context.window.Display();
     }
 
     return 0;
 }
 
-void handleInput(Context& context, Scene& scene) {
+void handleInput(Context& context, RenderContext& rContext) {
 
     static int sLastMouseX = 0;
     static int sLastMouseY = 0;
@@ -57,28 +71,28 @@ void handleInput(Context& context, Scene& scene) {
             switch(evt.Key.Code) {
 
                 case sf::Key::W:
-                    scene.MoveCamera(1.0, 0.0);
+                    rContext.MoveCamera(1.0, 0.0);
                     break;
                 case sf::Key::S:
-                    scene.MoveCamera(-1.0, 0.0);
+                    rContext.MoveCamera(-1.0, 0.0);
                     break;
                 case sf::Key::A:
-                    scene.MoveCamera(0.0, -1.0);
+                    rContext.MoveCamera(0.0, -1.0);
                     break;
                 case sf::Key::D:
-                    scene.MoveCamera(0.0, 1.0);
+                    rContext.MoveCamera(0.0, 1.0);
                     break;
                 case sf::Key::Left:
-                    scene.MoveLight(0.0, -0.1);
+                    rContext.MoveLight(0.0, -0.1);
                     break;
                 case sf::Key::Right:
-                    scene.MoveLight(0.0, 0.1);
+                    rContext.MoveLight(0.0, 0.1);
                     break;
                 case sf::Key::Down:
-                    scene.MoveLight(-0.1, 0.0);
+                    rContext.MoveLight(-0.1, 0.0);
                     break;
                 case sf::Key::Up:
-                    scene.MoveLight(0.1, 0.0);
+                    rContext.MoveLight(0.1, 0.0);
                     break;
 
                 default:
@@ -99,7 +113,7 @@ void handleInput(Context& context, Scene& scene) {
             // Pan the camera
             // The arguments are +pitch and +yaw. Positive pitch looks up, positive yaw looks right.
             // Y is relative to the top of the window, X is relative to the left of the window.
-            scene.PanCamera(-(evt.MouseMove.Y - sLastMouseY), evt.MouseMove.X - sLastMouseX);
+            rContext.PanCamera(-(evt.MouseMove.Y - sLastMouseY), evt.MouseMove.X - sLastMouseX);
 
             // Save the new current value for next time
             sLastMouseX = evt.MouseMove.X;

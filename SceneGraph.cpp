@@ -1,5 +1,5 @@
 #include "SceneGraph.h"
-#include "Scene.h"
+#include "RenderContext.h"
 
 using std::list;
 using std::vector;
@@ -174,7 +174,7 @@ SceneMesh::AddVertex(SceneVertex& v)
 }
 
 void
-SceneMesh::EnvironmentMap(Scene& scene, Vector& eyePos)
+SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
 {
     // Flag that we're in the process of texture generation. This
     // disables rendering of this model, which is what we want when
@@ -224,13 +224,13 @@ SceneMesh::EnvironmentMap(Scene& scene, Vector& eyePos)
         // Up direction
         Vector up(sUpDirections[i][0], sUpDirections[i][1], sUpDirections[i][2], 0.0);
 
-        // Make our view matrix and apply it to the scene
+        // Make our view matrix and apply it to the rendering context
         Matrix cubeView;
         cubeView.LookAt(eyePos, center, up);
-        scene.SetView(cubeView);
+        renderContext.SetView(cubeView);
 
         // Render the scene to the back buffer
-        scene.Render();
+        renderContext.Render(*mSceneGraph);
 
         // Bind the cube texture
         GL_CHECK(glActiveTexture(ENV_TEXTURE_UNIT));
@@ -260,7 +260,7 @@ SceneMesh::EnvironmentMap(Scene& scene, Vector& eyePos)
     }
 
     // Reapply the camera to the scene
-    scene.SetViewToCamera();
+    renderContext.SetViewToCamera();
 
     // Reset the projection matrix and viewport
     mSceneGraph->context->SetupView();

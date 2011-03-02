@@ -9,7 +9,7 @@ LIBS = -framework sfml-audio \
 	-framework OpenGL \
 	-L/opt/local/lib -lassimp -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
 
-OBJS = Main.o Shader.o Scene.o Context.o Texture.o Material.o DepthRenderTarget.o \
+OBJS = Main.o Shader.o RenderContext.o Context.o Texture.o Material.o DepthRenderTarget.o \
        Vector.o Matrix.o SceneGraph.o
 
 %.o: %.cpp *.h

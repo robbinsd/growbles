@@ -8,7 +8,7 @@ LIBS = -Llinux/lib64 -Llinux/lib \
     -lGLU \
     -lGLEW
 
-OBJS = Main.o Shader.o Scene.o Context.o Texture.o Material.o DepthRenderTarget.o \
+OBJS = Main.o Shader.o RenderContext.o Context.o Texture.o Material.o DepthRenderTarget.o \
        Vector.o Matrix.o SceneGraph.o
 
 %.o: %.cpp *.h

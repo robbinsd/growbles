@@ -10,7 +10,7 @@
 
 #define CUBEMAP_SIDE_SIZE 500
 
-class Scene;
+class RenderContext;
 class SceneGraph;
 
 struct SceneVertex {
@@ -54,7 +54,7 @@ class SceneMesh {
     /*
      * Environment maps this mesh.
      */
-    void EnvironmentMap(Scene& scene, Vector& eyePos);
+    void EnvironmentMap(RenderContext& scene, Vector& eyePos);
 
     /*
      * Store the geometry in worldspace.

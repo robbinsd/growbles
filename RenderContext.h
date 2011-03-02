@@ -1,5 +1,5 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef RENDERCONTEXT_H
+#define RENDERCONTEXT_H
 
 #include "Framework.h"
 #include "Matrix.h"
@@ -23,19 +23,19 @@ typedef enum {
     SCENELIGHT_COUNT
 } SceneLightType;
 
-class Scene {
+class RenderContext {
 
 public:
 
     /*
      * Constructor.
      */
-    Scene();
+    RenderContext();
 
     /*
      * Destructor.
      */
-    ~Scene()
+    ~RenderContext()
     {
         mContext = NULL;
     }
@@ -48,7 +48,7 @@ public:
     /*
      * Render the scene.
      */
-    void Render();
+    void Render(SceneGraph& sceneGraph);
 
 
     /*
@@ -79,11 +79,6 @@ public:
 protected:
 
     /*
-     * Loads a scene.
-     */
-    const aiScene* LoadScene(Assimp::Importer* importer, const char* path);
-
-    /*
      * Called to set up our entire lighting scheme.
      */
     void LightingChanged();
@@ -97,7 +92,7 @@ protected:
     /*
      * Renders the shadow pass.
      */
-    void ShadowPass();
+    void ShadowPass(SceneGraph& sceneGraph);
 
     /*
      * Applies the current lighting scheme to OpenGL.
@@ -138,7 +133,6 @@ protected:
      * Instance variables.
      */
     Context* mContext;
-    SceneGraph mSceneGraph;
 
     // Lighting
     LightInfo mLights[SCENELIGHT_COUNT];
@@ -157,4 +151,4 @@ protected:
     bool mShadowsDirty;
 };
 
-#endif /* SCENE_H */
+#endif /* RENDERCONTEXT_H */
