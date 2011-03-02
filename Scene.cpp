@@ -33,14 +33,6 @@ Scene::Scene() : mContext(NULL)
     mYaw = 90.0;
 }
 
-// Brazier positions
-static float sBPos[][3] = { {-8.399, 0.65, 2.41},
-                            {0.125, 0.65, 2.41},
-                            {8.610, 0.65, 2.41},
-                            {-8.399, 0.65, -2.642},
-                            {0.125, 0.65, -2.642},
-                            {8.610, 0.65, -2.642} };
-
 void
 Scene::Init(Context& context)
 {
@@ -54,21 +46,6 @@ Scene::Init(Context& context)
     mSceneGraph.LoadScene(CATHEDRAL_PATH, "Cathedral", &mSceneGraph.rootNode);
     mSceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", &mSceneGraph.rootNode);
 
-    // Set up the collision detector
-    mSceneGraph.StoreGeometry(mCollisionDetector);
-    mCollisionDetector.BuildKDTree();
-
-    // Initialize our fire emitters
-    for (unsigned i = 0; i < sizeof(mFireEmitters) / sizeof(FireEmitter); ++i) {
-        mFireEmitters[i].Init(context, Vector(sBPos[i][0], sBPos[i][1],
-                                              sBPos[i][2], 0.0));
-        mSmokeEmitters[i].Init(context, Vector(sBPos[i][0], sBPos[i][1] + 0.5f,
-                                               sBPos[i][2], 0.0));
-    }
-
-    // Initialize the particle gun
-    mParticleGun.Init(context, &mCollisionDetector);
-
     // Make sure the shadow pass starts disabled
     SetShadowPassEnabled(false);
 
@@ -81,9 +58,6 @@ Scene::Init(Context& context)
 
     // Apply the camera
     SetViewToCamera();
-
-    // Reset the step clock
-    mStepClock.Reset();
 }
 
 void
@@ -98,10 +72,6 @@ Scene::Render()
 
     // Render our scenegraph
     mSceneGraph.Render();
-
-    // If we're not doing a shadow pass, render the particles
-    if (!mDoingShadowPass)
-        RenderParticleEmitters();
 
     // Unbind the shadow texture
     GL_CHECK(glActiveTexture(SHADOW_TEXTURE_UNIT));
@@ -148,22 +118,7 @@ Scene::MoveCamera(float forward, float right)
     // This vector is a vector in view space. Put it in world space and
     // apply it to our world space camera coordinates.
     direction = GeneratePanMatrix().Inverse().MVProduct(direction);
-    Vector newCameraPos = mCameraPos + direction;
-
-    // Model the camera as a sphere
-    Vector frontClearance = direction.Unit().Scale(CAMERA_NEAR);
-    Vector start = mCameraPos + frontClearance;
-    Vector end = newCameraPos + frontClearance;
-
-    GTriangle* collision = mCollisionDetector.Collide(start, end);
-
-    // If we don't collide with anything, just move
-    if (!collision)
-        mCameraPos = newCameraPos;
-
-    // Otherwise, move us as close as we can go
-    else
-        mCameraPos = collision->GetStoppingPoint(start, end) - frontClearance;
+    mCameraPos = mCameraPos + direction;
 
     // Re-send the camera info
     SetViewToCamera();
@@ -197,54 +152,6 @@ Scene::MoveLight(float x, float z)
     mLights[SCENELIGHT_DIRECTIONAL].position.z += z;
 
     LightingChanged();
-}
-
-void
-Scene::IncreaseBulletBounciness()
-{
-    mParticleGun.ModifyBounciness(0.1);
-}
-
-void
-Scene::DecreaseBulletBounciness()
-{
-    mParticleGun.ModifyBounciness(-0.1);
-}
-
-void
-Scene::IncreaseBulletSpeed()
-{
-    mParticleGun.ModifyParticleSpeed(1.0);
-}
-
-void
-Scene::DecreaseBulletSpeed()
-{
-    mParticleGun.ModifyParticleSpeed(-1.0);
-}
-
-void
-Scene::IncreaseBulletSpread()
-{
-    mParticleGun.ModifyParticleSpread(1.0);
-}
-
-void
-Scene::DecreaseBulletSpread()
-{
-    mParticleGun.ModifyParticleSpread(-1.0);
-}
-
-void
-Scene::IncreaseDownwardGravity()
-{
-    mParticleGun.ModifyGravity(-1.0);
-}
-
-void
-Scene::DecreaseDownwardGravity()
-{
-    mParticleGun.ModifyGravity(1.0);
 }
 
 void
@@ -320,11 +227,6 @@ Scene::SetViewToCamera()
     // Set the view matrix
     Matrix cameraMatrix = GenerateCameraMatrix();
     SetView(cameraMatrix);
-
-    // Our particle gun needs to know where to fire from
-    mParticleGun.SetInjectionLocation(mCameraPos +
-                                      GetCameraDirection().Scale(0.5f));
-    mParticleGun.SetInjectionDirection(GetCameraDirection());
 }
 
 Matrix
@@ -371,26 +273,6 @@ Scene::GeneratePanMatrix()
 
 
     return rv;
-}
-
-void
-Scene::RenderParticleEmitters()
-{
-    // Determine the step time
-    float stepTime = mStepClock.GetElapsedTime();
-    mStepClock.Reset();
-
-    // Fire + smoke emitters
-    for (unsigned i = 0; i < sizeof(mFireEmitters) / sizeof(FireEmitter); ++i) {
-        mFireEmitters[i].Step(stepTime);
-        mSmokeEmitters[i].Step(stepTime);
-        mFireEmitters[i].Render();
-        mSmokeEmitters[i].Render();
-    }
-
-    // Particle gun
-    mParticleGun.Step(stepTime);
-    mParticleGun.Render();
 }
 
 void
@@ -458,46 +340,4 @@ Scene::RenderShadowQuad()
     GL_CHECK(glPopMatrix());
     GL_CHECK(glMatrixMode(GL_PROJECTION));
     GL_CHECK(glPopMatrix());
-}
-
-void
-Scene::DrawCollidingTriangle()
-{
-    // Looking down the -z axis, right is +x and forward is -z
-    Vector direction(0.0, 0.0, -1.0, 1.0);
-
-    // This vector is a vector in view space. Put it in world space and
-    // apply it to our world space camera coordinates.
-    direction = GeneratePanMatrix().Inverse().MVProduct(direction);
-    Vector newCameraPos = mCameraPos + direction;
-
-    // Model the camera as a sphere
-    Vector frontClearance = direction.Unit().Scale(CAMERA_NEAR);
-    Vector start = mCameraPos + frontClearance;
-    Vector end = newCameraPos + frontClearance;
-
-    GTriangle* collision = mCollisionDetector.Collide(start, end);
-
-    // If we don't collide with anything, just return
-    if (!collision)
-        return;
-
-    // Draw the triangles slightly closer to the camera to avoid z-fighting
-    Vector biasDir = direction.Scale(-0.01);
-    Vector p1 = collision->p1 + biasDir;
-    Vector p2 = collision->p2 + biasDir;
-    Vector p3 = collision->p3 + biasDir;
-
-    // Disable the shader (use the fixed-function pipeline)
-    GL_CHECK(glUseProgram(0));
-
-    glBegin(GL_TRIANGLES);
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex3f(p1.x, p1.y, p1.z);
-    glVertex3f(p2.x, p2.y, p2.z);
-    glVertex3f(p3.x, p3.y, p3.z);
-    GL_CHECK(glEnd());
-
-    // Reenable the shader
-    GL_CHECK(glUseProgram(mContext->shader.programID()));
 }

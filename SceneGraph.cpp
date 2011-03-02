@@ -277,6 +277,10 @@ SceneMesh::EnvironmentMap(Scene& scene, Vector& eyePos)
     mSceneGraph->materials[mMaterial].mShininess = 500.0;
 }
 
+/*
+ * Commented out until we have another type of world model than the old
+ * collision detector.
+ *
 void
 SceneMesh::StoreGeometry(CollisionDetector& detector, Matrix transform)
 {
@@ -298,6 +302,7 @@ SceneMesh::StoreGeometry(CollisionDetector& detector, Matrix transform)
                              transform.MVProduct(vertices[2]));
     }
 }
+*/
 
 SceneNode::SceneNode(SceneGraph* scene, Matrix transform,
                      const char* name) : mSceneGraph(scene)
@@ -386,6 +391,9 @@ SceneNode::Render(Matrix base)
         (*it)->Render(trans);
 }
 
+/*
+ * Commented out until we have another world model than the old collision
+ * detector.
 void
 SceneNode::StoreGeometry(CollisionDetector& detector, Matrix modelMat)
 {
@@ -402,6 +410,7 @@ SceneNode::StoreGeometry(CollisionDetector& detector, Matrix modelMat)
          it != mChildren.end(); ++it)
         (*it)->StoreGeometry(detector, trans);
 }
+*/
 
 SceneGraph::SceneGraph() : rootNode(this, Matrix(), "248_SCENEGRAPH_ROOT")
 {
@@ -434,12 +443,6 @@ SceneGraph::FindMesh(const string& name)
         if (meshes[i].GetName() == name)
             return &meshes[i];
     return NULL;
-}
-
-void
-SceneGraph::StoreGeometry(CollisionDetector& detector)
-{
-    rootNode.StoreGeometry(detector, Matrix());
 }
 
 void

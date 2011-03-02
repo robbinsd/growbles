@@ -56,31 +56,6 @@ void handleInput(Context& context, Scene& scene) {
 
             switch(evt.Key.Code) {
 
-                case sf::Key::Num1:
-                    scene.DecreaseDownwardGravity();
-                    break;
-                case sf::Key::Num2:
-                    scene.IncreaseDownwardGravity();
-                    break;
-                case sf::Key::Num3:
-                    scene.IncreaseBulletBounciness();
-                    break;
-                case sf::Key::Num4:
-                    scene.DecreaseBulletBounciness();
-                    break;
-                case sf::Key::Num5:
-                    scene.IncreaseBulletSpeed();
-                    break;
-                case sf::Key::Num6:
-                    scene.DecreaseBulletSpeed();
-                    break;
-                case sf::Key::Num7:
-                    scene.IncreaseBulletSpread();
-                    break;
-                case sf::Key::Num8:
-                    scene.DecreaseBulletSpread();
-                    break;
-
                 case sf::Key::W:
                     scene.MoveCamera(1.0, 0.0);
                     break;
@@ -106,22 +81,6 @@ void handleInput(Context& context, Scene& scene) {
                     scene.MoveLight(0.1, 0.0);
                     break;
 
-                case sf::Key::Space:
-                    scene.SetGunFiring(true);
-                    break;
-
-                default:
-                    break;
-            }
-
-            break;
-
-        case sf::Event::KeyReleased:
-
-            switch (evt.Key.Code) {
-                case sf::Key::Space:
-                    scene.SetGunFiring(false);
-                    break;
                 default:
                     break;
             }

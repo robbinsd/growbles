@@ -7,7 +7,6 @@
 #include <string>
 #include "Material.h"
 #include "Matrix.h"
-#include "CollisionDetector.h"
 
 #define CUBEMAP_SIDE_SIZE 500
 
@@ -60,7 +59,7 @@ class SceneMesh {
     /*
      * Store the geometry in worldspace.
      */
-    void StoreGeometry(CollisionDetector& detector, Matrix transform);
+    //void StoreGeometry(CollisionDetector& detector, Matrix transform);
 
     protected:
 
@@ -126,7 +125,7 @@ class SceneNode {
     /*
      * Stores the geometry of this node in worldspace.
      */
-    void StoreGeometry(CollisionDetector& detector, Matrix modelMat);
+    //void StoreGeometry(CollisionDetector& detector, Matrix modelMat);
 
     protected:
 
@@ -194,11 +193,6 @@ struct SceneGraph {
      * Finds a mesh with the given name. NULL if not found.
      */
     SceneMesh* FindMesh(const std::string& name);
-
-    /*
-     * Dumps our geometry to a collision detector.
-     */
-    void StoreGeometry(CollisionDetector& detector);
 
     protected:
 
