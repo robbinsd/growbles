@@ -9,7 +9,7 @@ LIBS = -Llinux/lib64 -Llinux/lib \
     -lGLEW
 
 OBJS = Main.o Shader.o RenderContext.o Texture.o Material.o DepthRenderTarget.o \
-       Vector.o Matrix.o SceneGraph.o
+       Vector.o Matrix.o SceneGraph.o WorldModel.o
 
 %.o: %.cpp *.h
 	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $< -o $@

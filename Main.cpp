@@ -1,7 +1,7 @@
 #include "Framework.h"
-#include "Shader.h"
 #include "RenderContext.h"
 #include "SceneGraph.h"
+#include "WorldModel.h"
 #include <stdlib.h>
 
 #define ARMADILLO_PATH "scene/armadillo.3ds"
@@ -9,7 +9,7 @@
 #define SPHERE_PATH "scene/sphere.3ds"
 
 
-void handleInput(RenderContext& rContext);
+void handleInput(WorldModel& world, RenderContext& rContext);
 
 int main(int argc, char** argv) {
 
@@ -23,23 +23,41 @@ int main(int argc, char** argv) {
     // Declare and initialize our scenegraph
     SceneGraph sceneGraph;
     sceneGraph.Init(renderContext);
+
+    // Declare and initialize our world model
+    WorldModel world;
+    world.Init(sceneGraph);
+
+    // New functionality: The world model creates the scenegraph based on its
+    // internal model, and updates it appropriately in response to MotionState
+    // callbacks.
+    //
+    // We preserve the old cathedral functionality for the time being:
     sceneGraph.LoadScene(CATHEDRAL_PATH, "Cathedral", &sceneGraph.rootNode);
     sceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", &sceneGraph.rootNode);
     Vector emapPos(0.0, 3.0, 0.0, 1.0);
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
 
-    // Put your game loop here (i.e., render with OpenGL, update animation)
+    // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
 
-        handleInput(renderContext);
+        // Handle input, which can affect both the world and the rendering context
+        handleInput(world, renderContext);
+
+        // Step the world
+        world.Step();
+
+        // Render the scenegraph
         renderContext.Render(sceneGraph);
+
+        // Display the window
         renderContext.GetWindow()->Display();
     }
 
     return 0;
 }
 
-void handleInput(RenderContext& rContext) {
+void handleInput(WorldModel& world, RenderContext& rContext) {
 
     static int sLastMouseX = 0;
     static int sLastMouseY = 0;
