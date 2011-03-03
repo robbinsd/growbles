@@ -12,6 +12,14 @@ WorldModel::Step()
 {
 }
 
+void GetState(WorldState& stateOut)
+{
+}
+
+void SetState(WorldState& stateIn)
+{
+}
+
 void
 WorldModel::GrowPlayer(unsigned playerID)
 {

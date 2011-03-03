@@ -3,6 +3,11 @@
 
 class SceneGraph;
 
+// Struct containing all mutable world state
+struct WorldState {
+
+};
+
 class WorldModel {
 
     public:
@@ -16,6 +21,13 @@ class WorldModel {
      * Steps the model forward in time.
      */
     void Step();
+
+    /*
+     * Get/Set world state. Allows for rewinding.
+     */
+    void GetState(WorldState& stateOut);
+    void SetState(WorldState& stateIn);
+
 
     /*
      * Inputs
