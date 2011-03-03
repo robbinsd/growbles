@@ -1,4 +1,5 @@
 #include "Communicator.h"
+#include "WorldModel.h"
 #include "assert.h"
 
 Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
@@ -19,5 +20,10 @@ Communicator::SetNumClients(unsigned n)
 
 void
 Communicator::Connect()
+{
+}
+
+void
+Communicator::Synchronize(WorldModel& model)
 {
 }

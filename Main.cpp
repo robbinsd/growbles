@@ -76,6 +76,10 @@ int main(int argc, char** argv) {
         // Handle input, which can affect both the world and the rendering context
         handleInput(world, renderContext);
 
+        // Apply any state updates that may have come in, and send off any
+        // necessary updates.
+        communicator.Synchronize(world);
+
         // Step the world
         world.Step();
 

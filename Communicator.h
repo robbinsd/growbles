@@ -1,6 +1,8 @@
 #ifndef COMMUNICATOR_H
 #define COMMUNICATOR_H
 
+class WorldModel;
+
 typedef enum {
     COMMUNICATOR_MODE_CLIENT = 0,
     COMMUNICATOR_MODE_SERVER,
@@ -36,6 +38,12 @@ class Communicator {
      * have connected.
      */
     void Connect();
+
+    /*
+     * For clients: Send any new input to the server, apply world updates.
+     * For server: Handle input updates, send world updates.
+     */
+    void Synchronize(WorldModel& model);
 
     protected:
 
