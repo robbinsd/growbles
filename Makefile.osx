@@ -7,7 +7,7 @@ LIBS = -framework sfml-audio \
 	-framework sfml-system \
 	-framework GLUT \
 	-framework OpenGL \
-	-L/opt/local/lib -lassimp -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
+	-L/opt/local/lib -lassimp -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath -lSockets
 
 OBJS = Main.o Shader.o RenderContext.o Texture.o Material.o DepthRenderTarget.o \
        Vector.o Matrix.o SceneGraph.o WorldModel.o
