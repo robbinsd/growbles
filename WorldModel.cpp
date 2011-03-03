@@ -11,3 +11,13 @@ void
 WorldModel::Step()
 {
 }
+
+void
+WorldModel::GrowPlayer(unsigned playerID)
+{
+}
+
+void
+WorldModel::ShrinkPlayer(unsigned playerID)
+{
+}

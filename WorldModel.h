@@ -17,6 +17,12 @@ class WorldModel {
      */
     void Step();
 
+    /*
+     * Inputs
+     */
+    void GrowPlayer(unsigned playerID);
+    void ShrinkPlayer(unsigned playerID);
+
     protected:
 
     // The scenegraph associated with this world

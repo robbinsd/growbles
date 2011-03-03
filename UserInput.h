@@ -6,12 +6,15 @@
 class RenderContext;
 class WorldModel;
 
+#define USERINPUT_MASK_GROW (1 << 0)
+#define USERINPUT_MASK_SHRINK (1 << 1)
+
 struct UserInput {
 
     /*
      * Dumb constructor.
      */
-    UserInput() : mInputs(0) {};
+    UserInput(unsigned playerID, unsigned timestamp);
 
     /*
      * Loads input from the user.
@@ -29,7 +32,13 @@ struct UserInput {
     void ApplyInput(WorldModel& model);
 
     // Bitfield of inputs
-    uint32_t mInputs;
+    uint32_t inputs;
+
+    // Worldspace timestamp when the input was applied
+    uint32_t timestamp;
+
+    // ID of the player doing the input
+    uint32_t playerID;
 };
 
 #endif /* USERINPUT_H */

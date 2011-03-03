@@ -2,6 +2,13 @@
 #include "RenderContext.h"
 #include "WorldModel.h"
 
+UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
+                                                              , timestamp(timestamp_)
+                                                              , playerID(playerID_)
+{
+}
+
+
 void
 UserInput::LoadInput(RenderContext& context)
 {
@@ -85,6 +92,17 @@ UserInput::LoadInput(RenderContext& context)
          * we record them, and then apply them later.
          */
         switch (evt.Type) {
+            case sf::Event::KeyPressed:
+                switch(evt.Key.Code) {
+                    case sf::Key::I:
+                        inputs |= USERINPUT_MASK_GROW;
+                        break;
+                    case sf::Key::K:
+                        inputs |= USERINPUT_MASK_SHRINK;
+                        break;
+                    default:
+                        break;
+                }
             default:
                 break;
         }
@@ -94,5 +112,8 @@ UserInput::LoadInput(RenderContext& context)
 void
 UserInput::ApplyInput(WorldModel& model)
 {
-
+    if (inputs & USERINPUT_MASK_GROW)
+        model.GrowPlayer(playerID);
+    if (inputs & USERINPUT_MASK_SHRINK)
+        model.ShrinkPlayer(playerID);
 }

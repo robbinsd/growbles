@@ -18,6 +18,10 @@ int main(int argc, char** argv) {
     // Random seed
     srandom(123456);
 
+    // Dummy timestamp. This should be replaced with our actual
+    // timestamp once the game clock gets going.
+    unsigned currTimestamp = 123456;
+
     // Declare and initialize our rendering context
     RenderContext renderContext;
     renderContext.Init();
@@ -74,7 +78,7 @@ int main(int argc, char** argv) {
 
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
-        UserInput input;
+        UserInput input(communicator.GetPlayerID(), currTimestamp);
         input.LoadInput(renderContext);
         input.ApplyInput(world);
         communicator.SendInput(input);
