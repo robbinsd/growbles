@@ -3,6 +3,7 @@
 #include "assert.h"
 
 Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
+                                                  , mPlayerID(0)
 {
 }
 
@@ -21,6 +22,7 @@ Communicator::SetNumClients(unsigned n)
 void
 Communicator::Connect()
 {
+    // TODO - player ID logic
 }
 
 void

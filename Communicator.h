@@ -53,10 +53,18 @@ class Communicator {
      */
     void Synchronize(WorldModel& model);
 
+    /*
+     * Gets our player ID.
+     */
+    unsigned GetPlayerID() { return mPlayerID; } ;
+
     protected:
 
     // Client or server?
     CommunicatorMode mMode;
+
+    // Our player ID
+    unsigned mPlayerID;
 };
 
 #endif /* COMMUNICATOR_H */
