@@ -39,6 +39,21 @@ int main(int argc, char** argv) {
     // Declare our communicator
     Communicator communicator(mode);
 
+    // If we're a client, who are we connecting to?
+    if (mode == COMMUNICATOR_MODE_CLIENT)
+        communicator.SetServer(getOption(argc, argv, "-s"));
+
+    // Otherwise, how many clients are we waiting for?
+    else {
+        int numClients = atoi(getOption(argc, argv, "-n"));
+        if (numClients < 0)
+            printUsageAndExit(argv[0]);
+        communicator.SetNumClients((unsigned) numClients);
+    }
+
+    // Connect to the server/clients
+    communicator.Connect();
+
     // Declare and initialize our world model
     WorldModel world;
     world.Init(sceneGraph);
@@ -172,7 +187,7 @@ char* getOption(int argc, char** argv, const char* flag)
 
 void printUsageAndExit(char* programName)
 {
-    printf("Usage: %s -m [client,server]\n", programName);
+    printf("Usage: %s -m [client,server] [-s address | -n numClients]\n", programName);
     exit(-1);
 }
 

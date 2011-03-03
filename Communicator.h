@@ -16,6 +16,26 @@ class Communicator {
      */
     Communicator(CommunicatorMode mode);
 
+    /*
+     * Sets the server IP address. Only valid for client mode.
+     */
+    void SetServer(const char* server);
+
+    /*
+     * Sets the number of clients we're expecting. Only valid
+     * for server mode.
+     */
+    void SetNumClients(unsigned n);
+
+    /*
+     * Connects to the other communicator(s).
+     *
+     * For client mode, this establishes a connection to the server.
+     *
+     * For server mode, this waits until the appropriate number of clients
+     * have connected.
+     */
+    void Connect();
 
     protected:
 
