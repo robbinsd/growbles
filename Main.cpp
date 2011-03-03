@@ -2,6 +2,7 @@
 #include "RenderContext.h"
 #include "SceneGraph.h"
 #include "WorldModel.h"
+#include "Communicator.h"
 #include <stdlib.h>
 
 #define ARMADILLO_PATH "scene/armadillo.3ds"
@@ -10,6 +11,8 @@
 
 
 void handleInput(WorldModel& world, RenderContext& rContext);
+char* getOption(int argc, char** argv, const char* flag);
+void printUsageAndExit(char* programName);
 
 int main(int argc, char** argv) {
 
@@ -22,6 +25,19 @@ int main(int argc, char** argv) {
 
     // Declare an empty scenegraph
     SceneGraph sceneGraph;
+
+    // Client or server mode?
+    char* modeString = getOption(argc, argv, "-m");
+    CommunicatorMode mode = COMMUNICATOR_MODE_NONE;
+    if (!strcmp(modeString, "client"))
+        mode = COMMUNICATOR_MODE_CLIENT;
+    else if (!strcmp(modeString, "server"))
+        mode = COMMUNICATOR_MODE_SERVER;
+    else
+        printUsageAndExit(argv[0]);
+
+    // Declare our communicator
+    Communicator communicator(mode);
 
     // Declare and initialize our world model
     WorldModel world;
@@ -138,5 +154,25 @@ void handleInput(WorldModel& world, RenderContext& rContext) {
             break;
         }
     }
+}
+
+char* getOption(int argc, char** argv, const char* flag)
+{
+    // Search for the flag
+    for (int i = 0; i < argc - 1; ++i)
+        if (!strcmp(argv[i], flag))
+            return argv[i + 1];
+
+    // If the flag wasn't found, bail out.
+    printUsageAndExit(argv[0]);
+
+    // Not reached
+    return NULL;
+}
+
+void printUsageAndExit(char* programName)
+{
+    printf("Usage: %s -m [client,server]\n", programName);
+    exit(-1);
 }
 
