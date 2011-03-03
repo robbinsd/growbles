@@ -2,6 +2,7 @@
 #define COMMUNICATOR_H
 
 class WorldModel;
+class UserInput;
 
 typedef enum {
     COMMUNICATOR_MODE_CLIENT = 0,
@@ -38,6 +39,13 @@ class Communicator {
      * have connected.
      */
     void Connect();
+
+    /*
+     * Sends client input to the server.
+     *
+     * No-op if we're the server.
+     */
+    void SendInput(UserInput& input);
 
     /*
      * For clients: Send any new input to the server, apply world updates.

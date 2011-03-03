@@ -27,3 +27,8 @@ void
 Communicator::Synchronize(WorldModel& model)
 {
 }
+
+void
+Communicator::SendInput(UserInput& input)
+{
+}
