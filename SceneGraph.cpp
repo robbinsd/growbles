@@ -435,6 +435,22 @@ SceneGraph::FindMesh(const string& name)
     return NULL;
 }
 
+SceneNode*
+SceneGraph::AddNode(SceneNode* parent, Matrix transform, const char* name)
+{
+    // Make sure the name is unique
+    assert(rootNode.FindNode(name) == NULL);
+
+    // Generate the SceneNode
+    SceneNode* sceneNode = new SceneNode(this, transform, name);
+
+    // Attach this node to its parent
+    parent->AddChild(sceneNode);
+
+    // Return a pointer
+    return sceneNode;
+}
+
 void
 SceneGraph::LoadScene(RenderContext& renderContext,
                       const char* path, const char* sceneName,
@@ -492,19 +508,15 @@ SceneGraph::LoadNode(SceneNode* parent, aiNode* node, const char* sceneName,
     Matrix transform;
     transform.Set(node->mTransformation);
 
-    // Make the node name, and make sure it's unique
+    // Make the node name
     string nodeName = string(sceneName) + string("_") + string(node->mName.data);
-    assert(rootNode.FindNode(nodeName) == NULL);
 
-    // Generate the SceneNode
-    SceneNode* sceneNode = new SceneNode(this, transform, nodeName.c_str());
+    // Create and add the node
+    SceneNode* sceneNode = AddNode(parent, transform, nodeName.c_str());
 
     // Add the meshes
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
         sceneNode->AddMesh(node->mMeshes[i] + meshOffset);
-
-    // Attach this node to its parent
-    parent->AddChild(sceneNode);
 
     // Add the children
     for (unsigned i = 0; i < node->mNumChildren; ++i)
