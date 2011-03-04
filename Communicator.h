@@ -1,13 +1,18 @@
 #ifndef COMMUNICATOR_H
 #define COMMUNICATOR_H
 
+#include <Sockets/SocketHandler.h>
+
+#define GROWBLES_PORT 9323
+
 class WorldModel;
 class UserInput;
+class GrowblesSocket;
 
 typedef enum {
-    COMMUNICATOR_MODE_CLIENT = 0,
+    COMMUNICATOR_MODE_NONE = 0,
+    COMMUNICATOR_MODE_CLIENT,
     COMMUNICATOR_MODE_SERVER,
-    COMMUNICATOR_MODE_NONE
 } CommunicatorMode;
 
 class Communicator {
@@ -28,7 +33,7 @@ class Communicator {
      * Sets the number of clients we're expecting. Only valid
      * for server mode.
      */
-    void SetNumClients(unsigned n);
+    void SetNumClientsExpected(unsigned n);
 
     /*
      * Connects to the other communicator(s).
@@ -60,11 +65,26 @@ class Communicator {
 
     protected:
 
+    /*
+     * Connection routines for client and server.
+     */
+    void ConnectAsClient();
+    void ConnectAsServer();
+
     // Client or server?
     CommunicatorMode mMode;
 
     // Our player ID
     unsigned mPlayerID;
+
+    // Valid for servers
+    std::string mServerAddress;
+
+    // Valid for clients
+    unsigned mNumClientsExpected;
+
+    // Our socket handler
+    SocketHandler mSocketHandler;
 };
 
 #endif /* COMMUNICATOR_H */

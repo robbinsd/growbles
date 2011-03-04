@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         int numClients = atoi(getOption(argc, argv, "-n"));
         if (numClients < 0)
             printUsageAndExit(argv[0]);
-        communicator.SetNumClients((unsigned) numClients);
+        communicator.SetNumClientsExpected((unsigned) numClients);
     }
 
     // Connect to the server/clients
