@@ -1,4 +1,4 @@
-CXXFLAGS = -I/opt/local/include -Wall
+CXXFLAGS = -I/opt/local/include -Wall -g
 
 LIBS = -framework sfml-audio \
 	-framework sfml-network \
