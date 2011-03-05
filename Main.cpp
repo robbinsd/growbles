@@ -5,17 +5,18 @@
 //#include "Communicator.h"
 #include "UserInput.h"
 #include <stdlib.h>
-#include <GL/glut.h>
 
-#define ARMADILLO_PATH "scene/armadillo.3ds"
-#define CATHEDRAL_PATH "scene/cathedral.3ds"
-#define SPHERE_PATH "scene/sphere.3ds"
+#define WORLDMESH_PATH "scenefiles/worldmesh.3ds"
+#define ARMADILLO_PATH "scenefiles/armadillo.3ds"
+#define SPHERE_PATH "scenefiles/sphere.3ds"
+
+#define ARMADILLO_BASE_Y 3.3
 
 char* getOption(int argc, char** argv, const char* flag);
 void printUsageAndExit(char* programName);
-void initOpenGL();
 
 int main(int argc, char** argv) {
+
     // Random seed
 #ifdef _WIN32
 	srand(123456);
@@ -27,8 +28,6 @@ int main(int argc, char** argv) {
     // timestamp once the game clock gets going.
     unsigned currTimestamp = 123456;
 
-	// Make sure we Initialize OpenGL before calling any GL functions
-	
     // Declare and initialize our rendering context
     RenderContext renderContext;
     renderContext.Init();
@@ -72,12 +71,16 @@ int main(int argc, char** argv) {
     // internal model, and updates it appropriately in response to MotionState
     // callbacks.
     //
-    // We preserve the old cathedral functionality for the time being:
-    sceneGraph.LoadScene(renderContext, CATHEDRAL_PATH, "Cathedral",
+    // We preserve the old functionality for the time being:
+    sceneGraph.LoadScene(renderContext, WORLDMESH_PATH, "WorldMesh",
                          &sceneGraph.rootNode);
+    Matrix armTransform;
+    armTransform.Translate(0.0, ARMADILLO_BASE_Y, 0.0);
+    SceneNode* armParent = sceneGraph.AddNode(&sceneGraph.rootNode, armTransform,
+                                              "armadilloParent");
     sceneGraph.LoadScene(renderContext, ARMADILLO_PATH, "Armadillo",
-                         &sceneGraph.rootNode);
-    Vector emapPos(0.0, 3.0, 0.0, 1.0);
+                         armParent);
+    Vector emapPos(0.0, 3.0 + ARMADILLO_BASE_Y, 0.0, 1.0);
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
 
     // Top level game loop
