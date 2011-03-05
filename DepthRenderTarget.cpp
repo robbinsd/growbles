@@ -1,7 +1,12 @@
 #include "DepthRenderTarget.h"
 #include <assert.h>
 
-DepthRenderTarget::DepthRenderTarget(unsigned int width, unsigned int height) {
+DepthRenderTarget::DepthRenderTarget() : initialized_(false)
+{
+}
+
+void
+DepthRenderTarget::Init(unsigned int width, unsigned int height) {
     width_ = width;
     height_ = height;
 
@@ -40,12 +45,19 @@ DepthRenderTarget::DepthRenderTarget(unsigned int width, unsigned int height) {
     GL_CHECK(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
     GL_CHECK(glDrawBuffer(GL_BACK));
+
+    // Mark us as initialized
+    initialized_ = true;
 }
 
 DepthRenderTarget::~DepthRenderTarget() {
-    GL_CHECK(glDeleteFramebuffersEXT(1, &frameBufferID_));
-    GL_CHECK(glDeleteRenderbuffersEXT(1, &depthBufferID_));
-    GL_CHECK(glDeleteTextures(1, &textureID_));
+
+    // If we were initialized, release resources
+    if (initialized_) {
+        GL_CHECK(glDeleteFramebuffersEXT(1, &frameBufferID_));
+        GL_CHECK(glDeleteRenderbuffersEXT(1, &depthBufferID_));
+        GL_CHECK(glDeleteTextures(1, &textureID_));
+    }
 }
 
 GLuint DepthRenderTarget::textureID() const {
