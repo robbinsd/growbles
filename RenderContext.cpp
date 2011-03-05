@@ -2,9 +2,7 @@
 
 using std::vector;
 
-RenderContext::RenderContext() : mShadowTarget(SHADOW_TEXTURE_WIDTH,
-                                               SHADOW_TEXTURE_HEIGHT)
-                               , mDoingShadowPass(false)
+RenderContext::RenderContext() : mDoingShadowPass(false)
                                , mShadowsDirty(true)
                                , mWindowSettings(24, 8, 2)
                                , mWindow(sf::VideoMode(800, 600), "Growbles",
@@ -68,6 +66,9 @@ RenderContext::Init()
     // Initialize and use our shaders
     mShader.Init();
     GL_CHECK(glUseProgram(mShader.programID()));
+
+    // Initialize the shadow buffer
+    mShadowTarget.Init(SHADOW_TEXTURE_WIDTH, SHADOW_TEXTURE_HEIGHT);
 
     // Setup the view system
     SetViewportAndProjection();

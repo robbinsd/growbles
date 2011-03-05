@@ -1,7 +1,7 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
+#include "SceneGraph.h"
 
-class SceneGraph;
 
 // Struct containing all mutable world state
 struct WorldState {

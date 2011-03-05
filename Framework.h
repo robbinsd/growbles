@@ -18,16 +18,16 @@
 #include <SFML/Graphics/Image.hpp>
 
 // Open Asset Import Library
-#ifndef __linux__
-#include <assimp/assimp.hpp>
-#include <assimp/aiScene.h>
-#include <assimp/aiPostProcess.h>
-#include <assimp/aiMaterial.h>
-#else
+#if defined __linux__ || defined _WIN32
 #include <assimp.hpp>
 #include <aiScene.h>
 #include <aiPostProcess.h>
 #include <aiMaterial.h>
+#else
+#include <assimp/assimp.hpp>
+#include <assimp/aiScene.h>
+#include <assimp/aiPostProcess.h>
+#include <assimp/aiMaterial.h>
 #endif
 
 #include <memory>
