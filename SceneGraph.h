@@ -168,6 +168,13 @@ struct SceneGraph {
     ~SceneGraph();
 
     /*
+     * Adds a node to the scenegraph.
+     *
+     * Returns a pointer to the added node.
+     */
+    SceneNode* AddNode(SceneNode* parent, Matrix transform, const char* name);
+
+    /*
      * Adds an aiScene, descending from the given node.
      */
     void LoadScene(RenderContext& renderContext,

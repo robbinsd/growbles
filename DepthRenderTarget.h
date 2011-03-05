@@ -6,12 +6,17 @@
 class DepthRenderTarget {
 public:
     /**
-     * Creates a new depth render target, for render to texture.  When this
+     * Dummy constructor.
+     */
+    DepthRenderTarget();
+
+    /*
+     * Initializes the depth render target, for render to texture. When this
      * target is bound using the bind() method, all OpenGL rendering is
      * directed into the texture.  The texture can be obtained by calling
      * the texture() function.
      */
-    DepthRenderTarget(unsigned int width, unsigned int height);
+    void Init(unsigned int width, unsigned int height);
 
     /**
      * Releases the texture and the underlying framebuffer object.
@@ -41,6 +46,7 @@ private:
     GLuint depthBufferID_;
     GLuint width_;
     GLuint height_;
+    bool initialized_;
 
 };
 

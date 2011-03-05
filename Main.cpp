@@ -1,128 +1,128 @@
 #include "Framework.h"
-#include "Shader.h"
+#include "RenderContext.h"
+#include "SceneGraph.h"
+#include "WorldModel.h"
+//#include "Communicator.h"
+#include "UserInput.h"
+#include <stdlib.h>
+#include <GL/glut.h>
 
-#define MODEL_PATH "models/teapot.3ds"
+#define ARMADILLO_PATH "scene/armadillo.3ds"
+#define CATHEDRAL_PATH "scene/cathedral.3ds"
+#define SPHERE_PATH "scene/sphere.3ds"
 
-// Note: See the SMFL documentation for info on setting up fullscreen mode
-// and using rendering settings
-// http://www.sfml-dev.org/tutorials/1.6/window-window.php
-sf::WindowSettings settings(24, 8, 2);
-sf::Window window(sf::VideoMode(800, 600), "CS248 Rules!", sf::Style::Close, settings);
- 
-// This is a clock you can use to control animation.  For more info, see:
-// http://www.sfml-dev.org/tutorials/1.6/window-time.php
-sf::Clock clck;
-
-// This creates an asset importer using the Open Asset Import library.
-// It automatically manages resources for you, and frees them when the program
-// exits.
-Assimp::Importer importer;
-const aiScene* scene;
-
+char* getOption(int argc, char** argv, const char* flag);
+void printUsageAndExit(char* programName);
 void initOpenGL();
-void loadAssets();
-void handleInput();
-void renderFrame();
 
 int main(int argc, char** argv) {
+    // Random seed
+#ifdef _WIN32
+	srand(123456);
+#else
+    srandom(123456);
+#endif
 
-    initOpenGL();
-    loadAssets();
+    // Dummy timestamp. This should be replaced with our actual
+    // timestamp once the game clock gets going.
+    unsigned currTimestamp = 123456;
 
-    // Put your game loop here (i.e., render with OpenGL, update animation)
-    while (window.IsOpened()) {
+	// Make sure we Initialize OpenGL before calling any GL functions
+	
+    // Declare and initialize our rendering context
+    RenderContext renderContext;
+    renderContext.Init();
 
-        handleInput();
-        renderFrame();
-        window.Display();
+    // Declare an empty scenegraph
+    SceneGraph sceneGraph;
+
+    // Client or server mode?
+    /*char* modeString = getOption(argc, argv, "-m");
+    CommunicatorMode mode = COMMUNICATOR_MODE_NONE;
+    if (!strcmp(modeString, "client"))
+        mode = COMMUNICATOR_MODE_CLIENT;
+    else if (!strcmp(modeString, "server"))
+        mode = COMMUNICATOR_MODE_SERVER;
+    else
+        printUsageAndExit(argv[0]);
+
+    // Declare our communicator
+    Communicator communicator(mode);
+
+    // If we're a client, who are we connecting to?
+    if (mode == COMMUNICATOR_MODE_CLIENT)
+        communicator.SetServer(getOption(argc, argv, "-s"));
+
+    // Otherwise, how many clients are we waiting for?
+    else {
+        int numClients = atoi(getOption(argc, argv, "-n"));
+        if (numClients < 0)
+            printUsageAndExit(argv[0]);
+        communicator.SetNumClientsExpected((unsigned) numClients);
+    }
+
+    // Connect to the server/clients
+    communicator.Connect();*/
+
+    // Declare and initialize our world model
+    WorldModel world;
+    world.Init(sceneGraph);
+
+    // New functionality: The world model creates the scenegraph based on its
+    // internal model, and updates it appropriately in response to MotionState
+    // callbacks.
+    //
+    // We preserve the old cathedral functionality for the time being:
+    sceneGraph.LoadScene(renderContext, CATHEDRAL_PATH, "Cathedral",
+                         &sceneGraph.rootNode);
+    sceneGraph.LoadScene(renderContext, ARMADILLO_PATH, "Armadillo",
+                         &sceneGraph.rootNode);
+    Vector emapPos(0.0, 3.0, 0.0, 1.0);
+    sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
+
+    // Top level game loop
+    while (renderContext.GetWindow()->IsOpened()) {
+
+        // Handle input. Local input is applied immediately, global input
+        // is recorded so that we can send it over the network.
+        /*UserInput input(communicator.GetPlayerID(), currTimestamp);
+        input.LoadInput(renderContext);
+        input.ApplyInput(world);
+        communicator.SendInput(input);
+
+        // Apply any state updates that may have come in, and send off any
+        // necessary updates.
+        communicator.Synchronize(world);*/
+
+        // Step the world
+        world.Step();
+
+        // Render the scenegraph
+        renderContext.Render(sceneGraph);
+
+        // Display the window
+        renderContext.GetWindow()->Display();
     }
 
     return 0;
 }
 
+char* getOption(int argc, char** argv, const char* flag)
+{
+    // Search for the flag
+    for (int i = 0; i < argc - 1; ++i)
+        if (!strcmp(argv[i], flag))
+            return argv[i + 1];
 
+    // If the flag wasn't found, bail out.
+    printUsageAndExit(argv[0]);
 
-void initOpenGL() {
-    // Initialize GLEW on Windows, to make sure that OpenGL 2.0 is loaded
-#ifdef FRAMEWORK_USE_GLEW
-    GLint error = glewInit();
-    if (GLEW_OK != error) {
-        std::cerr << glewGetErrorString(error) << std::endl;
-        exit(-1);
-    }
-    if (!GLEW_VERSION_2_0) {
-        std::cerr << "This program requires OpenGL 2.0" << std::endl;
-        exit(-1);
-    }
-#endif
-
-    // This initializes OpenGL with some common defaults.  More info here:
-    // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
-    glClearDepth(1.0f);
-    glClearColor(0.15f, 0.15f, 0.15f, 0.15f);
-    glEnable(GL_DEPTH_TEST);
-    glViewport(0, 0, window.GetWidth(), window.GetHeight());
+    // Not reached
+    return NULL;
 }
 
-
-
-
-void loadAssets() {
-    // Read in an asset file, and do some post-processing.  There is much 
-    // more you can do with this asset loader, including load textures.
-    // More info is here:
-    // http://assimp.sourceforge.net/lib_html/usage.html
-    scene = importer.ReadFile(MODEL_PATH,  
-        aiProcess_CalcTangentSpace |
-        aiProcess_Triangulate |
-        aiProcess_JoinIdenticalVertices |
-        aiProcessPreset_TargetRealtime_Quality);
-
-    if (!scene || scene->mNumMeshes <= 0) {
-        std::cerr << importer.GetErrorString() << std::endl;
-        exit(-1);
-    }
-        
-    //////////////////////////////////////////////////////////////////////////
-    // TODO: LOAD YOUR SHADERS/TEXTURES
-    //////////////////////////////////////////////////////////////////////////
-}
-
-
-
-
-void handleInput() {
-    //////////////////////////////////////////////////////////////////////////
-    // TODO: ADD YOUR INPUT HANDLING HERE. 
-    //////////////////////////////////////////////////////////////////////////
-
-    // Event loop, for processing user input, etc.  For more info, see:
-    // http://www.sfml-dev.org/tutorials/1.6/window-events.php
-    sf::Event evt;
-    while (window.GetEvent(evt)) {
-        switch (evt.Type) {
-        case sf::Event::Closed: 
-            // Close the window.  This will cause the game loop to exit,
-            // because the IsOpened() function will no longer return true.
-            window.Close(); 
-            break;
-        case sf::Event::Resized: 
-            // If the window is resized, then we need to change the perspective
-            // transformation and viewport
-            glViewport(0, 0, evt.Size.Width, evt.Size.Height);
-            break;
-        }
-    }
-}
-
-
-
-
-
-void renderFrame() {
-    //////////////////////////////////////////////////////////////////////////
-    // TODO: ADD YOUR RENDERING CODE HERE.  You may use as many .cpp files 
-    // in this assignment as you wish.
-    //////////////////////////////////////////////////////////////////////////
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void printUsageAndExit(char* programName)
+{
+    printf("Usage: %s -m [client,server] [-s address | -n numClients]\n", programName);
+    exit(-1);
 }
