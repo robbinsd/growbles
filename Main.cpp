@@ -5,6 +5,7 @@
 #include "Communicator.h"
 #include "UserInput.h"
 #include <stdlib.h>
+#include "Player.h"
 
 #define WORLDMESH_PATH "scenefiles/worldmesh.3ds"
 #define ARMADILLO_PATH "scenefiles/armadillo.3ds"
@@ -70,21 +71,46 @@ int main(int argc, char** argv) {
     // We preserve the old functionality for the time being:
     sceneGraph.LoadScene(renderContext, WORLDMESH_PATH, "WorldMesh",
                          &sceneGraph.rootNode);
+    // add armidillo to the scene
     Matrix armTransform;
     armTransform.Translate(0.0, ARMADILLO_BASE_Y, 0.0);
     SceneNode* armParent = sceneGraph.AddNode(&sceneGraph.rootNode, armTransform,
                                               "armadilloParent");
     sceneGraph.LoadScene(renderContext, ARMADILLO_PATH, "Armadillo",
                          armParent);
+    
+    // add a player to the scene
+    Matrix sphereTransform;
+    sphereTransform.Translate(-8.0, 2.0, 0.0);
+    SceneNode* sphereParent = sceneGraph.AddNode(&sceneGraph.rootNode, sphereTransform,
+                                              "sphereParent");
+    sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere",
+                         sphereParent);
+    Player player1(sphereParent);
+    world.SetPlayer(&player1);
+    
+    // add a second player to the scene
+    Matrix sphere2Transform;
+    sphere2Transform.Translate(-4.0, 2.0, 4.0);
+    SceneNode* sphere2Parent = sceneGraph.AddNode(&sceneGraph.rootNode, sphere2Transform,
+                                                 "sphere2Parent");
+    sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere2",
+                         sphere2Parent);
+    Player player2(sphere2Parent);
+    world.SetPlayer(&player2);
+    
+    // environment map
     Vector emapPos(0.0, 3.0 + ARMADILLO_BASE_Y, 0.0, 1.0);
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
+    
+    UserInput input(communicator.GetPlayerID(), currTimestamp);
 
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
 
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
-        UserInput input(communicator.GetPlayerID(), currTimestamp);
+        input.resetInputState();
         input.LoadInput(renderContext);
         input.ApplyInput(world);
         communicator.SendInput(input);

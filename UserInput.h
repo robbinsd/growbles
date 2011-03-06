@@ -8,6 +8,10 @@ class WorldModel;
 
 #define USERINPUT_MASK_GROW (1 << 0)
 #define USERINPUT_MASK_SHRINK (1 << 1)
+#define USERINPUT_MASK_UP (1 << 2)
+#define USERINPUT_MASK_DOWN (1 << 3)
+#define USERINPUT_MASK_LEFT (1 << 4)
+#define USERINPUT_MASK_RIGHT (1 << 5)
 
 struct UserInput {
 
@@ -39,6 +43,18 @@ struct UserInput {
 
     // ID of the player doing the input
     uint32_t playerID;
+    
+    // flag to denote if a key is down
+    bool keyDown;
+    
+    // flag to denote if a key is released
+    bool keyReleased;
+    
+    /*
+     * Reset variables associated with this input object
+     * this is necessary every time through the main game loop
+     */
+    void resetInputState();
 };
 
 #endif /* USERINPUT_H */

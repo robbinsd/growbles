@@ -5,6 +5,8 @@
 UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
                                                               , timestamp(timestamp_)
                                                               , playerID(playerID_)
+                                                              , keyDown(false)
+                                                              , keyReleased(false)
 {
 }
 
@@ -100,9 +102,25 @@ UserInput::LoadInput(RenderContext& context)
                     case sf::Key::K:
                         inputs |= USERINPUT_MASK_SHRINK;
                         break;
+                    case sf::Key::T:
+                        inputs |= USERINPUT_MASK_UP;
+                        break;
+                    case sf::Key::G:
+                        inputs |= USERINPUT_MASK_DOWN;
+                        break;
+                    case sf::Key::F:
+                        inputs |= USERINPUT_MASK_LEFT;
+                        break;
+                    case sf::Key::H:
+                        inputs |= USERINPUT_MASK_RIGHT;
+                        break;
                     default:
                         break;
                 }
+                break;
+            case sf::Event::KeyReleased:
+                keyReleased = true;
+                break;
             default:
                 break;
         }
@@ -112,8 +130,29 @@ UserInput::LoadInput(RenderContext& context)
 void
 UserInput::ApplyInput(WorldModel& model)
 {
-    if (inputs & USERINPUT_MASK_GROW)
+    if(inputs && keyDown == false) {
+        keyDown = true;
+    }
+    if(keyReleased) {
+        keyDown = false;
+        inputs = 0;
+    }
+    if(keyDown && inputs & USERINPUT_MASK_GROW)
         model.GrowPlayer(playerID);
-    if (inputs & USERINPUT_MASK_SHRINK)
+    if (keyDown && inputs & USERINPUT_MASK_SHRINK)
         model.ShrinkPlayer(playerID);
+    if (keyDown && inputs & USERINPUT_MASK_UP)
+        model.MovePlayer(playerID, USERINPUT_MASK_UP);
+    if (keyDown && inputs & USERINPUT_MASK_DOWN)
+        model.MovePlayer(playerID, USERINPUT_MASK_DOWN);
+    if (keyDown && inputs & USERINPUT_MASK_LEFT)
+        model.MovePlayer(playerID, USERINPUT_MASK_LEFT);
+    if (keyDown && inputs & USERINPUT_MASK_RIGHT)
+        model.MovePlayer(playerID, USERINPUT_MASK_RIGHT);
+}
+
+void
+UserInput::resetInputState()
+{
+    keyReleased = false;
 }
