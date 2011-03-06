@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     Matrix sphereTransform;
     sphereTransform.Translate(-8.0, 2.0, 0.0);
     SceneNode* sphereParent = sceneGraph.AddNode(&sceneGraph.rootNode, sphereTransform,
-                                              "sphereParent");
+                                                 "sphereParent");
     sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere",
                          sphereParent);
     Player player1(sphereParent);
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     Matrix sphere2Transform;
     sphere2Transform.Translate(-4.0, 2.0, 4.0);
     SceneNode* sphere2Parent = sceneGraph.AddNode(&sceneGraph.rootNode, sphere2Transform,
-                                                 "sphere2Parent");
+                                                  "sphere2Parent");
     sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere2",
                          sphere2Parent);
     Player player2(sphere2Parent);

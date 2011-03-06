@@ -14,8 +14,8 @@ Player::Player(SceneNode* playerSceneNode) : playerNode(playerSceneNode)
 }
 
 void
-Player::move(float x, float y, float z) {
+Player::Move(float x, float y, float z) {
     Matrix moveMatrix;
     moveMatrix.Translate(x, y, z);
-    playerNode->applyTransform(moveMatrix);
+    playerNode->ApplyTransform(moveMatrix);
 }

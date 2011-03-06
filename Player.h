@@ -25,7 +25,7 @@ public:
     /*
      * move the player
      */
-    void move(float x, float y, float z);
+    void Move(float x, float y, float z);
     
     // the node in the scene that contains the mesh for the player
     SceneNode* playerNode;

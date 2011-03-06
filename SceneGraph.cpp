@@ -361,7 +361,7 @@ SceneNode::FindNode(const string& name)
 }
 
 void
-SceneNode::applyTransform(Matrix transform) {
+SceneNode::ApplyTransform(Matrix transform) {
     mTransform = mTransform.MMProduct(transform);
 }
 

@@ -3,11 +3,6 @@
 
 #include "Player.h"
 
-#define USERINPUT_MASK_UP (1 << 2)
-#define USERINPUT_MASK_DOWN (1 << 3)
-#define USERINPUT_MASK_LEFT (1 << 4)
-#define USERINPUT_MASK_RIGHT (1 << 5)
-
 class SceneGraph;
 
 // Struct containing all mutable world state

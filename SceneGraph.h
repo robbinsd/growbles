@@ -126,7 +126,7 @@ class SceneNode {
      * Applies a tranformation to the node, can be used
      * to move/rotate meshes
      */
-    void applyTransform(Matrix transform);
+    void ApplyTransform(Matrix transform);
 
     /*
      * Stores the geometry of this node in worldspace.
