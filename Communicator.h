@@ -9,6 +9,7 @@
 class WorldModel;
 class UserInput;
 class GrowblesSocket;
+struct SceneGraph;
 
 typedef enum {
     COMMUNICATOR_MODE_NONE = 0,
@@ -58,6 +59,11 @@ class Communicator {
      * For server: Handle input updates, send world updates.
      */
     void Synchronize(WorldModel& model);
+
+    /*
+     * Initializes a world.
+     */
+    void InitWorld(WorldModel& world, SceneGraph& sceneGraph);
 
     /*
      * Gets our player ID.

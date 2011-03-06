@@ -9,7 +9,9 @@
 
 #include "Player.h"
 
-Player::Player(SceneNode* playerSceneNode) : playerNode(playerSceneNode)
+Player::Player(unsigned playerID,
+               SceneNode* playerSceneNode) : mPlayerID(playerID)
+                                           ,  mPlayerNode(playerSceneNode)
 {
 }
 
@@ -17,5 +19,5 @@ void
 Player::Move(float x, float y, float z) {
     Matrix moveMatrix;
     moveMatrix.Translate(x, y, z);
-    playerNode->ApplyTransform(moveMatrix);
+    mPlayerNode->ApplyTransform(moveMatrix);
 }

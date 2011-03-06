@@ -20,15 +20,25 @@ public:
     /*
      * constructor
      */
-    Player(SceneNode* playerSceneNode);
+    Player(unsigned playerID, SceneNode* playerSceneNode);
     
     /*
      * move the player
      */
     void Move(float x, float y, float z);
-    
+
+    /*
+     * Gets the ID of this player.
+     */
+    unsigned GetPlayerID() { return mPlayerID; } ;
+
+    protected:
+
+    // The ID of the player
+    unsigned mPlayerID;
+
     // the node in the scene that contains the mesh for the player
-    SceneNode* playerNode;
+    SceneNode* mPlayerNode;
 };
 
 #endif /* PLAYER_H */

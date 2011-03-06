@@ -1,8 +1,9 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
-#include "SceneGraph.h"
 
+#include "SceneGraph.h"
 #include "Player.h"
+#include <vector>
 
 class SceneGraph;
 
@@ -21,6 +22,11 @@ class WorldModel {
     void Init(SceneGraph& sceneGraph);
 
     /*
+     * Destructor.
+     */
+    ~WorldModel();
+
+    /*
      * Steps the model forward in time.
      */
     void Step();
@@ -30,12 +36,18 @@ class WorldModel {
      */
     void GetState(WorldState& stateOut);
     void SetState(WorldState& stateIn);
-    
-    /*
-     * Set the player to the specified player object
-     */
-    void SetPlayer(Player* p);
 
+    /*
+     * Adds a player to the world.
+     */
+    void AddPlayer(unsigned playerID, Vector initialPosition);
+
+    /*
+     * Gets a player by ID.
+     *
+     * Returns NULL if none is found.
+     */
+    Player* GetPlayer(unsigned playerID);
 
     /*
      * Inputs
@@ -48,9 +60,9 @@ class WorldModel {
 
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;
-    
-    // player
-    Player* player;
+
+    // The players
+    std::vector<Player*> mPlayers;
 };
 
 #endif /* WORLDMODEL_H */
