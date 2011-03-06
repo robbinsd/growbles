@@ -47,14 +47,38 @@ class WorldModel {
     void GrowPlayer(unsigned playerID);
     void ShrinkPlayer(unsigned playerID);
     void MovePlayer(unsigned playerID, int direction);
+    
+    /*
+     * Set up physics simulation
+     */
+    void SetupPhysicsSimulation();
+    
+    /*
+     * Clean up all the memory allocated for physics simulation
+     */
+    void DestroyPhysicsSimulation();
 
     protected:
 
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;
     
-    // player
+    // Player
     Player* player;
+    
+    // Physics Simulation
+    btBroadphaseInterface* broadphase;
+    btDefaultCollisionConfiguration* collisionConfiguration;
+    btCollisionDispatcher* dispatcher;
+    btSequentialImpulseConstraintSolver* solver;
+    btDiscreteDynamicsWorld* dynamicsWorld;
+    // ground
+    btCollisionShape* groundShape;
+    btRigidBody* groundRigidBody;
+    // sphere
+    btCollisionShape* fallShape;
+    btRigidBody* fallRigidBody;
+    
 };
 
 #endif /* WORLDMODEL_H */

@@ -81,22 +81,22 @@ int main(int argc, char** argv) {
     
     // add a player to the scene
     Matrix sphereTransform;
-    sphereTransform.Translate(-8.0, 2.0, 0.0);
+    //sphereTransform.Translate(-8.0, 2.0, 0.0);
     SceneNode* sphereParent = sceneGraph.AddNode(&sceneGraph.rootNode, sphereTransform,
                                               "sphereParent");
     sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere",
                          sphereParent);
-    Player player1(sphereParent);
+    Player player1(sphereParent, -8.0, 2.0, 0.0);
     world.SetPlayer(&player1);
     
     // add a second player to the scene
     Matrix sphere2Transform;
-    sphere2Transform.Translate(-4.0, 2.0, 4.0);
+    //sphere2Transform.Translate(-4.0, 2.0, 4.0);
     SceneNode* sphere2Parent = sceneGraph.AddNode(&sceneGraph.rootNode, sphere2Transform,
                                                  "sphere2Parent");
     sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere2",
                          sphere2Parent);
-    Player player2(sphere2Parent);
+    Player player2(sphere2Parent, -4.0, 2.0, 4.0);
     world.SetPlayer(&player2);
     
     // environment map
@@ -104,6 +104,9 @@ int main(int argc, char** argv) {
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
     
     UserInput input(communicator.GetPlayerID(), currTimestamp);
+    
+    // set up physics simulation
+    world.SetupPhysicsSimulation();
 
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
@@ -128,6 +131,9 @@ int main(int argc, char** argv) {
         // Display the window
         renderContext.GetWindow()->Display();
     }
+    
+    // free memory used for physics simulation
+    world.DestroyPhysicsSimulation();
 
     return 0;
 }

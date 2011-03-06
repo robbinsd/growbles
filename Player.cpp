@@ -9,13 +9,43 @@
 
 #include "Player.h"
 
-Player::Player(SceneNode* playerSceneNode) : playerNode(playerSceneNode)
+Player::Player(SceneNode* playerSceneNode, float xin, float yin, float zin) : playerNode(playerSceneNode),
+                                                                              x(0.0),
+                                                                              y(0.0),
+                                                                              z(0.0)
 {
+    this->moveTo(xin, yin, zin);
 }
 
 void
-Player::move(float x, float y, float z) {
+Player::move(float xin, float yin, float zin) {
     Matrix moveMatrix;
-    moveMatrix.Translate(x, y, z);
+    moveMatrix.Translate(xin, yin, zin);
     playerNode->applyTransform(moveMatrix);
+    x += xin;
+    y += yin;
+    z += zin;
+}
+
+void
+Player::moveTo(float xin, float yin, float zin) {
+    float moveX = xin - x;
+    float moveY = yin - y;
+    float moveZ = zin - z;
+    this->move(moveX, moveY, moveZ);
+}
+
+float
+Player::getX() {
+    return x;
+}
+
+float
+Player::getY() {
+    return y;
+}
+
+float
+Player::getZ() {
+    return z;
 }
