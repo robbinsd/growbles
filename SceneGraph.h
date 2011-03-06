@@ -11,7 +11,7 @@
 #define CUBEMAP_SIDE_SIZE 500
 
 class RenderContext;
-class SceneGraph;
+struct SceneGraph;
 
 struct SceneVertex {
 

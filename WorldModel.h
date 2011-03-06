@@ -1,5 +1,6 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
+#include "SceneGraph.h"
 
 #include "Player.h"
 

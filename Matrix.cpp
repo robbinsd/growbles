@@ -1,4 +1,7 @@
 #include "Matrix.h"
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 #include <assert.h>
 
@@ -141,6 +144,11 @@ Matrix::Translate(float x, float y, float z)
 
     *this = MMProduct(newMat);
 }
+
+#ifdef _WIN32
+#undef far
+#undef near
+#endif
 
 void
 Matrix::Ortho(float left, float right,

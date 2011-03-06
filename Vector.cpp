@@ -153,7 +153,11 @@ Vector::operator-(const Vector& other) const
 float
 Vector::RandomFloat()
 {
+#ifdef _WIN32
+    return (float) ((double) rand()) / (double) RAND_MAX;
+#else
     return (float) ((double) random()) / (double) RAND_MAX;
+#endif
 }
 
 // Generates a random float in the range [-mag, mag]

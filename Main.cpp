@@ -19,7 +19,11 @@ void printUsageAndExit(char* programName);
 int main(int argc, char** argv) {
 
     // Random seed
+#ifdef _WIN32
+	srand(123456);
+#else
     srandom(123456);
+#endif
 
     // Dummy timestamp. This should be replaced with our actual
     // timestamp once the game clock gets going.
@@ -151,4 +155,3 @@ void printUsageAndExit(char* programName)
     printf("Usage: %s -m [client,server] [-s address | -n numClients]\n", programName);
     exit(-1);
 }
-
