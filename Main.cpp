@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     renderContext.Init();
 
     // Declare an empty scenegraph
-    SceneGraph sceneGraph;
+    SceneGraph sceneGraph(renderContext);
 
     // Client or server mode?
     char* modeString = getOption(argc, argv, "-m");
@@ -73,23 +73,21 @@ int main(int argc, char** argv) {
     // callbacks.
     //
     // We preserve the old functionality for the time being:
-    sceneGraph.LoadScene(renderContext, WORLDMESH_PATH, "WorldMesh",
+    sceneGraph.LoadScene(WORLDMESH_PATH, "WorldMesh",
                          &sceneGraph.rootNode);
     // add armidillo to the scene
     Matrix armTransform;
     armTransform.Translate(0.0, ARMADILLO_BASE_Y, 0.0);
     SceneNode* armParent = sceneGraph.AddNode(&sceneGraph.rootNode, armTransform,
                                               "armadilloParent");
-    sceneGraph.LoadScene(renderContext, ARMADILLO_PATH, "Armadillo",
-                         armParent);
-    
+    sceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", armParent);
+   
     // add a player to the scene
     Matrix sphereTransform;
     sphereTransform.Translate(-8.0, 2.0, 0.0);
     SceneNode* sphereParent = sceneGraph.AddNode(&sceneGraph.rootNode, sphereTransform,
                                                  "sphereParent");
-    sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere",
-                         sphereParent);
+    sceneGraph.LoadScene(SPHERE_PATH, "Sphere", sphereParent);
     Player player1(sphereParent);
     world.SetPlayer(&player1);
     
@@ -98,14 +96,13 @@ int main(int argc, char** argv) {
     sphere2Transform.Translate(-4.0, 2.0, 4.0);
     SceneNode* sphere2Parent = sceneGraph.AddNode(&sceneGraph.rootNode, sphere2Transform,
                                                   "sphere2Parent");
-    sceneGraph.LoadScene(renderContext, SPHERE_PATH, "Sphere2",
-                         sphere2Parent);
+    sceneGraph.LoadScene(SPHERE_PATH, "Sphere2", sphere2Parent);
     Player player2(sphere2Parent);
     world.SetPlayer(&player2);
     
     // environment map
     Vector emapPos(0.0, 3.0 + ARMADILLO_BASE_Y, 0.0, 1.0);
-    sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(renderContext, emapPos);
+    sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(emapPos);
     
     UserInput input(communicator.GetPlayerID(), currTimestamp);
 

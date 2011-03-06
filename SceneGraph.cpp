@@ -174,12 +174,15 @@ SceneMesh::AddVertex(SceneVertex& v)
 }
 
 void
-SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
+SceneMesh::EnvironmentMap(Vector& eyePos)
 {
     // Flag that we're in the process of texture generation. This
     // disables rendering of this model, which is what we want when
     // we're trying to render from the perspective of the model.
     mDoingEnvMap = true;
+
+    // Get our RenderContext
+    RenderContext* renderContext = mSceneGraph->renderContext;
 
     // Set up the cube texture if we don't already have it.
     if (mCubeTextureID == 0) {
@@ -227,10 +230,10 @@ SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
         // Make our view matrix and apply it to the rendering context
         Matrix cubeView;
         cubeView.LookAt(eyePos, center, up);
-        renderContext.SetView(cubeView);
+        renderContext->SetView(cubeView);
 
         // Render the scene to the back buffer
-        renderContext.Render(*mSceneGraph);
+        renderContext->Render(*mSceneGraph);
 
         // Bind the cube texture
         GL_CHECK(glActiveTexture(ENV_TEXTURE_UNIT));
@@ -260,21 +263,21 @@ SceneMesh::EnvironmentMap(RenderContext& renderContext, Vector& eyePos)
     }
 
     // Reapply the camera to the scene
-    renderContext.SetViewToCamera();
+    renderContext->SetViewToCamera();
 
     // Reset the projection matrix and viewport
-    renderContext.SetViewportAndProjection();
+    renderContext->SetViewportAndProjection();
 
     // All done
     mDoingEnvMap = false;
 
     // Generate our own material
-    renderContext.materials.push_back(Material(renderContext));
-    mMaterial = renderContext.materials.size() - 1;
-    renderContext.materials[mMaterial].mDiffuse.Set(1.0, 1.0, 0.6, 1.0);
-    renderContext.materials[mMaterial].mSpecular.Set(1.0, 1.0, 0.6, 1.0);
-    renderContext.materials[mMaterial].mAmbient.Set(1.0, 1.0, 1.0, 1.0);
-    renderContext.materials[mMaterial].mShininess = 500.0;
+    renderContext->materials.push_back(Material(*renderContext));
+    mMaterial = renderContext->materials.size() - 1;
+    renderContext->materials[mMaterial].mDiffuse.Set(1.0, 1.0, 0.6, 1.0);
+    renderContext->materials[mMaterial].mSpecular.Set(1.0, 1.0, 0.6, 1.0);
+    renderContext->materials[mMaterial].mAmbient.Set(1.0, 1.0, 1.0, 1.0);
+    renderContext->materials[mMaterial].mShininess = 500.0;
 }
 
 /*
@@ -417,7 +420,9 @@ SceneNode::StoreGeometry(CollisionDetector& detector, Matrix modelMat)
 }
 */
 
-SceneGraph::SceneGraph() : rootNode(this, Matrix(), "248_SCENEGRAPH_ROOT")
+SceneGraph::SceneGraph(RenderContext& rc) : rootNode(this, Matrix(),
+                                                     "248_SCENEGRAPH_ROOT")
+                                                     , renderContext(&rc)
 {
 }
 
@@ -426,9 +431,9 @@ SceneGraph::~SceneGraph()
 }
 
 void
-SceneGraph::Render(RenderContext& renderContext)
+SceneGraph::Render()
 {
-    rootNode.Render(renderContext, Matrix());
+    rootNode.Render(*renderContext, Matrix());
 }
 
 SceneMesh*
@@ -457,8 +462,7 @@ SceneGraph::AddNode(SceneNode* parent, Matrix transform, const char* name)
 }
 
 void
-SceneGraph::LoadScene(RenderContext& renderContext,
-                      const char* path, const char* sceneName,
+SceneGraph::LoadScene(const char* path, const char* sceneName,
                       SceneNode* parent)
 {
     // Import the scene
@@ -477,12 +481,12 @@ SceneGraph::LoadScene(RenderContext& renderContext,
     // mesh indices. Since we can load multiple aiScenes, we need to determine
     // the offset relative to which the aiScene indices are valid.
     unsigned meshOffset = meshes.size();
-    unsigned materialOffset = renderContext.materials.size();
+    unsigned materialOffset = renderContext->materials.size();
 
     // Load the materials
     for (unsigned i = 0; i < scene->mNumMaterials; ++i) {
-        renderContext.materials.push_back(Material(renderContext));
-        renderContext.materials.back().InitWithMaterial(scene->mMaterials[i]);
+        renderContext->materials.push_back(Material(*renderContext));
+        renderContext->materials.back().InitWithMaterial(scene->mMaterials[i]);
     }
 
     // Load the meshes

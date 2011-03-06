@@ -54,7 +54,7 @@ class SceneMesh {
     /*
      * Environment maps this mesh.
      */
-    void EnvironmentMap(RenderContext& scene, Vector& eyePos);
+    void EnvironmentMap(Vector& eyePos);
 
     /*
      * Store the geometry in worldspace.
@@ -160,13 +160,16 @@ struct SceneGraph {
     // The root node in the scene graph
     SceneNode rootNode;
 
+    // The render context associated with this scenegraph
+    RenderContext* renderContext;
+
     // A vector of our meshes
     std::vector<SceneMesh> meshes;
 
     /*
      * Constructor.
      */
-    SceneGraph();
+    SceneGraph(RenderContext& renderContext);
 
     /*
      * Destructor.
@@ -183,14 +186,13 @@ struct SceneGraph {
     /*
      * Adds an aiScene, descending from the given node.
      */
-    void LoadScene(RenderContext& renderContext,
-                   const char* filename, const char* sceneName,
+    void LoadScene(const char* filename, const char* sceneName,
                    SceneNode* parent);
 
     /*
      * Renders the scene graph.
      */
-    void Render(RenderContext& renderContext);
+    void Render();
 
     /*
      * Finds a mesh with the given name. NULL if not found.
