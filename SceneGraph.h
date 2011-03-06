@@ -121,6 +121,12 @@ class SceneNode {
      * induced by the base matrix.
      */
     void Render(RenderContext& renderContext, Matrix base);
+    
+    /*
+     * Applies a tranformation to the node, can be used
+     * to move/rotate meshes
+     */
+    void applyTransform(Matrix transform);
 
     /*
      * Stores the geometry of this node in worldspace.
