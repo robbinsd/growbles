@@ -2,6 +2,7 @@
 #include "WorldModel.h"
 #include "assert.h"
 
+#include <Sockets/Lock.h>
 #include <Sockets/ListenSocket.h>
 #include <Sockets/TcpSocket.h>
 

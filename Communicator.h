@@ -1,6 +1,7 @@
 #ifndef COMMUNICATOR_H
 #define COMMUNICATOR_H
 
+#include "UserInput.h"
 #include <Sockets/SocketHandler.h>
 
 #define GROWBLES_PORT 9323

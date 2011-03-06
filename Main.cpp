@@ -2,7 +2,7 @@
 #include "RenderContext.h"
 #include "SceneGraph.h"
 #include "WorldModel.h"
-//#include "Communicator.h"
+#include "Communicator.h"
 #include "UserInput.h"
 #include <stdlib.h>
 
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     SceneGraph sceneGraph;
 
     // Client or server mode?
-    /*char* modeString = getOption(argc, argv, "-m");
+    char* modeString = getOption(argc, argv, "-m");
     CommunicatorMode mode = COMMUNICATOR_MODE_NONE;
     if (!strcmp(modeString, "client"))
         mode = COMMUNICATOR_MODE_CLIENT;
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     }
 
     // Connect to the server/clients
-    communicator.Connect();*/
+    communicator.Connect();
 
     // Declare and initialize our world model
     WorldModel world;
@@ -88,14 +88,14 @@ int main(int argc, char** argv) {
 
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
-        /*UserInput input(communicator.GetPlayerID(), currTimestamp);
+        UserInput input(communicator.GetPlayerID(), currTimestamp);
         input.LoadInput(renderContext);
         input.ApplyInput(world);
         communicator.SendInput(input);
 
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
-        communicator.Synchronize(world);*/
+        communicator.Synchronize(world);
 
         // Step the world
         world.Step();
