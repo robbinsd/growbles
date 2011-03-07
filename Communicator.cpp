@@ -167,6 +167,38 @@ GrowblesHandler::SendTo(Payload& payload, unsigned playerID)
     }
 }
 
+bool
+GrowblesHandler::HasPayload()
+{
+    for (socket_m::iterator it = m_sockets.begin();
+         it != m_sockets.end(); ++it) {
+        GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
+        if (socket->HasPayload())
+            return true;
+    }
+    return false;
+}
+
+unsigned
+GrowblesHandler::ReceivePayload(Payload& payload)
+{
+    // We must have a payload available
+    assert(HasPayload());
+
+    for (socket_m::iterator it = m_sockets.begin();
+         it != m_sockets.end(); ++it) {
+        GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
+        if (socket->HasPayload()) {
+            socket->GetPayload(payload);
+            return socket->GetClientID();
+        }
+    }
+
+    // We should never get here
+    assert(0);
+    return 0;
+}
+
 /*
  * Communicator Methods.
  */

@@ -96,6 +96,13 @@ class GrowblesHandler : public SocketHandler {
 
     // Sends a payload to a specific player
     void SendTo(Payload& payload, unsigned playerID);
+
+    // Do any of the sockets have a payload?
+    bool HasPayload();
+
+    // Gets any available payload, returning the playerID of the source
+    // HasPayload() must return true.
+    unsigned ReceivePayload(Payload& payload);
 };
 
 typedef enum {
