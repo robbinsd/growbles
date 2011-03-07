@@ -3,6 +3,7 @@
 
 #include "UserInput.h"
 #include <Sockets/SocketHandler.h>
+#include <Sockets/TcpSocket.h>
 
 #define GROWBLES_PORT 9323
 
@@ -31,6 +32,31 @@ struct Payload {
     // Pointer to the payload data
     void* data;
 
+};
+
+class GrowblesSocket : public TcpSocket {
+
+    public:
+
+    // Constructor
+    GrowblesSocket(ISocketHandler& h);
+
+    // When we accept a client connection as server
+    void OnAccept();
+
+    // Gets the ID of the client this socket communicates with.
+    //
+    // Not valid to call for client-side sockets.
+    unsigned GetClientID();
+
+    // Sends a payload
+    void SendPayload(Payload& payload);
+
+    protected:
+
+    // The ID of the client this socket represents. Note that this is only
+    // set, and thus should only be queried, on server-side sockets.
+    unsigned mClientID;
 };
 
 class GrowblesHandler : public SocketHandler {

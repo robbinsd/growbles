@@ -4,7 +4,6 @@
 
 #include <Sockets/Lock.h>
 #include <Sockets/ListenSocket.h>
-#include <Sockets/TcpSocket.h>
 
 const unsigned sGrowblesMagic = 0x640E8135;
 
@@ -33,72 +32,57 @@ Payload::GetDataSize()
  * GrowblesSocket Methods.
  */
 
-class GrowblesSocket : public TcpSocket {
+GrowblesSocket::GrowblesSocket(ISocketHandler& h) : TcpSocket(h)
+                                                  , mClientID(0)
+{
+    // We don't want TCP to buffer things up
+    SetTcpNodelay();
+}
 
-    public:
-    GrowblesSocket(ISocketHandler& h) : TcpSocket(h)
-                                      , mClientID(0)
-    {
-        // We don't want TCP to buffer things up
-        SetTcpNodelay();
-    }
+void
+GrowblesSocket::OnAccept()
+{
+    // We start by sending clients the magic word
+    unsigned message[2];
+    message[0] = sGrowblesMagic;
 
-    void OnAccept() {
+    // Then we send them their player ID
+    mClientID = sNextPlayerID++;
+    message[1] = mClientID;
 
-        // We start by sending clients the magic word
-        unsigned message[2];
-        message[0] = sGrowblesMagic;
+    // Send
+    SendBuf((const char *)&message, sizeof(message));
+}
 
-        // Then we send them their player ID
-        mClientID = sNextPlayerID++;
-        message[1] = mClientID;
+unsigned
+GrowblesSocket::GetClientID()
+{
+    assert(mClientID != 0);
+    return mClientID;
+}
 
-        // Send
-        SendBuf((const char *)&message, sizeof(message));
-    }
+void
+GrowblesSocket::SendPayload(Payload& payload)
+{
+    // We're using TCP_NODELAY, which sends data immediately. However, we want
+    // our payload to go in a single packet. So we create a buffer here for
+    // the packet.
+    unsigned dataSize = payload.GetDataSize();
+    unsigned buffSize = sizeof(payload.type) + sizeof(size_t) + dataSize;
+    char* buffer = (char*)malloc(buffSize);
+    assert(buffer);
 
-    /*
-     * Gets the ID of the client this socket communicates with.
-     *
-     * Not valid to call for client-side sockets.
-     */
-    unsigned GetClientID() {
-        assert(mClientID != 0);
-        return mClientID;
-    }
+    // Fill the buffer
+    char* currBuffer = buffer;
+    memcpy(currBuffer, &payload.type, sizeof(payload.type));
+    currBuffer += sizeof(payload.type);
+    memcpy(currBuffer, &dataSize, sizeof(dataSize));
+    currBuffer += sizeof(dataSize);
+    memcpy(currBuffer, payload.data, dataSize);
 
-    /*
-     * Sends a payload.
-     */
-    void SendPayload(Payload& payload)
-    {
-        // We're using TCP_NODELAY, which sends data immediately. However, we want
-        // our payload to go in a single packet. So we create a buffer here for
-        // the packet.
-        unsigned dataSize = payload.GetDataSize();
-        unsigned buffSize = sizeof(payload.type) + sizeof(size_t) + dataSize;
-        char* buffer = (char*)malloc(buffSize);
-        assert(buffer);
-
-        // Fill the buffer
-        char* currBuffer = buffer;
-        memcpy(currBuffer, &payload.type, sizeof(payload.type));
-        currBuffer += sizeof(payload.type);
-        memcpy(currBuffer, &dataSize, sizeof(dataSize));
-        currBuffer += sizeof(dataSize);
-        memcpy(currBuffer, payload.data, dataSize);
-
-        // Send the buffer
-        SendBuf(currBuffer, buffSize);
-    }
-
-    protected:
-
-    // The ID of the client this socket represents. Note that this is only
-    // set, and thus should only be queried, on server-side sockets.
-    unsigned mClientID;
-
-};
+    // Send the buffer
+    SendBuf(currBuffer, buffSize);
+}
 
 /*
  * GrowblesHandler Methods.
