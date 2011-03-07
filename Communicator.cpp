@@ -84,6 +84,46 @@ GrowblesSocket::SendPayload(Payload& payload)
     SendBuf(currBuffer, buffSize);
 }
 
+bool
+GrowblesSocket::HasPayload()
+{
+    // If we're waiting for the data portion of a payload
+    if (mIncoming.type != PAYLOAD_TYPE_NONE)
+        return GetInputLength() >= mIncoming.GetDataSize();
+
+    // Otherwise, we're starting from scratch. See if the header's there.
+    if (GetInputLength() < sizeof(PayloadType) + sizeof(PayloadType))
+        return false;
+
+    // We've received the header. Read it in and recur.
+    size_t dataSize;
+    ReadInput((char*)&mIncoming.type, sizeof(mIncoming.type));
+    ReadInput((char*)&dataSize, sizeof(dataSize));
+    assert(dataSize == mIncoming.GetDataSize()); // Make sure compilers pack
+                                                 // the structs the same way.
+    return HasPayload();
+}
+
+void
+GrowblesSocket::GetPayload(Payload& payload)
+{
+    // We must have a payload ready
+    assert(HasPayload());
+
+    // Set the type
+    payload.type = mIncoming.type;
+
+    // Allocate the data buffer
+    payload.data = malloc(payload.GetDataSize());
+    assert(payload.data);
+
+    // Read the data from the socket input buffer
+    ReadInput((char*)payload.data, payload.GetDataSize());
+
+    // Clear our incoming tracker
+    mIncoming.type = PAYLOAD_TYPE_NONE;
+}
+
 /*
  * GrowblesHandler Methods.
  */

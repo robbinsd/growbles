@@ -52,11 +52,21 @@ class GrowblesSocket : public TcpSocket {
     // Sends a payload
     void SendPayload(Payload& payload);
 
+    // Do we have a payload ready for reading?
+    bool HasPayload();
+
+    // Gets a payload. Caller must deallocate.
+    // HasPayload() must return true first;
+    void GetPayload(Payload& payload);
+
     protected:
 
     // The ID of the client this socket represents. Note that this is only
     // set, and thus should only be queried, on server-side sockets.
     unsigned mClientID;
+
+    // Incoming payload
+    Payload mIncoming;
 };
 
 class GrowblesHandler : public SocketHandler {
