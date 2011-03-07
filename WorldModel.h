@@ -39,8 +39,12 @@ class WorldModel {
 
     /*
      * Adds a player to the world.
+     *
+     * This places the players where it pleases, and as such should only
+     * be called on the server (where the world is generated). Everybody else
+     * should receive state dumps from the server.
      */
-    void AddPlayer(unsigned playerID, Vector initialPosition);
+    void AddPlayer(unsigned playerID);
 
     /*
      * Gets a player by ID.
@@ -57,6 +61,11 @@ class WorldModel {
     void MovePlayer(unsigned playerID, int direction);
 
     protected:
+
+    /*
+     * Internal-only method. Adds a player at a specified position.
+     */
+    void AddPlayer(unsigned playerID, Vector position);
 
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;

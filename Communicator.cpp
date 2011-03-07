@@ -148,14 +148,12 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
     world.Init(sceneGraph);
 
     // Add the server player
-    Vector serverPos(-8.0f, 2.0f, 0.0f, 0.0f);
-    world.AddPlayer(mPlayerID, serverPos);
+    world.AddPlayer(mPlayerID);
 
     // We only support one client for now
     // TODO - fix playerID hack
-    Vector clientPos(-4.0f, 2.0f, 4.0f, 0.0f);
     assert(mSocketHandler.GetCount() <= 1);
-    world.AddPlayer(mPlayerID + 1, clientPos);
+    world.AddPlayer(mPlayerID + 1);
 }
 
 void

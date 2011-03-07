@@ -64,8 +64,28 @@ WorldModel::ShrinkPlayer(unsigned playerID)
 {
 }
 
+static float sInitialPositions[][3] = { {-8.0, 2.0, 0.0},
+                                        {-4.0, 2.0, 4.0} };
+
 void
-WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
+WorldModel::AddPlayer(unsigned playerID)
+{
+    // Generate the initial position.
+    //
+    // We only have enough initial positions for two players. This can be trivially
+    // fixed.
+    unsigned posIndex = mPlayers.size();
+    assert(posIndex <= 1);
+    Vector initialPosition(sInitialPositions[posIndex][0],
+                           sInitialPositions[posIndex][1],
+                           sInitialPositions[posIndex][2],
+                           0.0f);
+
+    // Call the internal helper
+    AddPlayer(playerID, initialPosition);
+}
+
+void WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
 {
     // Make sure we don't already have a player by this ID
     assert(GetPlayer(playerID) == NULL);
