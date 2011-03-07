@@ -7,9 +7,6 @@
 
 const unsigned sGrowblesMagic = 0x640E8135;
 
-// 0 should never be a player ID
-static unsigned sNextPlayerID = 1;
-
 /*
  * Payload Methods.
  */
@@ -33,7 +30,7 @@ Payload::GetDataSize()
  */
 
 GrowblesSocket::GrowblesSocket(ISocketHandler& h) : TcpSocket(h)
-                                                  , mClientID(0)
+                                                  , mRemoteID(0)
 {
     // We don't want TCP to buffer things up
     SetTcpNodelay();
@@ -42,23 +39,42 @@ GrowblesSocket::GrowblesSocket(ISocketHandler& h) : TcpSocket(h)
 void
 GrowblesSocket::OnAccept()
 {
+    // Superclass method
+    TcpSocket::OnAccept();
+
+    // This should only be used for server-side sockets.
+    // ConnectAsClient() shouldn't run.
+    assert(mRemoteID == 0);
+
     // We start by sending clients the magic word
-    unsigned message[2];
+    unsigned message[3];
     message[0] = sGrowblesMagic;
 
+    // Then we send them our ID
+    Communicator* comm = dynamic_cast<GrowblesHandler&>(Handler()).GetCommunicator();
+    message[1] = comm->mPlayerID;
+
     // Then we send them their player ID
-    mClientID = sNextPlayerID++;
-    message[1] = mClientID;
+    SetRemoteID(comm->mNextPlayerID++);
+    message[2] = mRemoteID;
 
     // Send
     SendBuf((const char *)&message, sizeof(message));
 }
 
 unsigned
-GrowblesSocket::GetClientID()
+GrowblesSocket::GetRemoteID()
 {
-    assert(mClientID != 0);
-    return mClientID;
+    assert(mRemoteID != 0);
+    return mRemoteID;
+}
+
+void
+GrowblesSocket::SetRemoteID(unsigned id)
+{
+    // ID should only be set once
+    assert(mRemoteID == 0);
+    mRemoteID = id;
 }
 
 void
@@ -128,12 +144,17 @@ GrowblesSocket::GetPayload(Payload& payload)
  * GrowblesHandler Methods.
  */
 
+GrowblesHandler::GrowblesHandler(Communicator& c) : SocketHandler()
+                                                  , mCommunicator(&c)
+{
+}
+
 void
 GrowblesHandler::AddPlayers(WorldModel& model)
 {
     for (socket_m::iterator it = m_sockets.begin();
          it != m_sockets.end(); ++it)
-        model.AddPlayer(dynamic_cast<GrowblesSocket*>(it->second)->GetClientID());
+        model.AddPlayer(dynamic_cast<GrowblesSocket*>(it->second)->GetRemoteID());
 }
 
 void
@@ -149,7 +170,7 @@ GrowblesHandler::SendToAllExcept(Payload& payload, unsigned excluded)
     for (socket_m::iterator it = m_sockets.begin();
          it != m_sockets.end(); ++it) {
         GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
-        if (socket->GetClientID() != excluded)
+        if (socket->GetRemoteID() != excluded)
             socket->SendPayload(payload);
     }
 }
@@ -160,7 +181,7 @@ GrowblesHandler::SendTo(Payload& payload, unsigned playerID)
     for (socket_m::iterator it = m_sockets.begin();
          it != m_sockets.end(); ++it) {
         GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
-        if (socket->GetClientID() == playerID) {
+        if (socket->GetRemoteID() == playerID) {
             socket->SendPayload(payload);
             return;
         }
@@ -190,7 +211,7 @@ GrowblesHandler::ReceivePayload(Payload& payload)
         GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
         if (socket->HasPayload()) {
             socket->GetPayload(payload);
-            return socket->GetClientID();
+            return socket->GetRemoteID();
         }
     }
 
@@ -205,11 +226,13 @@ GrowblesHandler::ReceivePayload(Payload& payload)
 
 Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
                                                   , mPlayerID(0)
+                                                  , mNextPlayerID(1)
                                                   , mNumClientsExpected(0)
+                                                  , mSocketHandler(*this)
 {
     // If we're a server, assign ourselves a player ID
     if (mode == COMMUNICATOR_MODE_SERVER)
-        mPlayerID = sNextPlayerID++;
+        mPlayerID = mNextPlayerID++;
 }
 
 void
@@ -246,7 +269,7 @@ Communicator::ConnectAsClient()
     mSocketHandler.Add(socket);
 
     // Read the first transmission from the server
-    unsigned openingMessage[2];
+    unsigned openingMessage[3];
     while (socket->GetInputLength() < sizeof(openingMessage))
         mSocketHandler.Select();
     socket->ReadInput((char *)&openingMessage, sizeof(openingMessage));
@@ -257,8 +280,11 @@ Communicator::ConnectAsClient()
         exit(-1);
     }
 
+    // Set the server's ID
+    socket->SetRemoteID(openingMessage[1]);
+
     // Save our player ID
-    mPlayerID = openingMessage[1];
+    mPlayerID = openingMessage[2];
     printf("Assigned player ID %u\n", mPlayerID);
 }
 

@@ -11,6 +11,7 @@ class WorldModel;
 class UserInput;
 class GrowblesSocket;
 struct SceneGraph;
+class Communicator;
 
 typedef enum {
     PAYLOAD_TYPE_NONE = 0,
@@ -51,12 +52,12 @@ class GrowblesSocket : public TcpSocket {
     GrowblesSocket(ISocketHandler& h);
 
     // When we accept a client connection as server
-    void OnAccept();
+    virtual void OnAccept();
 
-    // Gets the ID of the client this socket communicates with.
-    //
-    // Not valid to call for client-side sockets.
-    unsigned GetClientID();
+    // Gets/Sets the ID of the remote player this socket connects
+    // us to.
+    unsigned GetRemoteID();
+    void SetRemoteID(unsigned ID);
 
     // Sends a payload
     void SendPayload(Payload& payload);
@@ -70,9 +71,8 @@ class GrowblesSocket : public TcpSocket {
 
     protected:
 
-    // The ID of the client this socket represents. Note that this is only
-    // set, and thus should only be queried, on server-side sockets.
-    unsigned mClientID;
+    // The ID of the remote player this socket connects us to.
+    unsigned mRemoteID;
 
     // Incoming payload
     Payload mIncoming;
@@ -81,6 +81,9 @@ class GrowblesSocket : public TcpSocket {
 class GrowblesHandler : public SocketHandler {
 
     public:
+
+    // Constructor
+    GrowblesHandler(Communicator& c);
 
     // Adds each connection as a player in the world.
     //
@@ -103,6 +106,14 @@ class GrowblesHandler : public SocketHandler {
     // Gets any available payload, returning the playerID of the source
     // HasPayload() must return true.
     unsigned ReceivePayload(Payload& payload);
+
+    // Gets our Communicator
+    Communicator* GetCommunicator() { return mCommunicator; };
+
+    protected:
+
+    // The Communicator possessing this handler
+    Communicator* mCommunicator;
 };
 
 typedef enum {
@@ -112,6 +123,8 @@ typedef enum {
 } CommunicatorMode;
 
 class Communicator {
+
+    friend class GrowblesSocket;
 
     public:
 
@@ -177,6 +190,9 @@ class Communicator {
 
     // Our player ID
     unsigned mPlayerID;
+
+    // The next player ID to assign
+    unsigned mNextPlayerID;
 
     // Valid for servers
     std::string mServerAddress;
