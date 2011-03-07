@@ -51,6 +51,15 @@ class GrowblesSocket : public TcpSocket {
 
 };
 
+void
+GrowblesHandler::AddPlayers(WorldModel& model)
+{
+    for (socket_m::iterator it = m_sockets.begin();
+         it != m_sockets.end(); ++it)
+        model.AddPlayer(dynamic_cast<GrowblesSocket*>(it->second)->GetClientID());
+}
+
+
 Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
                                                   , mPlayerID(0)
                                                   , mNumClientsExpected(0)
@@ -150,10 +159,8 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
     // Add the server player
     world.AddPlayer(mPlayerID);
 
-    // We only support one client for now
-    // TODO - fix playerID hack
-    assert(mSocketHandler.GetCount() <= 1);
-    world.AddPlayer(mPlayerID + 1);
+    // Add the client players
+    mSocketHandler.AddPlayers(world);
 }
 
 void

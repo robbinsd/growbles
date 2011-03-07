@@ -11,6 +11,16 @@ class UserInput;
 class GrowblesSocket;
 struct SceneGraph;
 
+class GrowblesHandler : public SocketHandler {
+
+    public:
+
+    // Adds each connection as a player in the world.
+    //
+    // Should only be called on the server.
+    void AddPlayers(WorldModel& model);
+};
+
 typedef enum {
     COMMUNICATOR_MODE_NONE = 0,
     COMMUNICATOR_MODE_CLIENT,
@@ -91,7 +101,7 @@ class Communicator {
     unsigned mNumClientsExpected;
 
     // Our socket handler
-    SocketHandler mSocketHandler;
+    GrowblesHandler mSocketHandler;
 };
 
 #endif /* COMMUNICATOR_H */
