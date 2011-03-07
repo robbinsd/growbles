@@ -46,11 +46,13 @@ WorldModel::Step()
 {
 }
 
-void GetState(WorldState& stateOut)
+void
+WorldModel::GetState(WorldState& stateOut)
 {
 }
 
-void SetState(WorldState& stateIn)
+void
+WorldModel::SetState(WorldState& stateIn)
 {
 }
 
