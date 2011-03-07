@@ -23,6 +23,8 @@ struct Payload {
     Payload() : type(PAYLOAD_TYPE_NONE), data(NULL) {};
     Payload(PayloadType t, void* d) : type(t), data(d) {};
 
+    ~Payload() { if (data) free(data); } ;
+
     // Gets the data size for a given type
     size_t GetDataSize();
 
@@ -31,6 +33,13 @@ struct Payload {
 
     // Pointer to the payload data
     void* data;
+
+    // Disallow copy constructor and operator=, as they would mess up
+    // our memory ownership model.
+    private:
+    Payload(const Payload& other);
+    Payload& operator=(const Payload& rhs);
+
 
 };
 
