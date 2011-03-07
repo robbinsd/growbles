@@ -7,7 +7,31 @@
 #include <Sockets/TcpSocket.h>
 
 const unsigned sGrowblesMagic = 0x640E8135;
+
+// 0 should never be a player ID
 static unsigned sNextPlayerID = 1;
+
+/*
+ * Payload Methods.
+ */
+
+size_t
+Payload::GetDataSize()
+{
+    switch(type) {
+        case PAYLOAD_TYPE_WORLDSTATE:
+            return sizeof(WorldState);
+        case PAYLOAD_TYPE_USERINPUT:
+            return sizeof(UserInput);
+        default:
+            assert(0); // Not reached
+            return 0;
+    }
+}
+
+/*
+ * GrowblesSocket Methods.
+ */
 
 class GrowblesSocket : public TcpSocket {
 
@@ -43,6 +67,31 @@ class GrowblesSocket : public TcpSocket {
         return mClientID;
     }
 
+    /*
+     * Sends a payload.
+     */
+    void SendPayload(Payload& payload)
+    {
+        // We're using TCP_NODELAY, which sends data immediately. However, we want
+        // our payload to go in a single packet. So we create a buffer here for
+        // the packet.
+        unsigned dataSize = payload.GetDataSize();
+        unsigned buffSize = sizeof(payload.type) + sizeof(size_t) + dataSize;
+        char* buffer = (char*)malloc(buffSize);
+        assert(buffer);
+
+        // Fill the buffer
+        char* currBuffer = buffer;
+        memcpy(currBuffer, &payload.type, sizeof(payload.type));
+        currBuffer += sizeof(payload.type);
+        memcpy(currBuffer, &dataSize, sizeof(dataSize));
+        currBuffer += sizeof(dataSize);
+        memcpy(currBuffer, payload.data, dataSize);
+
+        // Send the buffer
+        SendBuf(currBuffer, buffSize);
+    }
+
     protected:
 
     // The ID of the client this socket represents. Note that this is only
@@ -50,6 +99,10 @@ class GrowblesSocket : public TcpSocket {
     unsigned mClientID;
 
 };
+
+/*
+ * GrowblesHandler Methods.
+ */
 
 void
 GrowblesHandler::AddPlayers(WorldModel& model)
@@ -59,6 +112,40 @@ GrowblesHandler::AddPlayers(WorldModel& model)
         model.AddPlayer(dynamic_cast<GrowblesSocket*>(it->second)->GetClientID());
 }
 
+void
+GrowblesHandler::SendToAll(Payload& payload)
+{
+    // Zero can never be a player ID
+    SendToAllExcept(payload, 0);
+}
+
+void
+GrowblesHandler::SendToAllExcept(Payload& payload, unsigned excluded)
+{
+    for (socket_m::iterator it = m_sockets.begin();
+         it != m_sockets.end(); ++it) {
+        GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
+        if (socket->GetClientID() != excluded)
+            socket->SendPayload(payload);
+    }
+}
+
+void
+GrowblesHandler::SendTo(Payload& payload, unsigned playerID)
+{
+    for (socket_m::iterator it = m_sockets.begin();
+         it != m_sockets.end(); ++it) {
+        GrowblesSocket* socket = dynamic_cast<GrowblesSocket*>(it->second);
+        if (socket->GetClientID() == playerID) {
+            socket->SendPayload(payload);
+            return;
+        }
+    }
+}
+
+/*
+ * Communicator Methods.
+ */
 
 Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
                                                   , mPlayerID(0)

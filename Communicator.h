@@ -11,6 +11,28 @@ class UserInput;
 class GrowblesSocket;
 struct SceneGraph;
 
+typedef enum {
+    PAYLOAD_TYPE_NONE = 0,
+    PAYLOAD_TYPE_WORLDSTATE,
+    PAYLOAD_TYPE_USERINPUT
+} PayloadType;
+
+struct Payload {
+
+    Payload() : type(PAYLOAD_TYPE_NONE), data(NULL) {};
+    Payload(PayloadType t, void* d) : type(t), data(d) {};
+
+    // Gets the data size for a given type
+    size_t GetDataSize();
+
+    // The type of the payload
+    PayloadType type;
+
+    // Pointer to the payload data
+    void* data;
+
+};
+
 class GrowblesHandler : public SocketHandler {
 
     public:
@@ -19,6 +41,16 @@ class GrowblesHandler : public SocketHandler {
     //
     // Should only be called on the server.
     void AddPlayers(WorldModel& model);
+
+    // Sends a payload to all connected sockets
+    void SendToAll(Payload& payload);
+
+    // Sends a payload to all connected sockets except
+    // the one given by excluded.
+    void SendToAllExcept(Payload& payload, unsigned excluded);
+
+    // Sends a payload to a specific player
+    void SendTo(Payload& payload, unsigned playerID);
 };
 
 typedef enum {
