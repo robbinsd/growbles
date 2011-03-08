@@ -21,10 +21,10 @@ typedef enum {
 
 struct Payload {
 
-    Payload() : type(PAYLOAD_TYPE_NONE), data(NULL) {};
-    Payload(PayloadType t, void* d) : type(t), data(d) {};
+    Payload() : type(PAYLOAD_TYPE_NONE), data(NULL), ownData(false) {};
+    Payload(PayloadType t, void* d) : type(t), data(d), ownData(false) {};
 
-    ~Payload() { if (data) free(data); } ;
+    ~Payload();
 
     // Gets the data size for a given type
     size_t GetDataSize();
@@ -34,6 +34,9 @@ struct Payload {
 
     // Pointer to the payload data
     void* data;
+
+    // Is the data owned by us? Default no.
+    bool ownData;
 
     // Disallow copy constructor and operator=, as they would mess up
     // our memory ownership model.

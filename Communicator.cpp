@@ -11,6 +11,19 @@ const unsigned sGrowblesMagic = 0x640E8135;
  * Payload Methods.
  */
 
+Payload::~Payload()
+{
+    // If we don't own the data, we have nothing to do
+    if (!ownData)
+        return;
+
+    // If we're marked as owning the data, we ought to have it.
+    assert(data);
+
+    // Free the data
+    free(data);
+}
+
 size_t
 Payload::GetDataSize()
 {
@@ -135,6 +148,9 @@ GrowblesSocket::GetPayload(Payload& payload)
 
     // Read the data from the socket input buffer
     ReadInput((char*)payload.data, payload.GetDataSize());
+
+    // The given payload owns the data now
+    payload.ownData = true;
 
     // Clear our incoming tracker
     mIncoming.type = PAYLOAD_TYPE_NONE;
