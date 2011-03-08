@@ -17,6 +17,13 @@ Vector::Vector(float xx, float yy, float zz, float ww) : x(xx)
 {
 }
 
+Vector::Vector(btVector3 vec) : x(vec.x())
+                              , y(vec.y())
+                              , z(vec.z())
+                              , w(1.0)
+{
+}
+
 void
 Vector::Set(float x, float y, float z, float w)
 {
@@ -153,7 +160,11 @@ Vector::operator-(const Vector& other) const
 float
 Vector::RandomFloat()
 {
+#ifdef _WIN32
+    return (float) ((double) rand()) / (double) RAND_MAX;
+#else
     return (float) ((double) random()) / (double) RAND_MAX;
+#endif
 }
 
 // Generates a random float in the range [-mag, mag]

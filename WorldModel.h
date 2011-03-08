@@ -1,12 +1,9 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
 
+#include "SceneGraph.h"
 #include "Player.h"
-
-#define USERINPUT_MASK_UP (1 << 2)
-#define USERINPUT_MASK_DOWN (1 << 3)
-#define USERINPUT_MASK_LEFT (1 << 4)
-#define USERINPUT_MASK_RIGHT (1 << 5)
+#include <vector>
 
 class SceneGraph;
 
@@ -25,6 +22,11 @@ class WorldModel {
     void Init(SceneGraph& sceneGraph);
 
     /*
+     * Destructor.
+     */
+    ~WorldModel();
+
+    /*
      * Steps the model forward in time.
      */
     void Step();
@@ -34,12 +36,18 @@ class WorldModel {
      */
     void GetState(WorldState& stateOut);
     void SetState(WorldState& stateIn);
-    
-    /*
-     * Set the player to the specified player object
-     */
-    void SetPlayer(Player* p);
 
+    /*
+     * Adds a player to the world.
+     */
+    void AddPlayer(unsigned playerID, Vector initialPosition);
+
+    /*
+     * Gets a player by ID.
+     *
+     * Returns NULL if none is found.
+     */
+    Player* GetPlayer(unsigned playerID);
 
     /*
      * Inputs
@@ -47,24 +55,14 @@ class WorldModel {
     void GrowPlayer(unsigned playerID);
     void ShrinkPlayer(unsigned playerID);
     void MovePlayer(unsigned playerID, int direction);
-    
-    /*
-     * Set up physics simulation
-     */
-    void SetupPhysicsSimulation();
-    
-    /*
-     * Clean up all the memory allocated for physics simulation
-     */
-    void DestroyPhysicsSimulation();
 
     protected:
 
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;
-    
-    // Player
-    Player* player;
+
+    // The players
+    std::vector<Player*> mPlayers;
     
     // Physics Simulation
     btBroadphaseInterface* broadphase;
@@ -72,13 +70,15 @@ class WorldModel {
     btCollisionDispatcher* dispatcher;
     btSequentialImpulseConstraintSolver* solver;
     btDiscreteDynamicsWorld* dynamicsWorld;
-    // ground
+    // Physics properties of the platform
     btCollisionShape* groundShape;
     btRigidBody* groundRigidBody;
-    // sphere
-    btCollisionShape* fallShape;
-    btRigidBody* fallRigidBody;
-    
+    // Physics properties of the player
+    btCollisionShape* playerShape;
+    btRigidBody* playerRigidBody;
+    // Physics properties of the other player
+    btCollisionShape* otherPlayerShape;
+    btRigidBody* otherPlayerRigidBody;
 };
 
 #endif /* WORLDMODEL_H */

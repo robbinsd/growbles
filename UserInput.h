@@ -2,6 +2,7 @@
 #define USERINPUT_H
 
 #include "Framework.h"
+#include <stdint.h>
 
 class RenderContext;
 class WorldModel;

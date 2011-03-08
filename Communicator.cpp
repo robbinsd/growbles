@@ -2,6 +2,7 @@
 #include "WorldModel.h"
 #include "assert.h"
 
+#include <Sockets/Lock.h>
 #include <Sockets/ListenSocket.h>
 #include <Sockets/TcpSocket.h>
 
@@ -134,6 +135,27 @@ Communicator::ConnectAsServer()
 void
 Communicator::Synchronize(WorldModel& model)
 {
+}
+
+void
+Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
+{
+    // If we're a client, we need to receive the initial scene data from the server.
+    // We don't support that yet, so assert that we're a server.
+    assert(mMode == COMMUNICATOR_MODE_SERVER);
+
+    // Initialize the world
+    world.Init(sceneGraph);
+
+    // Add the server player
+    Vector serverPos(-8.0f, 2.0f, 0.0f, 0.0f);
+    world.AddPlayer(mPlayerID, serverPos);
+
+    // We only support one client for now
+    // TODO - fix playerID hack
+    Vector clientPos(-4.0f, 2.0f, 4.0f, 0.0f);
+    assert(mSocketHandler.GetCount() <= 1);
+    world.AddPlayer(mPlayerID + 1, clientPos);
 }
 
 void
