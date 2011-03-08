@@ -3,12 +3,121 @@
 
 #include "UserInput.h"
 #include <Sockets/SocketHandler.h>
+#include <Sockets/TcpSocket.h>
 
 #define GROWBLES_PORT 9323
 
 class WorldModel;
 class UserInput;
 class GrowblesSocket;
+struct SceneGraph;
+class Communicator;
+
+typedef enum {
+    PAYLOAD_TYPE_NONE = 0,
+    PAYLOAD_TYPE_WORLDSTATE,
+    PAYLOAD_TYPE_USERINPUT
+} PayloadType;
+
+struct Payload {
+
+    Payload() : type(PAYLOAD_TYPE_NONE), data(NULL), ownData(false) {};
+    Payload(PayloadType t, void* d) : type(t), data(d), ownData(false) {};
+
+    ~Payload();
+
+    // Gets the data size for a given type
+    size_t GetDataSize();
+
+    // The type of the payload
+    PayloadType type;
+
+    // Pointer to the payload data
+    void* data;
+
+    // Is the data owned by us? Default no.
+    bool ownData;
+
+    // Disallow copy constructor and operator=, as they would mess up
+    // our memory ownership model.
+    private:
+    Payload(const Payload& other);
+    Payload& operator=(const Payload& rhs);
+
+
+};
+
+class GrowblesSocket : public TcpSocket {
+
+    public:
+
+    // Constructor
+    GrowblesSocket(ISocketHandler& h);
+
+    // When we accept a client connection as server
+    virtual void OnAccept();
+
+    // Gets/Sets the ID of the remote player this socket connects
+    // us to.
+    unsigned GetRemoteID();
+    void SetRemoteID(unsigned ID);
+
+    // Sends a payload
+    void SendPayload(Payload& payload);
+
+    // Do we have a payload ready for reading?
+    bool HasPayload();
+
+    // Gets a payload. Caller must deallocate.
+    // HasPayload() must return true first;
+    void GetPayload(Payload& payload);
+
+    protected:
+
+    // The ID of the remote player this socket connects us to.
+    unsigned mRemoteID;
+
+    // Incoming payload
+    Payload mIncoming;
+};
+
+class GrowblesHandler : public SocketHandler {
+
+    public:
+
+    // Constructor
+    GrowblesHandler(Communicator& c);
+
+    // Adds each connection as a player in the world.
+    //
+    // Should only be called on the server.
+    void AddPlayers(WorldModel& model);
+
+    // Sends a payload to all connected sockets
+    void SendToAll(Payload& payload);
+
+    // Sends a payload to all connected sockets except
+    // the one given by excluded.
+    void SendToAllExcept(Payload& payload, unsigned excluded);
+
+    // Sends a payload to a specific player
+    void SendTo(Payload& payload, unsigned playerID);
+
+    // Do any of the sockets have a payload?
+    bool HasPayload();
+
+    // Gets any available payload, returning the playerID of the source
+    // HasPayload() must return true.
+    unsigned ReceivePayload(Payload& payload);
+
+    // Gets our Communicator
+    Communicator* GetCommunicator() { return mCommunicator; };
+
+    protected:
+
+    // The Communicator possessing this handler
+    Communicator* mCommunicator;
+};
 
 typedef enum {
     COMMUNICATOR_MODE_NONE = 0,
@@ -17,6 +126,8 @@ typedef enum {
 } CommunicatorMode;
 
 class Communicator {
+
+    friend class GrowblesSocket;
 
     public:
 
@@ -60,6 +171,11 @@ class Communicator {
     void Synchronize(WorldModel& model);
 
     /*
+     * Initializes a world.
+     */
+    void InitWorld(WorldModel& world, SceneGraph& sceneGraph);
+
+    /*
      * Gets our player ID.
      */
     unsigned GetPlayerID() { return mPlayerID; } ;
@@ -78,6 +194,9 @@ class Communicator {
     // Our player ID
     unsigned mPlayerID;
 
+    // The next player ID to assign
+    unsigned mNextPlayerID;
+
     // Valid for servers
     std::string mServerAddress;
 
@@ -85,7 +204,7 @@ class Communicator {
     unsigned mNumClientsExpected;
 
     // Our socket handler
-    SocketHandler mSocketHandler;
+    GrowblesHandler mSocketHandler;
 };
 
 #endif /* COMMUNICATOR_H */

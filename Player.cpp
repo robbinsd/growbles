@@ -9,13 +9,29 @@
 
 #include "Player.h"
 
-Player::Player(SceneNode* playerSceneNode) : playerNode(playerSceneNode)
+Player::Player(unsigned playerID,
+               SceneNode* playerSceneNode,
+               Vector initialPosition) : mPlayerID(playerID)
+                                       , mPlayerNode(playerSceneNode)
+                                       , position(Vector(0.0, 0.0, 0.0, 0.0))
 {
+    this->moveTo(initialPosition);
 }
 
 void
-Player::move(float x, float y, float z) {
+Player::move(Vector moveVec) {
     Matrix moveMatrix;
-    moveMatrix.Translate(x, y, z);
-    playerNode->applyTransform(moveMatrix);
+    moveMatrix.Translate(moveVec.x, moveVec.y, moveVec.z);
+    mPlayerNode->ApplyTransform(moveMatrix);
+    position = position + moveVec;
+}
+
+void
+Player::moveTo(Vector pos) {
+    this->move(pos - position);
+}
+
+Vector
+Player::getPosition() {
+    return position;
 }
