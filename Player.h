@@ -20,13 +20,23 @@ public:
     /*
      * constructor
      */
-    Player(unsigned playerID, SceneNode* playerSceneNode);
+    Player(unsigned playerID, SceneNode* playerSceneNode, Vector initialPosition);
+
+    /*
+     * move the player by a translation vector
+     */
+    void move(Vector moveVec);
     
     /*
-     * move the player
+     * move the player to a specified location
      */
-    void Move(float x, float y, float z);
-
+    void moveTo(Vector pos);
+    
+    /*
+     * Get the current position of the player
+     */
+    Vector getPosition();
+    
     /*
      * Gets the ID of this player.
      */
@@ -39,6 +49,9 @@ public:
 
     // the node in the scene that contains the mesh for the player
     SceneNode* mPlayerNode;
+    
+    // The current position of the player
+    Vector position;
 };
 
 #endif /* PLAYER_H */

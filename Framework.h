@@ -30,6 +30,10 @@
 #include <assimp/aiMaterial.h>
 #endif
 
+// Bullet
+#include <bullet/btBulletCollisionCommon.h>
+#include <bullet/btBulletDynamicsCommon.h>
+
 #include <memory>
 #include <iostream>
 #include <assert.h>

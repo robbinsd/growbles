@@ -72,6 +72,22 @@ class WorldModel {
 
     // The players
     std::vector<Player*> mPlayers;
+    
+    // Physics Simulation
+    btBroadphaseInterface* broadphase;
+    btDefaultCollisionConfiguration* collisionConfiguration;
+    btCollisionDispatcher* dispatcher;
+    btSequentialImpulseConstraintSolver* solver;
+    btDiscreteDynamicsWorld* dynamicsWorld;
+    // Physics properties of the platform
+    btCollisionShape* groundShape;
+    btRigidBody* groundRigidBody;
+    // Physics properties of the player
+    btCollisionShape* playerShape;
+    btRigidBody* playerRigidBody;
+    // Physics properties of the other player
+    btCollisionShape* otherPlayerShape;
+    btRigidBody* otherPlayerRigidBody;
 };
 
 #endif /* WORLDMODEL_H */
