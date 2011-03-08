@@ -318,18 +318,39 @@ Communicator::Synchronize(WorldModel& model)
 void
 Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
 {
-    // If we're a client, we need to receive the initial scene data from the server.
-    // We don't support that yet, so assert that we're a server.
-    assert(mMode == COMMUNICATOR_MODE_SERVER);
-
     // Initialize the world
     world.Init(sceneGraph);
 
-    // Add the server player
-    world.AddPlayer(mPlayerID);
+    // If we're a server, add the players to the world, then send the worldstate
+    if (mMode == COMMUNICATOR_MODE_SERVER) {
 
-    // Add the client players
-    mSocketHandler.AddPlayers(world);
+        // Add the server player
+        world.AddPlayer(mPlayerID);
+
+        // Add the client players
+        mSocketHandler.AddPlayers(world);
+
+        // Send the state to all clients
+        WorldState state;
+        world.GetState(state);
+        Payload payload(PAYLOAD_TYPE_WORLDSTATE, &state);
+        mSocketHandler.SendToAll(payload);
+    }
+
+    // Otherwise, we're the client. Receive a worldstate from the server.
+    else {
+
+        // Receive the worldstate payload
+        Payload received;
+        while (!mSocketHandler.HasPayload())
+            mSocketHandler.Select();
+        mSocketHandler.ReceivePayload(received);
+        assert(received.type == PAYLOAD_TYPE_WORLDSTATE);
+
+        // Apply it
+        world.SetState(*(WorldState*)received.data);
+    }
+
 }
 
 void

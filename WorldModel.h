@@ -10,6 +10,11 @@ class SceneGraph;
 // Struct containing all mutable world state
 struct WorldState {
 
+    // We want some values here so that this structure
+    // takes up room in order to test the network code.
+    WorldState() : dummy1(12), dummy2(33) {};
+    unsigned dummy1;
+    unsigned dummy2;
 };
 
 class WorldModel {
