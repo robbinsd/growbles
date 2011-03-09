@@ -115,8 +115,8 @@ WorldModel::GetState(WorldState& stateOut)
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
         playerInfo.pos =  mPlayers[i]->getPosition();
         playerInfoVec.push_back(playerInfo);
-        stateOut.playerVec = playerInfoVec;
     }
+    stateOut.playerVec = playerInfoVec;
 }
 
 void
