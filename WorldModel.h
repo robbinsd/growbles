@@ -1,12 +1,12 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
-#include "SceneGraph.h"
 
 #include "SceneGraph.h"
 #include "Player.h"
 #include <vector>
 
 class SceneGraph;
+class UserInput;
 
 // Struct containing all mutable world state
 struct WorldState {
@@ -58,6 +58,11 @@ class WorldModel {
      * Returns NULL if none is found.
      */
     Player* GetPlayer(unsigned playerID);
+
+    /*
+     * Applies inputs.
+     */
+    void ApplyInput(UserInput& input);
 
     /*
      * Inputs

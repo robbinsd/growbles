@@ -7,12 +7,18 @@
 class RenderContext;
 class WorldModel;
 
-#define USERINPUT_MASK_GROW (1 << 0)
-#define USERINPUT_MASK_SHRINK (1 << 1)
-#define USERINPUT_MASK_UP (1 << 2)
-#define USERINPUT_MASK_DOWN (1 << 3)
-#define USERINPUT_MASK_LEFT (1 << 4)
-#define USERINPUT_MASK_RIGHT (1 << 5)
+#define USERINPUT_MASK_GROW_BEGIN (1 << 0)
+#define USERINPUT_MASK_GROW_END (1 << 1)
+#define USERINPUT_MASK_SHRINK_BEGIN (1 << 2)
+#define USERINPUT_MASK_SHRINK_END (1 << 3)
+#define USERINPUT_MASK_UP_BEGIN (1 << 4)
+#define USERINPUT_MASK_UP_END (1 << 5)
+#define USERINPUT_MASK_DOWN_BEGIN (1 << 6)
+#define USERINPUT_MASK_DOWN_END (1 << 7)
+#define USERINPUT_MASK_LEFT_BEGIN (1 << 8)
+#define USERINPUT_MASK_LEFT_END (1 << 9)
+#define USERINPUT_MASK_RIGHT_BEGIN (1 << 10)
+#define USERINPUT_MASK_RIGHT_END (1 << 11)
 
 struct UserInput {
 
@@ -31,11 +37,6 @@ struct UserInput {
      */
     void LoadInput(RenderContext& context);
 
-    /*
-     * Applies recorded input to a world model.
-     */
-    void ApplyInput(WorldModel& model);
-
     // Bitfield of inputs
     uint32_t inputs;
 
@@ -44,18 +45,6 @@ struct UserInput {
 
     // ID of the player doing the input
     uint32_t playerID;
-    
-    // flag to denote if a key is down
-    bool keyDown;
-    
-    // flag to denote if a key is released
-    bool keyReleased;
-    
-    /*
-     * Reset variables associated with this input object
-     * this is necessary every time through the main game loop
-     */
-    void resetInputState();
 };
 
 #endif /* USERINPUT_H */

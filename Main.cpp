@@ -65,16 +65,14 @@ int main(int argc, char** argv) {
     WorldModel world;
     communicator.InitWorld(world, sceneGraph);
 
-    UserInput input(communicator.GetPlayerID(), currTimestamp);
-
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
 
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
-        input.resetInputState();
+        UserInput input(communicator.GetPlayerID(), currTimestamp);
         input.LoadInput(renderContext);
-        input.ApplyInput(world);
+        world.ApplyInput(input);
         communicator.SendInput(input);
 
         // Apply any state updates that may have come in, and send off any

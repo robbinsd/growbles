@@ -206,8 +206,15 @@ WorldModel::GetPlayer(unsigned playerID)
 }
 
 void
+WorldModel::ApplyInput(UserInput& input)
+{
+
+}
+
+void
 WorldModel::MovePlayer(unsigned playerID, int direction)
 {
+#if 0
     // Get the referenced player
     Player* player = GetPlayer(playerID);
     assert(player);
@@ -229,5 +236,6 @@ WorldModel::MovePlayer(unsigned playerID, int direction)
         default:
             break;
     }
+#endif
 }
 

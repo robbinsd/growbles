@@ -5,8 +5,6 @@
 UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
                                                               , timestamp(timestamp_)
                                                               , playerID(playerID_)
-                                                              , keyDown(false)
-                                                              , keyReleased(false)
 {
 }
 
@@ -93,66 +91,52 @@ UserInput::LoadInput(RenderContext& context)
          * Global inputs. These affect the state of other players. As such,
          * we record them, and then apply them later.
          */
+
+        // Is it a keypress?
+        bool isPress = evt.Type == sf::Event::KeyPressed;
+
         switch (evt.Type) {
             case sf::Event::KeyPressed:
+            case sf::Event::KeyReleased:
+
+                // Handle each key
                 switch(evt.Key.Code) {
                     case sf::Key::I:
-                        inputs |= USERINPUT_MASK_GROW;
+                        inputs |= isPress
+                          ? USERINPUT_MASK_GROW_BEGIN
+                          : USERINPUT_MASK_GROW_END;
                         break;
                     case sf::Key::K:
-                        inputs |= USERINPUT_MASK_SHRINK;
+                        inputs |= isPress
+                          ? USERINPUT_MASK_SHRINK_BEGIN
+                          : USERINPUT_MASK_SHRINK_END;
                         break;
                     case sf::Key::T:
-                        inputs |= USERINPUT_MASK_UP;
+                        inputs |= isPress
+                          ? USERINPUT_MASK_UP_BEGIN
+                          : USERINPUT_MASK_UP_END;
                         break;
                     case sf::Key::G:
-                        inputs |= USERINPUT_MASK_DOWN;
+                        inputs |= isPress
+                          ? USERINPUT_MASK_DOWN_BEGIN
+                          : USERINPUT_MASK_DOWN_END;
                         break;
                     case sf::Key::F:
-                        inputs |= USERINPUT_MASK_LEFT;
+                        inputs |= isPress
+                          ? USERINPUT_MASK_LEFT_BEGIN
+                          : USERINPUT_MASK_LEFT_END;
                         break;
                     case sf::Key::H:
-                        inputs |= USERINPUT_MASK_RIGHT;
+                        inputs |= isPress
+                          ? USERINPUT_MASK_RIGHT_BEGIN
+                          : USERINPUT_MASK_RIGHT_END;
                         break;
                     default:
                         break;
                 }
                 break;
-            case sf::Event::KeyReleased:
-                keyReleased = true;
-                break;
             default:
                 break;
         }
     }
-}
-
-void
-UserInput::ApplyInput(WorldModel& model)
-{
-    if(inputs && keyDown == false) {
-        keyDown = true;
-    }
-    if(keyReleased) {
-        keyDown = false;
-        inputs = 0;
-    }
-    if(keyDown && inputs & USERINPUT_MASK_GROW)
-        model.GrowPlayer(playerID);
-    if (keyDown && inputs & USERINPUT_MASK_SHRINK)
-        model.ShrinkPlayer(playerID);
-    if (keyDown && inputs & USERINPUT_MASK_UP)
-        model.MovePlayer(playerID, USERINPUT_MASK_UP);
-    if (keyDown && inputs & USERINPUT_MASK_DOWN)
-        model.MovePlayer(playerID, USERINPUT_MASK_DOWN);
-    if (keyDown && inputs & USERINPUT_MASK_LEFT)
-        model.MovePlayer(playerID, USERINPUT_MASK_LEFT);
-    if (keyDown && inputs & USERINPUT_MASK_RIGHT)
-        model.MovePlayer(playerID, USERINPUT_MASK_RIGHT);
-}
-
-void
-UserInput::resetInputState()
-{
-    keyReleased = false;
 }
