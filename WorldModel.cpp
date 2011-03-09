@@ -63,7 +63,7 @@ WorldModel::~WorldModel()
         delete *it;
 
     // Destroy physics simulation
-    for(int i = 0; i < mPlayers.size(); ++i) {
+    for(unsigned i = 0; i < mPlayers.size(); ++i) {
         Player *player = mPlayers[i];
         assert(player);
         btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
@@ -93,7 +93,7 @@ WorldModel::Step()
     dynamicsWorld->stepSimulation(1/60.f, 10);
 
     // Loop over players
-    for(int i = 0; i < mPlayers.size(); ++i){
+    for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *player = mPlayers[i];
         assert(player);
         btTransform trans;
