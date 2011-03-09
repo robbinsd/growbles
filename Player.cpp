@@ -50,7 +50,9 @@ Player::applyInput(UserInput& input)
     assert(((ends >> 1) & begins) == 0);
 
     // Sanity check - We shouldn't begin anything already begun
-    assert((begins & activeInputs) == 0);
+    // NOTE - this is disabled because operating systems actually send multiple
+    // KeyPressed events after a certain delay when holding down a key.
+    // assert((begins & activeInputs) == 0);
 
     // Sanity check - We shouldn't end anything not begun
     assert(((ends >> 1) | activeInputs) == activeInputs);
