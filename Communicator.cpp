@@ -24,14 +24,14 @@ Payload::~Payload()
     free(data);
 }
 
-size_t
+unsigned
 Payload::GetDataSize()
 {
     switch(type) {
         case PAYLOAD_TYPE_WORLDSTATE:
-            return sizeof(WorldState);
+            return (unsigned) sizeof(WorldState);
         case PAYLOAD_TYPE_USERINPUT:
-            return sizeof(UserInput);
+            return (unsigned) sizeof(UserInput);
         default:
             assert(0); // Not reached
             return 0;
@@ -97,7 +97,7 @@ GrowblesSocket::SendPayload(Payload& payload)
     // our payload to go in a single packet. So we create a buffer here for
     // the packet.
     unsigned dataSize = payload.GetDataSize();
-    unsigned buffSize = sizeof(payload.type) + sizeof(size_t) + dataSize;
+    unsigned buffSize = sizeof(payload.type) + sizeof(dataSize) + dataSize;
     char* buffer = (char*)malloc(buffSize);
     assert(buffer);
 
@@ -125,7 +125,7 @@ GrowblesSocket::HasPayload()
         return false;
 
     // We've received the header. Read it in and recur.
-    size_t dataSize;
+    unsigned dataSize;
     ReadInput((char*)&mIncoming.type, sizeof(mIncoming.type));
     ReadInput((char*)&dataSize, sizeof(dataSize));
     assert(dataSize == mIncoming.GetDataSize()); // Make sure compilers pack

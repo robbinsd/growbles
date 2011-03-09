@@ -27,7 +27,7 @@ struct Payload {
     ~Payload();
 
     // Gets the data size for a given type
-    size_t GetDataSize();
+    unsigned GetDataSize();
 
     // The type of the payload
     PayloadType type;
