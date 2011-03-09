@@ -96,6 +96,7 @@ WorldModel::Step()
     for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *player = mPlayers[i];
         assert(player);
+        HandleInputForPlayer(player->GetPlayerID());
         btTransform trans;
         mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
         Vector playerPos(trans.getOrigin());
@@ -113,16 +114,6 @@ WorldModel::GetState(WorldState& stateOut)
 
 void
 WorldModel::SetState(WorldState& stateIn)
-{
-}
-
-void
-WorldModel::GrowPlayer(unsigned playerID)
-{
-}
-
-void
-WorldModel::ShrinkPlayer(unsigned playerID)
 {
 }
 
@@ -208,34 +199,36 @@ WorldModel::GetPlayer(unsigned playerID)
 void
 WorldModel::ApplyInput(UserInput& input)
 {
+    // Get the player the input applies to
+    Player* player = GetPlayer(input.playerID);
+    assert(player);
 
+    // Apply it
+    player->applyInput(input);
 }
 
 void
-WorldModel::MovePlayer(unsigned playerID, int direction)
+WorldModel::HandleInputForPlayer(unsigned playerID)
 {
-#if 0
     // Get the referenced player
     Player* player = GetPlayer(playerID);
     assert(player);
     btRigidBody* playerRigidBody = mPlayerRigidBodies[player];
 
-    switch (direction) {
-        case USERINPUT_MASK_UP:
-            playerRigidBody->applyForce(btVector3(1.0, 0.0, 0.0), btVector3(1.0, 1.0, 1.0));
-            break;
-        case USERINPUT_MASK_DOWN:
-            playerRigidBody->applyForce(btVector3(-1.0, 0.0, 0.0), btVector3(1.0, 1.0, 1.0));
-            break;
-        case USERINPUT_MASK_LEFT:
-            playerRigidBody->applyForce(btVector3(0.0, 0.0, -1.0), btVector3(1.0, 1.0, 1.0));
-            break;
-        case USERINPUT_MASK_RIGHT:
-            playerRigidBody->applyForce(btVector3(1.0, 0.0, 1.0), btVector3(1.0, 1.0, 1.0));
-            break;
-        default:
-            break;
-    }
-#endif
+    // Get the inputs
+    uint32_t activeInputs = player->GetActiveInputs();
+
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_UP, true))
+        playerRigidBody->applyForce(btVector3(1.0, 0.0, 0.0),
+                                    btVector3(1.0, 1.0, 1.0));
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_DOWN, true))
+        playerRigidBody->applyForce(btVector3(-1.0, 0.0, 0.0),
+                                    btVector3(1.0, 1.0, 1.0));
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_LEFT, true))
+        playerRigidBody->applyForce(btVector3(0.0, 0.0, -1.0),
+                                    btVector3(1.0, 1.0, 1.0));
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_RIGHT, true))
+        playerRigidBody->applyForce(btVector3(1.0, 0.0, 1.0),
+                                    btVector3(1.0, 1.0, 1.0));
 }
 

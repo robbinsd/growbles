@@ -64,19 +64,17 @@ class WorldModel {
      */
     void ApplyInput(UserInput& input);
 
-    /*
-     * Inputs
-     */
-    void GrowPlayer(unsigned playerID);
-    void ShrinkPlayer(unsigned playerID);
-    void MovePlayer(unsigned playerID, int direction);
-
     protected:
 
     /*
      * Internal-only method. Adds a player at a specified position.
      */
     void AddPlayer(unsigned playerID, Vector position);
+
+    /*
+     * Applies forces for the current inputs.
+     */
+    void HandleInputForPlayer(unsigned playerID);
 
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;

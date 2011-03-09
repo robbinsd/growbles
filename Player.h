@@ -43,11 +43,16 @@ public:
      * Apply an input.
      */
     void applyInput(UserInput& input);
-    
+
     /*
      * Gets the ID of this player.
      */
     unsigned GetPlayerID() { return mPlayerID; } ;
+
+    /*
+     * Get the active inputs.
+     */
+    uint32_t GetActiveInputs() { return activeInputs; };
 
     protected:
 
