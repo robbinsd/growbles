@@ -202,7 +202,7 @@ RenderContext::SetViewportAndProjection()
     GL_CHECK(glViewport(0, 0, mWindow.GetWidth(), mWindow.GetHeight()));
     GL_CHECK(glMatrixMode(GL_PROJECTION));
     GL_CHECK(glLoadIdentity());
-    GL_CHECK(gluPerspective(90.0,
+    GL_CHECK(gluPerspective(60.0,
                             ((GLfloat)mWindow.GetWidth()) /
                             ((GLfloat)mWindow.GetHeight()),
                             CAMERA_NEAR, CAMERA_FAR));

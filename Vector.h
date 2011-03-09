@@ -17,7 +17,7 @@ struct Vector {
     */
     Vector();
     Vector(float xx, float yy, float zz, float ww);
-    Vector(btVector3 vec);
+    Vector(const btVector3 &vec);
 
     /*
     * Batch setter.

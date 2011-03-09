@@ -12,8 +12,8 @@
 Player::Player(unsigned playerID,
                SceneNode* playerSceneNode,
                Vector initialPosition) : mPlayerID(playerID)
-                                           , mPlayerNode(playerSceneNode)
-                                           , position(Vector(0.0, 0.0, 0.0, 0.0))
+                                       , mPlayerNode(playerSceneNode)
+                                       , position(Vector(0.0, 0.0, 0.0, 0.0))
 {
     this->moveTo(initialPosition);
 }

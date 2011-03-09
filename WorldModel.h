@@ -1,5 +1,6 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
+#include "SceneGraph.h"
 
 #include "SceneGraph.h"
 #include "Player.h"
@@ -7,9 +8,21 @@
 
 class SceneGraph;
 
+// struct containing information about a player
+struct PlayerInfo {
+    int playerID;
+    Vector pos;
+};
+
 // Struct containing all mutable world state
 struct WorldState {
 
+    // We want some values here so that this structure
+    // takes up room in order to test the network code.
+    WorldState() : dummy1(12), dummy2(33) {};
+    unsigned dummy1;
+    unsigned dummy2;
+    std::vector<PlayerInfo> playerVec;
 };
 
 class WorldModel {
@@ -39,8 +52,12 @@ class WorldModel {
 
     /*
      * Adds a player to the world.
+     *
+     * This places the players where it pleases, and as such should only
+     * be called on the server (where the world is generated). Everybody else
+     * should receive state dumps from the server.
      */
-    void AddPlayer(unsigned playerID, Vector initialPosition);
+    void AddPlayer(unsigned playerID);
 
     /*
      * Gets a player by ID.
@@ -58,12 +75,20 @@ class WorldModel {
 
     protected:
 
+    /*
+     * Internal-only method. Adds a player at a specified position.
+     */
+    void AddPlayer(unsigned playerID, Vector position);
+
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;
 
     // The players
     std::vector<Player*> mPlayers;
     
+    // Physics properties of each player
+    std::map<Player *, btCollisionShape*> mPlayerShapes;
+    std::map<Player *, btRigidBody*> mPlayerRigidBodies;
     // Physics Simulation
     btBroadphaseInterface* broadphase;
     btDefaultCollisionConfiguration* collisionConfiguration;
@@ -73,12 +98,6 @@ class WorldModel {
     // Physics properties of the platform
     btCollisionShape* groundShape;
     btRigidBody* groundRigidBody;
-    // Physics properties of the player
-    btCollisionShape* playerShape;
-    btRigidBody* playerRigidBody;
-    // Physics properties of the other player
-    btCollisionShape* otherPlayerShape;
-    btRigidBody* otherPlayerRigidBody;
 };
 
 #endif /* WORLDMODEL_H */

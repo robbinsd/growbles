@@ -21,7 +21,7 @@ public:
      * constructor
      */
     Player(unsigned playerID, SceneNode* playerSceneNode, Vector initialPosition);
-    
+
     /*
      * move the player by a translation vector
      */
