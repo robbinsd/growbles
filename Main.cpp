@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
     // Random seed
 #ifdef _WIN32
-	srand(123456);
+    srand(123456);
 #else
     srandom(123456);
 #endif
