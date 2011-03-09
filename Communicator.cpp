@@ -110,7 +110,7 @@ GrowblesSocket::SendPayload(Payload& payload)
     memcpy(currBuffer, payload.data, dataSize);
 
     // Send the buffer
-    SendBuf(currBuffer, buffSize);
+    SendBuf(buffer, buffSize);
 }
 
 bool
