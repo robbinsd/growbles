@@ -13,6 +13,8 @@
 #include "Framework.h"
 #include "SceneGraph.h"
 
+class UserInput;
+
 class Player {
     
 public:
@@ -36,6 +38,11 @@ public:
      * Get the current position of the player
      */
     Vector getPosition();
+
+    /*
+     * Apply an input.
+     */
+    void applyInput(UserInput& input);
     
     /*
      * Gets the ID of this player.
@@ -49,9 +56,14 @@ public:
 
     // the node in the scene that contains the mesh for the player
     SceneNode* mPlayerNode;
-    
+
     // The current position of the player
     Vector position;
+
+    // The current active inputs applied to this player.
+    // This is a bitfield of the USERINPUT_* variety, with only begin
+    // bits defined.
+    uint32_t activeInputs;
 };
 
 #endif /* PLAYER_H */
