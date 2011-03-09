@@ -79,6 +79,9 @@ class WorldModel {
     // The players
     std::vector<Player*> mPlayers;
     
+    // Physics properties of each player
+    std::map<Player *, btCollisionShape*> mPlayerShapes;
+    std::map<Player *, btRigidBody*> mPlayerRigidBodies;
     // Physics Simulation
     btBroadphaseInterface* broadphase;
     btDefaultCollisionConfiguration* collisionConfiguration;
@@ -88,12 +91,6 @@ class WorldModel {
     // Physics properties of the platform
     btCollisionShape* groundShape;
     btRigidBody* groundRigidBody;
-    // Physics properties of the player
-    btCollisionShape* playerShape;
-    btRigidBody* playerRigidBody;
-    // Physics properties of the other player
-    btCollisionShape* otherPlayerShape;
-    btRigidBody* otherPlayerRigidBody;
 };
 
 #endif /* WORLDMODEL_H */

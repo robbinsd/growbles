@@ -13,7 +13,6 @@ using std::stringstream;
 
 #define ARMADILLO_BASE_Y 3.3
 
-
 void
 WorldModel::Init(SceneGraph& sceneGraph)
 {
@@ -54,37 +53,6 @@ WorldModel::Init(SceneGraph& sceneGraph)
     groundRigidBodyCI.m_restitution = 0.1;
     groundRigidBody = new btRigidBody(groundRigidBodyCI);
     dynamicsWorld->addRigidBody(groundRigidBody);
-    
-    // Create the player rigidBody
-    playerShape = new btSphereShape(1);
-    btDefaultMotionState* playerMotionState =
-    new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(-8.0, 50.0, 0.0)));
-    
-    btScalar playerMass = 1;
-    btVector3 playerInertia(0, 0, 0);
-    playerShape->calculateLocalInertia(playerMass,playerInertia);
-    
-    btRigidBody::btRigidBodyConstructionInfo playerRigidBodyCI(playerMass, playerMotionState, playerShape, playerInertia);
-    playerRigidBodyCI.m_friction = 0.5;
-    playerRigidBodyCI.m_restitution = 0.1;
-    playerRigidBodyCI.m_angularDamping = 0.5;
-    playerRigidBody = new btRigidBody(playerRigidBodyCI);
-    playerRigidBody->setActivationState(DISABLE_DEACTIVATION);
-    dynamicsWorld->addRigidBody(playerRigidBody);
-    
-    // Create the other player's rigidBody
-    otherPlayerShape = new btSphereShape(1);
-    btDefaultMotionState* otherPlayerMotionState =
-    new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(-4.0, 30.0, 4.0)));
-    otherPlayerShape->calculateLocalInertia(playerMass,playerInertia);
-    
-    btRigidBody::btRigidBodyConstructionInfo otherPlayerRigidBodyCI(playerMass, otherPlayerMotionState, otherPlayerShape, playerInertia);
-    otherPlayerRigidBodyCI.m_friction = 0.5;
-    otherPlayerRigidBodyCI.m_restitution = 0.1;
-    otherPlayerRigidBodyCI.m_angularDamping = 0.5;
-    otherPlayerRigidBody = new btRigidBody(otherPlayerRigidBodyCI);
-    otherPlayerRigidBody->setActivationState(DISABLE_DEACTIVATION);
-    dynamicsWorld->addRigidBody(otherPlayerRigidBody);
 }
 
 WorldModel::~WorldModel()
@@ -95,20 +63,20 @@ WorldModel::~WorldModel()
         delete *it;
     
     // Destroy physics simulation
-    dynamicsWorld->removeRigidBody(playerRigidBody);
-    delete playerRigidBody->getMotionState();
-    delete playerRigidBody;
-    
-    dynamicsWorld->removeRigidBody(otherPlayerRigidBody);
-    delete otherPlayerRigidBody->getMotionState();
-    delete otherPlayerRigidBody;
+	for(int i = 0; i < mPlayers.size(); ++i){
+		Player *player = mPlayers[i];
+		assert(player);
+		btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
+		dynamicsWorld->removeRigidBody(playerRigidBody);
+		delete playerRigidBody->getMotionState();
+		delete playerRigidBody;
+		delete mPlayerShapes[player];
+	}
     
     dynamicsWorld->removeRigidBody(groundRigidBody);
     delete groundRigidBody->getMotionState();
     delete groundRigidBody;
     
-    delete playerShape;
-    delete otherPlayerShape;
     delete groundShape;
     
     delete dynamicsWorld;
@@ -121,25 +89,18 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step()
 {
-    // Get players
-    Player* player = GetPlayer(1);
-    assert(player);
-    
-    Player* otherPlayer = GetPlayer(2);
-    assert(otherPlayer);
-    
     // BOF step physics
     dynamicsWorld->stepSimulation(1/60.f, 10);
-    
-    btTransform trans;
-    playerRigidBody->getMotionState()->getWorldTransform(trans);
-    Vector playerPos(trans.getOrigin());
-    player->moveTo(playerPos);
-    
-    btTransform otherTrans;
-    otherPlayerRigidBody->getMotionState()->getWorldTransform(otherTrans);
-    Vector otherPlayerPos(otherTrans.getOrigin());
-    otherPlayer->moveTo(otherPlayerPos);
+	
+    // Loop over players
+	for(int i = 0; i < mPlayers.size(); ++i){
+		Player *player = mPlayers[i];
+		assert(player);
+		btTransform trans;
+		mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
+		Vector playerPos(trans.getOrigin());
+		player->moveTo(playerPos);
+	}
     
     //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
     // EOF step physics
@@ -209,6 +170,26 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
 
     // Add it to our list of players
     mPlayers.push_back(player);
+
+	// Create the player rigidBody
+    btCollisionShape* playerShape = new btSphereShape(1);
+	mPlayerShapes[player] = playerShape;
+    btDefaultMotionState* playerMotionState =
+		new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),
+		btVector3(initialPosition.x,initialPosition.y,initialPosition.z)));
+    
+    btScalar playerMass = 1;
+    btVector3 playerInertia(0, 0, 0);
+    playerShape->calculateLocalInertia(playerMass,playerInertia);
+    
+    btRigidBody::btRigidBodyConstructionInfo playerRigidBodyCI(playerMass, playerMotionState, playerShape, playerInertia);
+    playerRigidBodyCI.m_friction = 0.5;
+    playerRigidBodyCI.m_restitution = 0.1;
+    playerRigidBodyCI.m_angularDamping = 0.5;
+    btRigidBody *playerRigidBody = new btRigidBody(playerRigidBodyCI);
+	mPlayerRigidBodies[player] = playerRigidBody;
+    playerRigidBody->setActivationState(DISABLE_DEACTIVATION);
+    dynamicsWorld->addRigidBody(playerRigidBody);
 }
 
 Player*
@@ -230,6 +211,7 @@ WorldModel::MovePlayer(unsigned playerID, int direction)
     // Get the referenced player
     Player* player = GetPlayer(playerID);
     assert(player);
+	btRigidBody* playerRigidBody = mPlayerRigidBodies[player];
 
     switch (direction) {
         case USERINPUT_MASK_UP:

@@ -17,7 +17,7 @@ Vector::Vector(float xx, float yy, float zz, float ww) : x(xx)
 {
 }
 
-Vector::Vector(btVector3 vec) : x(vec.x())
+Vector::Vector(const btVector3 &vec) : x(vec.x())
                               , y(vec.y())
                               , z(vec.z())
                               , w(1.0)
