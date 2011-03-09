@@ -320,9 +320,10 @@ Communicator::ConnectAsServer()
     mSocketHandler.Add(&listenSocket);
 
     // We want to wait until we've accepted the desired number of connections.
-    // Note that we want GetCount() to be one more than our desired number of
-    // clients, because the handler is holding onto the ListenSocket too.
-    while (mSocketHandler.GetCount() < mNumClientsExpected + 1)
+    // Note that we want GetNumActiveSockets() to be one more than our desired
+    // number of clients, because the handler is holding onto the ListenSocket
+    // too.
+    while (mSocketHandler.GetNumActiveSockets() < mNumClientsExpected + 1)
         mSocketHandler.Select(1,0);
 }
 

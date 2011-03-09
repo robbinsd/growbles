@@ -113,6 +113,11 @@ class GrowblesHandler : public SocketHandler {
     // Gets our Communicator
     Communicator* GetCommunicator() { return mCommunicator; };
 
+    // For some dumb reason SocketHandler has a staging area for sockets (m_add),
+    // and includes the number of staged sockets in GetCount(). We want to know
+    // how many sockets are actually active.
+    unsigned GetNumActiveSockets() { return m_sockets.size(); };
+
     protected:
 
     // The Communicator possessing this handler
