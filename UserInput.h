@@ -7,18 +7,21 @@
 class RenderContext;
 class WorldModel;
 
-#define USERINPUT_MASK_GROW_BEGIN (1 << 0)
-#define USERINPUT_MASK_GROW_END (1 << 1)
-#define USERINPUT_MASK_SHRINK_BEGIN (1 << 2)
-#define USERINPUT_MASK_SHRINK_END (1 << 3)
-#define USERINPUT_MASK_UP_BEGIN (1 << 4)
-#define USERINPUT_MASK_UP_END (1 << 5)
-#define USERINPUT_MASK_DOWN_BEGIN (1 << 6)
-#define USERINPUT_MASK_DOWN_END (1 << 7)
-#define USERINPUT_MASK_LEFT_BEGIN (1 << 8)
-#define USERINPUT_MASK_LEFT_END (1 << 9)
-#define USERINPUT_MASK_RIGHT_BEGIN (1 << 10)
-#define USERINPUT_MASK_RIGHT_END (1 << 11)
+typedef enum {
+    USERINPUT_INDEX_GROW = 0,
+    USERINPUT_INDEX_SHRINK,
+    USERINPUT_INDEX_UP,
+    USERINPUT_INDEX_DOWN,
+    USERINPUT_INDEX_LEFT,
+    USERINPUT_INDEX_RIGHT,
+    USERINPUT_INDEX_COUNT
+} UserInputIndex;
+
+// The actual bitmask uses 2 bits for each item (one to signal the start
+// of application and one to signal the end). Begin events always have an
+// even bit index.
+
+#define GEN_INPUT_MASK(index, isBegin) (isBegin ? 1 << (2*index) : 1 << (2*index+1))
 
 struct UserInput {
 

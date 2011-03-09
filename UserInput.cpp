@@ -102,34 +102,22 @@ UserInput::LoadInput(RenderContext& context)
                 // Handle each key
                 switch(evt.Key.Code) {
                     case sf::Key::I:
-                        inputs |= isPress
-                          ? USERINPUT_MASK_GROW_BEGIN
-                          : USERINPUT_MASK_GROW_END;
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_GROW, isPress);
                         break;
                     case sf::Key::K:
-                        inputs |= isPress
-                          ? USERINPUT_MASK_SHRINK_BEGIN
-                          : USERINPUT_MASK_SHRINK_END;
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_SHRINK, isPress);
                         break;
                     case sf::Key::T:
-                        inputs |= isPress
-                          ? USERINPUT_MASK_UP_BEGIN
-                          : USERINPUT_MASK_UP_END;
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_UP, isPress);
                         break;
                     case sf::Key::G:
-                        inputs |= isPress
-                          ? USERINPUT_MASK_DOWN_BEGIN
-                          : USERINPUT_MASK_DOWN_END;
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_DOWN, isPress);
                         break;
                     case sf::Key::F:
-                        inputs |= isPress
-                          ? USERINPUT_MASK_LEFT_BEGIN
-                          : USERINPUT_MASK_LEFT_END;
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_LEFT, isPress);
                         break;
                     case sf::Key::H:
-                        inputs |= isPress
-                          ? USERINPUT_MASK_RIGHT_BEGIN
-                          : USERINPUT_MASK_RIGHT_END;
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_RIGHT, isPress);
                         break;
                     default:
                         break;
