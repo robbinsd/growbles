@@ -47,13 +47,13 @@ Player::applyInput(UserInput& input)
     uint32_t ends = input.inputs & 0xAAAAAAAA;
 
     // Sanity check - We shouldn't begin and end the same input
-    assert((ends >> 1) & begins == 0);
+    assert(((ends >> 1) & begins) == 0);
 
     // Sanity check - We shouldn't begin anything already begun
-    assert(begins & activeInputs == 0);
+    assert((begins & activeInputs) == 0);
 
     // Sanity check - We shouldn't end anything not begun
-    assert((ends >> 1) | activeInputs == activeInputs);
+    assert(((ends >> 1) | activeInputs) == activeInputs);
 
     // Apply our begins
     activeInputs |= begins;
