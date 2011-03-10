@@ -373,4 +373,12 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
 void
 Communicator::SendInput(UserInput& input)
 {
+    // Create the payload
+    Payload outgoing;
+    outgoing.type = PAYLOAD_TYPE_USERINPUT;
+    outgoing.data = &input;
+
+    // Send to all. For servers, this means all clients. For clients, this
+    // means just the server.
+    mSocketHandler.SendToAll(outgoing);
 }
