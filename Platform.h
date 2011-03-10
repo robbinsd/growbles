@@ -15,29 +15,31 @@ enum {IDLE, BLINKING, FALLING};
 
 class Platform
 {
-    public:
-        Platform(int timeToDrop);
-		~Platform();
-        void reset();
-        void update();
-        void render();
-		float getRadius();
+public:
+    Platform(int timeToDrop);
+    ~Platform();
+    void reset();
+    void update();
+    void render();
+    float getRadius();
+    int getFallingRing();
+    float getFallingRingPos();
 
-    private:
-        int dropTicks, dropTimer, blinkTimer, dropCount; // Timers and counters
-		bool blinkOn; // Toggles blinking
-        float curRadius, curDrawRadius; // Indicates the collision and actual drawn radius
-		float dropVelocity, dropY; // Drop movement
+private:
+    int dropTicks, dropTimer, blinkTimer, dropCount, fallingRing; // Timers and counters
+    bool blinkOn; // Toggles blinking
+    float curRadius, curDrawRadius; // Indicates the collision and actual drawn radius
+    float dropVelocity, dropY; // Drop movement
 
-        // The colors for different parts of the platform
-        float regularColor[3], brightColor[3], topColor[3];
+    // The colors for different parts of the platform
+    float regularColor[3], brightColor[3], topColor[3];
 
-		// Quadric objects for cylinders, and disks of the platform
-        GLUquadric *innerCylinder, *outerCylinder;
-		GLUquadric *innerDisk, *outerDisk;
+    // Quadric objects for cylinders, and disks of the platform
+    GLUquadric *innerCylinder, *outerCylinder;
+    GLUquadric *innerDisk, *outerDisk;
 
-        // Drop state variable
-        int dropState;
+    // Drop state variable
+    int dropState;
 };
 
 #endif

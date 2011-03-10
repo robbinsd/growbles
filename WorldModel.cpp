@@ -45,17 +45,24 @@ WorldModel::Init(SceneGraph& sceneGraph)
 
     // Create the ground rigidBody
     //groundShape = new btStaticPlaneShape(btVector3(0,1,0),1);
-    groundShape = new btCylinderShape(btVector3(15,3,15));
-
-    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,1,0)));
-
-    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
-    groundRigidBodyCI.m_friction = 0.5;
-    groundRigidBodyCI.m_restitution = 0.1;
-    groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    dynamicsWorld->addRigidBody(groundRigidBody);
+    // 5 rings, ring 1 is the outermost and ring 5 is in the center
+    float ringRadius = 15.0;
+    for (int i=0; i<5; i++) {
+        btCollisionShape* platformShape = new btCylinderShape(btVector3(ringRadius, 3, ringRadius));
+        platformShapes.push_back(platformShape);
+        
+        btDefaultMotionState* platformMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,1,0)));
+        
+        btRigidBody::btRigidBodyConstructionInfo platformRigidBodyCI(0, platformMotionState, platformShape, btVector3(0,0,0));
+        platformRigidBodyCI.m_friction = 0.5;
+        platformRigidBodyCI.m_restitution = 0.1;
+        btRigidBody* platformRigidBody = new btRigidBody(platformRigidBodyCI);
+        dynamicsWorld->addRigidBody(platformRigidBody);
+        platformRigidBodies.push_back(platformRigidBody);
+        ringRadius -= 3.0;
+    }
     
-    // Create the platform
+    // Create the temporary platform
     platform = new Platform(200);
     
     // Enable the debug drawer
@@ -71,6 +78,7 @@ WorldModel::~WorldModel()
         delete *it;
 
     // Destroy physics simulation
+    // Destroy players
     for(unsigned i = 0; i < mPlayers.size(); ++i) {
         Player *player = mPlayers[i];
         assert(player);
@@ -81,19 +89,22 @@ WorldModel::~WorldModel()
         delete mPlayerShapes[player];
     }
 
-    dynamicsWorld->removeRigidBody(groundRigidBody);
-    delete groundRigidBody->getMotionState();
-    delete groundRigidBody;
-
-    delete groundShape;
-
+    // Destroy platform
+    for (int i=0; i<5; i++) {
+        dynamicsWorld->removeRigidBody(platformRigidBodies[i]);
+        delete platformRigidBodies[i]->getMotionState();
+        delete platformRigidBodies[i];
+        delete platformShapes[i];
+    }
+    
+    // Destroy other physics stuff
     delete dynamicsWorld;
     delete solver;
     delete collisionConfiguration;
     delete dispatcher;
     delete broadphase;
     
-    // Delete the platform
+    // Delete the temporary platform
     delete platform;
 }
 
@@ -125,6 +136,12 @@ WorldModel::Step(sf::Clock& clck, GLint shaderID)
     if(time > 0.05) {
         clck.Reset();
         platform->update();
+        
+        // move the platform rigid bodies along with the rings
+        int fallingRing = platform->getFallingRing();
+        std::cout << "falling ring: " << fallingRing << "\n";
+        float fallingRingPos = platform->getFallingRingPos();
+        MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
     }
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -288,4 +305,5 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
         playerRigidBody->applyForce(btVector3(1.0, 0.0, 1.0),
                                     btVector3(1.0, 1.0, 1.0));
 }
+
 
