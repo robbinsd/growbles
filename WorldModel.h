@@ -111,15 +111,4 @@ class WorldModel {
     GLDebugDrawer debugDrawer;
 };
 
-/*
- * Helper function to move a rigid body to a certain location
- */
-static void MoveRigidBody(btRigidBody* body, float x, float y, float z)
-{
-    btTransform transform;
-    transform.setIdentity();
-    transform.setOrigin(btVector3(btScalar(x), btScalar(y), btScalar(z)));
-    body->setWorldTransform(transform);
-}
-
 #endif /* WORLDMODEL_H */
