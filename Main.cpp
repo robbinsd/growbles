@@ -6,6 +6,7 @@
 #include "UserInput.h"
 #include <stdlib.h>
 #include "Player.h"
+sf::Clock clck;
 
 char* getOption(int argc, char** argv, const char* flag);
 void printUsageAndExit(char* programName);
@@ -80,8 +81,8 @@ int main(int argc, char** argv) {
         communicator.Synchronize(world);
 
         // Step the world
-        world.Step();
-
+        world.Step(clck, renderContext.GetShaderID());
+        
         // Render the scenegraph
         renderContext.Render(sceneGraph);
 

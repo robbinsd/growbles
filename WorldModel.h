@@ -2,11 +2,19 @@
 #define WORLDMODEL_H
 
 #include "SceneGraph.h"
+#include "Platform.h"
+#include "GLDebugDrawer.h"
 #include "Player.h"
 #include <vector>
 
 class SceneGraph;
 class UserInput;
+
+// struct containing information about a player
+struct PlayerInfo {
+    int playerID;
+    Vector pos;
+};
 
 // Struct containing all mutable world state
 struct WorldState {
@@ -16,6 +24,7 @@ struct WorldState {
     WorldState() : dummy1(12), dummy2(33) {};
     unsigned dummy1;
     unsigned dummy2;
+    std::vector<PlayerInfo> playerVec;
 };
 
 class WorldModel {
@@ -35,7 +44,7 @@ class WorldModel {
     /*
      * Steps the model forward in time.
      */
-    void Step();
+    void Step(sf::Clock& clck, GLint shaderID);
 
     /*
      * Get/Set world state. Allows for rewinding.
@@ -94,6 +103,12 @@ class WorldModel {
     // Physics properties of the platform
     btCollisionShape* groundShape;
     btRigidBody* groundRigidBody;
+    
+    // The platform
+    Platform* platform;
+    
+    // Debug drawer
+    GLDebugDrawer debugDrawer;
 };
 
 #endif /* WORLDMODEL_H */
