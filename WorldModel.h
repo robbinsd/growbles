@@ -101,8 +101,8 @@ class WorldModel {
     btSequentialImpulseConstraintSolver* solver;
     btDiscreteDynamicsWorld* dynamicsWorld;
     // Physics properties of the platform
-    btCollisionShape* groundShape;
-    btRigidBody* groundRigidBody;
+    std::vector<btCollisionShape*> platformShapes;
+    std::vector<btRigidBody*> platformRigidBodies;
     
     // The platform
     Platform* platform;
@@ -110,5 +110,16 @@ class WorldModel {
     // Debug drawer
     GLDebugDrawer debugDrawer;
 };
+
+/*
+ * Helper function to move a rigid body to a certain location
+ */
+static void MoveRigidBody(btRigidBody* body, float x, float y, float z)
+{
+    btTransform transform;
+    transform.setIdentity();
+    transform.setOrigin(btVector3(btScalar(x), btScalar(y), btScalar(z)));
+    body->setWorldTransform(transform);
+}
 
 #endif /* WORLDMODEL_H */

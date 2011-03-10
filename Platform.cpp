@@ -29,16 +29,18 @@ Platform::~Platform()
 	gluDeleteQuadric(outerDisk);
 }
 
-void Platform::reset()
+void
+Platform::reset()
 {
-	dropTimer=blinkTimer=dropCount=0;
+	dropTimer=blinkTimer=dropCount=fallingRing=0;
 	blinkOn=false;
 	curRadius=curDrawRadius=START_RADIUS;
 	dropState = IDLE;
 	dropY = dropVelocity = 0.0f;
 }
 
-void Platform::update()
+void
+Platform::update()
 {
 	if(dropState == IDLE || dropState == BLINKING) // If waiting to drop
     {
@@ -78,11 +80,13 @@ void Platform::update()
 			blinkOn = false;
 			curDrawRadius -= RADIUS_DECREASE; // Decrease the draw radius
 			dropState = IDLE;
+            fallingRing++;
 		}
 	}
 }
 
-void Platform::render()
+void
+Platform::render()
 {
     // Render the outer disk
 	glPushMatrix();
@@ -150,7 +154,20 @@ void Platform::render()
     glPopMatrix();
 }
 
-float Platform::getRadius()
+float
+Platform::getRadius()
 {
 	return curRadius;
+}
+
+int
+Platform::getFallingRing()
+{
+    return fallingRing;
+}
+
+float
+Platform::getFallingRingPos()
+{
+    return -dropY;
 }
