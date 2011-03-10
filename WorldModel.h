@@ -1,9 +1,10 @@
 #ifndef WORLDMODEL_H
 #define WORLDMODEL_H
-#include "SceneGraph.h"
 
 #include "SceneGraph.h"
 #include "Player.h"
+#include "Platform.h"
+#include "GLDebugDrawer.h"
 #include <vector>
 
 class SceneGraph;
@@ -42,7 +43,7 @@ class WorldModel {
     /*
      * Steps the model forward in time.
      */
-    void Step();
+    void Step(sf::Clock& clck, GLint shaderID);
 
     /*
      * Get/Set world state. Allows for rewinding.
@@ -98,6 +99,12 @@ class WorldModel {
     // Physics properties of the platform
     btCollisionShape* groundShape;
     btRigidBody* groundRigidBody;
+    
+    // The platform
+    Platform* platform;
+    
+    // Debug drawer
+    GLDebugDrawer debugDrawer;
 };
 
 #endif /* WORLDMODEL_H */

@@ -6,7 +6,7 @@
 #include "UserInput.h"
 #include <stdlib.h>
 #include "Player.h"
-#include "Platform.h"
+sf::Clock clck;
 
 char* getOption(int argc, char** argv, const char* flag);
 void printUsageAndExit(char* programName);
@@ -67,10 +67,6 @@ int main(int argc, char** argv) {
     communicator.InitWorld(world, sceneGraph);
 
     UserInput input(communicator.GetPlayerID(), currTimestamp);
-    
-    bool testPlatform = false;
-    //Platform platform(5);
-    //platform.reset();
 
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
@@ -87,43 +83,7 @@ int main(int argc, char** argv) {
         communicator.Synchronize(world);
 
         // Step the world
-        world.Step();
-        
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (testPlatform) { // work in progress
-            GL_CHECK(glMatrixMode(GL_MODELVIEW));
-            GL_CHECK(glPushMatrix());
-            GL_CHECK(glLoadIdentity());
-            GL_CHECK(glMatrixMode(GL_PROJECTION));
-            GL_CHECK(glPushMatrix());
-            GL_CHECK(glLoadIdentity());
-            //GL_CHECK(glOrtho(-0.1, 1.1, -0.1, 1.1, -1.0, 1.0));
-            
-            // Disable the shader (use the fixed-function pipeline)
-            GL_CHECK(glUseProgram(0));
-            
-            // Draw our quad
-            glBegin(GL_QUADS);
-            glVertex2d(0.0,0.0);
-            glVertex2d(10.0,0.0);
-            glVertex2d(10.0,10.0);
-            glVertex2d(0.0,10.0);
-            glEnd();
-            //platform.render();
-            
-            // Flush
-            GL_CHECK(glFlush());
-            
-            // Reenable the shader
-            GL_CHECK(glUseProgram(renderContext.GetShaderID()));
-            
-            // Restore our old matrices
-            GL_CHECK(glMatrixMode(GL_MODELVIEW));
-            GL_CHECK(glPopMatrix());
-            GL_CHECK(glMatrixMode(GL_PROJECTION));
-            GL_CHECK(glPopMatrix());
-        }
-        
+        world.Step(clck, renderContext.GetShaderID());
         
         // Render the scenegraph
         renderContext.Render(sceneGraph);

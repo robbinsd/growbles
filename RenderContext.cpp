@@ -103,7 +103,7 @@ RenderContext::Render(SceneGraph& sceneGraph)
         ShadowPass(sceneGraph);
 
     // Clear the buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind the shadow texture
     GL_CHECK(glActiveTexture(SHADOW_TEXTURE_UNIT));

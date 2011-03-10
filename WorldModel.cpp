@@ -44,15 +44,23 @@ WorldModel::Init(SceneGraph& sceneGraph)
     dynamicsWorld->setGravity(btVector3(0,-10,0));
 
     // Create the ground rigidBody
-    groundShape = new btStaticPlaneShape(btVector3(0,2,0),1);
+    //groundShape = new btStaticPlaneShape(btVector3(0,1,0),1);
+    groundShape = new btCylinderShape(btVector3(15,3,15));
 
-    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,1,0)));
 
     btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
     groundRigidBodyCI.m_friction = 0.5;
     groundRigidBodyCI.m_restitution = 0.1;
     groundRigidBody = new btRigidBody(groundRigidBodyCI);
     dynamicsWorld->addRigidBody(groundRigidBody);
+    
+    // Create the platform
+    platform = new Platform(200);
+    
+    // Enable the debug drawer
+    debugDrawer.setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+    dynamicsWorld->setDebugDrawer(&debugDrawer);
 }
 
 WorldModel::~WorldModel()
@@ -84,10 +92,13 @@ WorldModel::~WorldModel()
     delete collisionConfiguration;
     delete dispatcher;
     delete broadphase;
+    
+    // Delete the platform
+    delete platform;
 }
 
 void
-WorldModel::Step()
+WorldModel::Step(sf::Clock& clck, GLint shaderID)
 {
     // BOF step physics
     dynamicsWorld->stepSimulation(1/60.f, 10);
@@ -98,12 +109,40 @@ WorldModel::Step()
         assert(player);
         btTransform trans;
         mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
-        Vector playerPos(trans.getOrigin());
+        Vector playerPos(trans.getOrigin().getX(), trans.getOrigin().getY()-3.0, trans.getOrigin().getZ(), 1.0);
+        //std::cout << "player y: " << trans.getOrigin().getY() << "\n";
         player->moveTo(playerPos);
     }
 
     //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
     // EOF step physics
+    
+    // BOF update platform
+    
+    // update platform position
+    float time = clck.GetElapsedTime();
+    if(time > 0.05) {
+        clck.Reset();
+        platform->update();
+    }
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // Disable the shader so we can draw the platform using the fixed pipeline
+    GL_CHECK(glUseProgram(0));
+    
+    // Draw debug wireframes
+    dynamicsWorld->debugDrawWorld();
+    
+    // Draw platform
+    platform->render();
+    
+    // Flush
+    GL_CHECK(glFlush());
+    
+    // Reenable the shader
+    GL_CHECK(glUseProgram(shaderID));
+    // EOF update platform
 }
 
 void
@@ -144,8 +183,8 @@ WorldModel::ShrinkPlayer(unsigned playerID)
 {
 }
 
-static float sInitialPositions[][3] = { {-8.0, 2.0, 0.0},
-                                        {-4.0, 2.0, 4.0} };
+static float sInitialPositions[][3] = { {-8.0, 5.0, 0.0},
+                                        {-4.0, 5.0, 4.0} };
 
 void
 WorldModel::AddPlayer(unsigned playerID)
