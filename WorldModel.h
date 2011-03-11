@@ -35,6 +35,11 @@ class WorldModel {
     public:
 
     /*
+     * Dummy constructor.
+     */
+    WorldModel() : mCurrentTimestamp(0) {};
+
+    /*
      * Initializes the world model.
      */
     void Init(SceneGraph& sceneGraph);
@@ -112,6 +117,9 @@ class WorldModel {
     
     // Debug drawer
     GLDebugDrawer debugDrawer;
+
+    // Current timestamp
+    unsigned mCurrentTimestamp;
 };
 
 #endif /* WORLDMODEL_H */

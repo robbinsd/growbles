@@ -168,6 +168,9 @@ WorldModel::Step(unsigned numTicks, GLint shaderID)
     // Reenable the shader
     GL_CHECK(glUseProgram(shaderID));
     // EOF update platform
+
+    // Update the current timestamp
+    mCurrentTimestamp += numTicks;
 }
 
 void
@@ -181,6 +184,7 @@ WorldModel::GetState(WorldState& stateOut)
         playerInfoVec.push_back(playerInfo);
     }
     stateOut.playerVec = playerInfoVec;
+    stateOut.timestamp = mCurrentTimestamp;
 }
 
 void
@@ -196,6 +200,7 @@ WorldModel::SetState(WorldState& stateIn)
         //Vector playerPos = playerInfoVec[i].pos;
         //player->moveTo(playerPos);
     }
+    mCurrentTimestamp = stateIn.timestamp;
 }
 
 static float sInitialPositions[][3] = { {-8.0, 5.0, 0.0},
