@@ -42,6 +42,11 @@ class Timeline {
     Timeline();
 
     /*
+     * Destructor.
+     */
+    ~Timeline();
+
+    /*
      * Initialize the timeline. Must be called at t=0.
      */
     void Init(WorldModel& model, CommunicatorMode mode);
@@ -78,6 +83,11 @@ class Timeline {
      * world model?
      */
     bool UpToDate();
+
+    /*
+     * Prunes keyframes up to (but not including) the given timestamp.
+     */
+    void Prune(unsigned timestamp);
 
     /*
      * Finds the keyframe with the highest timestamp less than

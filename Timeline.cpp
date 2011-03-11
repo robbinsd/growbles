@@ -11,6 +11,14 @@ Timeline::Timeline() : mWorld(NULL)
 {
 }
 
+Timeline::~Timeline()
+{
+    if (mKeyframes.size() == 0)
+        return;
+
+    Prune(mKeyframes.back()->state.timestamp + 1);
+}
+
 void
 Timeline::Init(WorldModel& model, CommunicatorMode mode)
 {
@@ -131,6 +139,17 @@ Timeline::UpToDate()
 {
     assert (mWorld->GetCurrentTimestamp() >= mKeyframes.back()->state.timestamp);
     return (mWorld->GetCurrentTimestamp() == mKeyframes.back()->state.timestamp);
+}
+
+void
+Timeline::Prune(unsigned timestamp)
+{
+    KeyframeIterator it = mKeyframes.begin();
+    while (it != mKeyframes.end()) {
+        if ((*it)->state.timestamp >= timestamp)
+            return;
+        mKeyframes.erase(it++);
+    }
 }
 
 KeyframeIterator
