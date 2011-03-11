@@ -61,7 +61,7 @@ class Timeline {
 
     /*
      * Rebuilds the state snapshots in the keyframes, starting with a
-     * known good position.
+     * position with a known good snapshot.
      *
      * This mucks with WorldModel state. At the end, it leaves WorldModel
      * with the rebuilt state at the last keyframe.

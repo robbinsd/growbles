@@ -80,7 +80,35 @@ Timeline::AddInputInternal(UserInput& input)
 void
 Timeline::Rectify(KeyframeIterator lastGood)
 {
-    // TODO
+    // Rewind ourselves to the state snapshot given
+    mWorld->SetState((*lastGood)->state);
+    KeyframeIterator curr, upcoming;
+    curr = upcoming = lastGood;
+
+    while (curr != mKeyframes.end()) {
+
+        // We increment upcoming at the _beginning_ of the loop
+        ++upcoming;
+
+        // Dump the world model state into the timeline
+        WorldState state;
+        mWorld->GetState(state);
+        (*curr)->state = state;
+
+        // Apply all the inputs at this stage
+        for (unsigned i = 0; i < (*curr)->inputs.size(); ++i)
+            mWorld->ApplyInput((*curr)->inputs[i]);
+
+        // Step the world, if necessary
+        if (upcoming != mKeyframes.end()) {
+            unsigned stepSize = (*upcoming)->state.timestamp -
+                                  (*curr)->state.timestamp;
+            mWorld->Step(stepSize);
+        }
+
+        // We increment curr at the _end_ of the loop
+        ++curr;
+    }
 }
 
 void
