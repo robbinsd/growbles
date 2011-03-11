@@ -120,7 +120,7 @@ WorldModel::~WorldModel()
 }
 
 void
-WorldModel::Step(unsigned numTicks, GLint shaderID)
+WorldModel::Step(unsigned numTicks)
 {
     assert(numTicks > 0);
 
@@ -152,6 +152,9 @@ WorldModel::Step(unsigned numTicks, GLint shaderID)
     std::cout << "falling ring: " << fallingRing << "\n";
     float fallingRingPos = platform->getFallingRingPos();
     MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
+
+    /* Drawing should not happen in WorldModel.
+
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -170,6 +173,8 @@ WorldModel::Step(unsigned numTicks, GLint shaderID)
     // Reenable the shader
     GL_CHECK(glUseProgram(shaderID));
     // EOF update platform
+    //
+    */
 
     // Update the current timestamp
     mCurrentTimestamp += numTicks;

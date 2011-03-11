@@ -52,7 +52,7 @@ class WorldModel {
     /*
      * Steps the model forward in time.
      */
-    void Step(unsigned numTicks, GLint shaderID);
+    void Step(unsigned numTicks);
 
     /*
      * Get/Set world state. Allows for rewinding.
