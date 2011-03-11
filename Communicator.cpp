@@ -240,7 +240,9 @@ GrowblesHandler::ReceivePayload(Payload& payload)
  * Communicator Methods.
  */
 
-Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
+Communicator::Communicator(Timeline& timeline,
+                           CommunicatorMode mode) : mTimeline(&timeline)
+                                                  , mMode(mode)
                                                   , mPlayerID(0)
                                                   , mNextPlayerID(1)
                                                   , mNumClientsExpected(0)
@@ -367,12 +369,9 @@ Communicator::Synchronize(WorldModel& model)
 }
 
 void
-Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
+Communicator::Bootstrap(WorldModel& world)
 {
-    // Initialize the world
-    world.Init(sceneGraph);
-
-    // If we're a server, add the players to the world, then send the worldstate
+    // If we're the server
     if (mMode == COMMUNICATOR_MODE_SERVER) {
 
         // Add the server player
@@ -388,7 +387,7 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
         mSocketHandler.SendToAll(payload);
     }
 
-    // Otherwise, we're the client. Receive a worldstate from the server.
+    // If we're the client
     else {
 
         // Receive the worldstate payload
@@ -401,7 +400,6 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
         // Apply it
         world.SetState(*(WorldState*)received.data);
     }
-
 }
 
 void

@@ -6,6 +6,8 @@
 #include "UserInput.h"
 #include <stdlib.h>
 #include "Player.h"
+#include "Timeline.h"
+
 sf::Clock clck;
 
 char* getOption(int argc, char** argv, const char* flag);
@@ -31,6 +33,10 @@ int main(int argc, char** argv) {
     // Declare an empty scenegraph
     SceneGraph sceneGraph(renderContext);
 
+    // Declare our world model, and point it to the scene graph
+    WorldModel world;
+    world.Init(sceneGraph);
+
     // Client or server mode?
     char* modeString = getOption(argc, argv, "-m");
     CommunicatorMode mode = COMMUNICATOR_MODE_NONE;
@@ -41,8 +47,12 @@ int main(int argc, char** argv) {
     else
         printUsageAndExit(argv[0]);
 
+    // Declare and initialize our timeline
+    Timeline timeline;
+    timeline.Init(world);
+
     // Declare our communicator
-    Communicator communicator(mode);
+    Communicator communicator(timeline, mode);
 
     // If we're a client, who are we connecting to?
     if (mode == COMMUNICATOR_MODE_CLIENT)
@@ -59,12 +69,8 @@ int main(int argc, char** argv) {
     // Connect to the server/clients
     communicator.Connect();
 
-    // Declare and initialize our world model
-    //
-    // The Communicator needs to initialize the world, because it knows how many
-    // players there are.
-    WorldModel world;
-    communicator.InitWorld(world, sceneGraph);
+    // Put the players on the map and get people on the same page
+    communicator.Bootstrap(world);
 
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {

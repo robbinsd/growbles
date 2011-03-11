@@ -12,6 +12,7 @@ class UserInput;
 class GrowblesSocket;
 struct SceneGraph;
 class Communicator;
+class Timeline;
 
 typedef enum {
     PAYLOAD_TYPE_NONE = 0,
@@ -139,7 +140,7 @@ class Communicator {
     /*
      * Constructor.
      */
-    Communicator(CommunicatorMode mode);
+    Communicator(Timeline& timeline, CommunicatorMode mode);
 
     /*
      * Sets the server IP address. Only valid for client mode.
@@ -176,9 +177,9 @@ class Communicator {
     void Synchronize(WorldModel& model);
 
     /*
-     * Initializes a world.
+     * Bootstraps the client and server and gets everyone on the same page.
      */
-    void InitWorld(WorldModel& world, SceneGraph& sceneGraph);
+    void Bootstrap(WorldModel& world);
 
     /*
      * Gets our player ID.
@@ -192,6 +193,9 @@ class Communicator {
      */
     void ConnectAsClient();
     void ConnectAsServer();
+
+    // Timeline
+    Timeline* mTimeline;
 
     // Client or server?
     CommunicatorMode mMode;
