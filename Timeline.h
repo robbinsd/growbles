@@ -18,8 +18,9 @@
 struct Keyframe {
 
     /*
-     * Constructor.
+     * Constructors.
      */
+    Keyframe() {};
     Keyframe(WorldState& s) : state(s) {};
 
     // state snapshot
@@ -28,6 +29,8 @@ struct Keyframe {
     // Inputs applied
     std::vector<UserInput> inputs;
 };
+
+typedef std::list<Keyframe*>::iterator KeyframeIterator;
 
 class Timeline {
 
@@ -51,9 +54,32 @@ class Timeline {
     protected:
 
     /*
+     * Internal method to add input. The input must be in the range
+     * of our keyframes.
+     */
+    void AddInputInternal(UserInput& input);
+
+    /*
+     * Rebuilds the state snapshots in the keyframes, starting with a
+     * known good position.
+     *
+     * This mucks with WorldModel state. At the end, it leaves WorldModel
+     * with the rebuilt state at the last keyframe.
+     */
+    void Rectify(KeyframeIterator lastGood);
+
+    /*
      * Generates a keyframe for the current worldstate.
      */
     void GenerateCurrentKeyframe();
+
+    /*
+     * Finds the keyframe with the highest timestamp less than
+     * or equal to timestamp.
+     *
+     * Returns NULL if timestamp is later than the newest keyframe.
+     */
+    KeyframeIterator FindKeyframe(unsigned timestamp);
 
     // Pointer to our worldmodel
     WorldModel* mWorld;

@@ -25,6 +25,10 @@ Timeline::Init(WorldModel& model, CommunicatorMode mode)
 void
 Timeline::AddInput(UserInput& input)
 {
+    // We may be fast-forwarding and rewinding, so make sure our timeline contains
+    // the newest model state.
+    GenerateCurrentKeyframe();
+
     // If the input is before our first keyframe, we can't do anything about it.
     if (input.timestamp < mKeyframes.front()->state.timestamp) {
         printf("Warning - Received input for player %u with timestamp %u, but "
@@ -32,11 +36,6 @@ Timeline::AddInput(UserInput& input)
                input.playerID, input.timestamp, mKeyframes.front()->state.timestamp);
         return;
     }
-
-    // If the world has progressed far enough and it's just the timeline lagging
-    // behind, generate an up-to-date timestamp.
-    if (input.timestamp <= mWorld->GetCurrentTimestamp())
-        GenerateCurrentKeyframe();
 
     // If the input is ahead of our current worldstate...
     if (input.timestamp > mKeyframes.back()->state.timestamp) {
@@ -49,20 +48,71 @@ Timeline::AddInput(UserInput& input)
         return;
     }
 
-    // TODO - finish me
+    // Call the helper method
+    AddInputInternal(input);
+}
+
+void
+Timeline::AddInputInternal(UserInput& input)
+{
+    // Find the newest keyframe with a timestamp less than or equal to this one
+    KeyframeIterator nearest = FindKeyframe(input.timestamp);
+    assert(nearest != mKeyframes.end());
+
+    // If there isn't a keyframe already there, we have to make one.
+    // Note that we're about to Rectify(), so the state snapshot can be garbage.
+    if ((*nearest)->state.timestamp < input.timestamp) {
+        Keyframe* newFrame = new Keyframe();
+        newFrame->inputs.push_back(input);
+        KeyframeIterator pos = nearest;
+        ++pos;
+        mKeyframes.insert(pos, newFrame);
+    }
+
+    // If there is a keyframe, just add the input
+    else
+        (*nearest)->inputs.push_back(input);
+
+    // Rectify
+    Rectify(nearest);
+}
+
+void
+Timeline::Rectify(KeyframeIterator lastGood)
+{
+    // TODO
 }
 
 void
 Timeline::GenerateCurrentKeyframe()
 {
+    // If the newest keyframe matches the worldate, we've got nothing to do.
+    if (mWorld->GetCurrentTimestamp() == mKeyframes.back()->state.timestamp)
+        return;
+    assert(mWorld->GetCurrentTimestamp() > mKeyframes.back()->state.timestamp);
+
     // Grab the world state
     WorldState state;
     mWorld->GetState(state);
 
-    // This should be ahead of any other keyframes we have
-    assert(state.timestamp > mKeyframes.back()->state.timestamp);
-
     // Append our keyframe
     Keyframe* frame = new Keyframe(state);
     mKeyframes.push_back(frame);
+}
+
+KeyframeIterator
+Timeline::FindKeyframe(unsigned timestamp)
+{
+    assert(mKeyframes.size() > 0);
+    KeyframeIterator lastGood = mKeyframes.end();
+    for (KeyframeIterator it = mKeyframes.begin();
+         it != mKeyframes.end(); ++it) {
+
+        if ((*it)->state.timestamp <= timestamp)
+            lastGood = it;
+        else
+            break;
+    }
+
+    return lastGood;
 }
