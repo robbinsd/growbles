@@ -47,9 +47,8 @@ int main(int argc, char** argv) {
     else
         printUsageAndExit(argv[0]);
 
-    // Declare and initialize our timeline
+    // Declare our timeline. It will be initialized by the Communicator.
     Timeline timeline;
-    timeline.Init(world);
 
     // Declare our communicator
     Communicator communicator(timeline, mode);

@@ -1,5 +1,6 @@
 #include "Communicator.h"
 #include "WorldModel.h"
+#include "Timeline.h"
 #include "assert.h"
 
 #include <Sockets/Lock.h>
@@ -400,6 +401,9 @@ Communicator::Bootstrap(WorldModel& world)
         // Apply it
         world.SetState(*(WorldState*)received.data);
     }
+
+    // Start our timeline
+    mTimeline->Init(world);
 }
 
 void

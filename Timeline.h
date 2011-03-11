@@ -16,14 +16,21 @@
  */
 struct Keyframe {
 
+    /*
+     * Constructor.
+     */
+    Keyframe(WorldState& s);
+
+    /*
+     * Inserts an input into the appropriate place in the list.
+     */
+    void InsertInput(UserInput& input);
+
     // state snapshot
     WorldState state;
 
     // An ordered list of inputs
     std::list<UserInput> inputs;
-
-    // Inserts an input into the appropriate place in the list
-    void InsertInput(UserInput& input);
 };
 
 class Timeline {
@@ -36,7 +43,7 @@ class Timeline {
     Timeline();
 
     /*
-     * Initialize the timeline.
+     * Initialize the timeline. Must be called at t=0.
      */
     void Init(WorldModel& model);
 
@@ -46,7 +53,7 @@ class Timeline {
     WorldModel* mWorld;
 
     // Our set of keyframes, from newest to oldest
-    std::vector<Keyframe> mKeyframes;
+    std::vector<Keyframe*> mKeyframes;
 
 };
 

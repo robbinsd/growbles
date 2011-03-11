@@ -25,6 +25,9 @@ struct WorldState {
     unsigned dummy1;
     unsigned dummy2;
     std::vector<PlayerInfo> playerVec;
+
+    // Timestamp of this worldstate
+    unsigned timestamp;
 };
 
 class WorldModel {
