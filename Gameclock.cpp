@@ -24,7 +24,7 @@ Gameclock::Tick()
     } while (elapsedTime < mTickDuration);
 
     // Determine how many ticks passed
-    unsigned nTicks = (unsigned) elapsedTime / mTickDuration;
+    unsigned nTicks = (unsigned) (elapsedTime / mTickDuration);
     assert(nTicks > 0);
 
     // Increment the timestamp
