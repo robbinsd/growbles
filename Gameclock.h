@@ -3,6 +3,8 @@
 
 #include "Framework.h"
 
+#define GAMECLOCK_TICK_MS 32
+
 class Gameclock {
 
     public:

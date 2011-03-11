@@ -4,11 +4,10 @@
 #include "WorldModel.h"
 #include "Communicator.h"
 #include "UserInput.h"
-#include <stdlib.h>
 #include "Player.h"
 #include "Timeline.h"
-
-sf::Clock clck;
+#include "Gameclock.h"
+#include <stdlib.h>
 
 char* getOption(int argc, char** argv, const char* flag);
 void printUsageAndExit(char* programName);
@@ -22,9 +21,8 @@ int main(int argc, char** argv) {
     srandom(123456);
 #endif
 
-    // Dummy timestamp. This should be replaced with our actual
-    // timestamp once the game clock gets going.
-    unsigned currTimestamp = 123456;
+    // Gameclock
+    Gameclock clock(GAMECLOCK_TICK_MS);
 
     // Declare and initialize our rendering context
     RenderContext renderContext;
@@ -71,12 +69,21 @@ int main(int argc, char** argv) {
     // Put the players on the map and get people on the same page
     communicator.Bootstrap(world);
 
+    // Start the clock
+    clock.Start();
+
+    // We need to track how many steps the clock ticks forward each iteration
+    unsigned lastNow;
+
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
 
+        // Save the current value of clock.Now()
+        lastNow = clock.Now();
+
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
-        UserInput input(communicator.GetPlayerID(), currTimestamp);
+        UserInput input(communicator.GetPlayerID(), clock.Now());
         input.LoadInput(renderContext);
         world.ApplyInput(input);
         communicator.SendInput(input);
@@ -86,13 +93,16 @@ int main(int argc, char** argv) {
         communicator.Synchronize(world);
 
         // Step the world
-        world.Step(clck, renderContext.GetShaderID());
+        world.Step(clock.Now() - lastNow, renderContext.GetShaderID());
         
         // Render the scenegraph
         renderContext.Render(sceneGraph);
 
         // Display the window
         renderContext.GetWindow()->Display();
+
+        // Tick the clock
+        clock.Tick();
     }
 
     return 0;

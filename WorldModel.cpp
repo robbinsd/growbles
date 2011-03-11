@@ -120,7 +120,7 @@ WorldModel::~WorldModel()
 }
 
 void
-WorldModel::Step(sf::Clock& clck, GLint shaderID)
+WorldModel::Step(unsigned numTicks, GLint shaderID)
 {
     // BOF step physics
     dynamicsWorld->stepSimulation(1/60.f, 10);
@@ -143,17 +143,13 @@ WorldModel::Step(sf::Clock& clck, GLint shaderID)
     // BOF update platform
     
     // update platform position
-    float time = clck.GetElapsedTime();
-    if(time > 0.05) {
-        clck.Reset();
-        platform->update();
-        
-        // move the platform rigid bodies along with the rings
-        int fallingRing = platform->getFallingRing();
-        std::cout << "falling ring: " << fallingRing << "\n";
-        float fallingRingPos = platform->getFallingRingPos();
-        MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
-    }
+    platform->update();
+    
+    // move the platform rigid bodies along with the rings
+    int fallingRing = platform->getFallingRing();
+    std::cout << "falling ring: " << fallingRing << "\n";
+    float fallingRingPos = platform->getFallingRingPos();
+    MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     

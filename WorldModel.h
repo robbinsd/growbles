@@ -47,7 +47,7 @@ class WorldModel {
     /*
      * Steps the model forward in time.
      */
-    void Step(sf::Clock& clck, GLint shaderID);
+    void Step(unsigned numTicks, GLint shaderID);
 
     /*
      * Get/Set world state. Allows for rewinding.
