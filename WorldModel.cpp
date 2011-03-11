@@ -187,6 +187,7 @@ WorldModel::GetState(WorldState& stateOut)
     for (size_t i=0; i<mPlayers.size(); i++) {
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
+        playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
         playerInfo.pos =  mPlayers[i]->getPosition();
         playerInfoVec.push_back(playerInfo);
     }
@@ -206,6 +207,7 @@ WorldModel::SetState(WorldState& stateIn)
         }
         //Vector playerPos = playerInfoVec[i].pos;
         //player->moveTo(playerPos);
+        // HANDLE activeInputs!
     }
     mCurrentTimestamp = stateIn.timestamp;
 }

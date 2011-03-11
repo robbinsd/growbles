@@ -12,7 +12,8 @@ class UserInput;
 
 // struct containing information about a player
 struct PlayerInfo {
-    int playerID;
+    unsigned playerID;
+    unsigned activeInputs;
     Vector pos;
 };
 
