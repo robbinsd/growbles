@@ -78,9 +78,6 @@ int main(int argc, char** argv) {
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
 
-        // Save the current value of clock.Now()
-        lastNow = clock.Now();
-
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
         UserInput input(communicator.GetPlayerID(), clock.Now());
@@ -92,6 +89,12 @@ int main(int argc, char** argv) {
         // necessary updates.
         communicator.Synchronize(world);
 
+        // Save the current value of clock.Now()
+        lastNow = clock.Now();
+
+        // Tick the clock
+        clock.Tick();
+
         // Step the world
         world.Step(clock.Now() - lastNow, renderContext.GetShaderID());
         
@@ -101,8 +104,6 @@ int main(int argc, char** argv) {
         // Display the window
         renderContext.GetWindow()->Display();
 
-        // Tick the clock
-        clock.Tick();
     }
 
     return 0;

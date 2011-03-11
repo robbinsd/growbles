@@ -23,6 +23,9 @@ Gameclock::Tick()
         elapsedTime = mClock.GetElapsedTime() + mClockRemainder;
     } while (elapsedTime < mTickDuration);
 
+    // Reset the clock
+    mClock.Reset();
+
     // Determine how many ticks passed
     unsigned nTicks = (unsigned) (elapsedTime / mTickDuration);
     assert(nTicks > 0);

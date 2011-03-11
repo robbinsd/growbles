@@ -122,6 +122,8 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks, GLint shaderID)
 {
+    assert(numTicks > 0);
+
     // BOF step physics
     dynamicsWorld->stepSimulation(1/60.f, 10);
 
