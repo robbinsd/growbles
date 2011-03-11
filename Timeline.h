@@ -74,6 +74,12 @@ class Timeline {
     void GenerateCurrentKeyframe();
 
     /*
+     * Does the newest timestamp in the timeline match the timestamp of the
+     * world model?
+     */
+    bool UpToDate();
+
+    /*
      * Finds the keyframe with the highest timestamp less than
      * or equal to timestamp.
      *

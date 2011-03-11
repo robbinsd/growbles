@@ -27,7 +27,8 @@ Timeline::AddInput(UserInput& input)
 {
     // We may be fast-forwarding and rewinding, so make sure our timeline contains
     // the newest model state.
-    GenerateCurrentKeyframe();
+    if (!UpToDate())
+        GenerateCurrentKeyframe();
 
     // If the input is before our first keyframe, we can't do anything about it.
     if (input.timestamp < mKeyframes.front()->state.timestamp) {
@@ -114,10 +115,7 @@ Timeline::Rectify(KeyframeIterator lastGood)
 void
 Timeline::GenerateCurrentKeyframe()
 {
-    // If the newest keyframe matches the worldate, we've got nothing to do.
-    if (mWorld->GetCurrentTimestamp() == mKeyframes.back()->state.timestamp)
-        return;
-    assert(mWorld->GetCurrentTimestamp() > mKeyframes.back()->state.timestamp);
+    assert(mKeyframes.size() == 0 || UpToDate());
 
     // Grab the world state
     WorldState state;
@@ -126,6 +124,13 @@ Timeline::GenerateCurrentKeyframe()
     // Append our keyframe
     Keyframe* frame = new Keyframe(state);
     mKeyframes.push_back(frame);
+}
+
+bool
+Timeline::UpToDate()
+{
+    assert (mWorld->GetCurrentTimestamp() >= mKeyframes.back()->state.timestamp);
+    return (mWorld->GetCurrentTimestamp() == mKeyframes.back()->state.timestamp);
 }
 
 KeyframeIterator
