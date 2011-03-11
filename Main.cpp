@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
-        communicator.Synchronize(world);
+        communicator.Synchronize();
 
         // Tick the clock
         clock.Tick();

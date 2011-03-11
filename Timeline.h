@@ -12,26 +12,21 @@
 
 /*
  * A keyframe is an item in our timeline. It contains a snapshot of the
- * world state at that timestamp, and any known subsequent inputs that
- * are timestamped before the next keyframe.
+ * world state at the beginning of that timestep, and the input applied
+ * during that timestep.
  */
 struct Keyframe {
 
     /*
      * Constructor.
      */
-    Keyframe(WorldState& s);
-
-    /*
-     * Inserts an input into the appropriate place in the list.
-     */
-    void InsertInput(UserInput& input);
+    Keyframe(WorldState& s) : state(s) {};
 
     // state snapshot
     WorldState state;
 
-    // An ordered list of inputs
-    std::list<UserInput> inputs;
+    // Inputs applied
+    std::vector<UserInput> inputs;
 };
 
 class Timeline {
@@ -48,7 +43,17 @@ class Timeline {
      */
     void Init(WorldModel& model, CommunicatorMode mode);
 
+    /*
+     * Adds an input to the timeline.
+     */
+    void AddInput(UserInput& input);
+
     protected:
+
+    /*
+     * Generates a keyframe for the current worldstate.
+     */
+    void GenerateCurrentKeyframe();
 
     // Pointer to our worldmodel
     WorldModel* mWorld;
@@ -57,7 +62,7 @@ class Timeline {
     CommunicatorMode mMode;
 
     // Our set of keyframes, from newest to oldest
-    std::vector<Keyframe*> mKeyframes;
+    std::list<Keyframe*> mKeyframes;
 
 };
 

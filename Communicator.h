@@ -174,7 +174,7 @@ class Communicator {
      * For clients: Send any new input to the server, apply world updates.
      * For server: Handle input updates, send world updates.
      */
-    void Synchronize(WorldModel& model);
+    void Synchronize();
 
     /*
      * Bootstraps the client and server and gets everyone on the same page.

@@ -331,7 +331,7 @@ Communicator::ConnectAsServer()
 }
 
 void
-Communicator::Synchronize(WorldModel& model)
+Communicator::Synchronize()
 {
     // Queue up any input we might have, but don't wait
     mSocketHandler.Select(0, 0);
@@ -349,13 +349,13 @@ Communicator::Synchronize(WorldModel& model)
             // Worldstate dumps should only come from the server.
             case PAYLOAD_TYPE_WORLDSTATE:
                 assert(mMode == COMMUNICATOR_MODE_CLIENT);
-                model.SetState(*(WorldState*)incoming.data);
+                //model.SetState(*(WorldState*)incoming.data);
                 break;
 
             // User inputs can come from anyone. The server forwards received
             // inputs to everyone else.
             case PAYLOAD_TYPE_USERINPUT:
-                model.ApplyInput(*(UserInput*)incoming.data);
+                //model.ApplyInput(*(UserInput*)incoming.data);
                 if (mMode == COMMUNICATOR_MODE_SERVER)
                     mSocketHandler.SendToAllExcept(incoming,
                                                    ((UserInput*)incoming.data)

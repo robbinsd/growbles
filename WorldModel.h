@@ -81,6 +81,11 @@ class WorldModel {
      */
     void ApplyInput(UserInput& input);
 
+    /*
+     * Gets the current timestamp.
+     */
+    unsigned GetCurrentTimestamp() { return mCurrentTimestamp; };
+
     protected:
 
     /*
