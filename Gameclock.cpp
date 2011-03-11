@@ -2,6 +2,7 @@
 #include <assert.h>
 
 Gameclock::Gameclock(unsigned tickMS) : mTimestamp(0)
+                                      , mLastStep(0)
                                       , mTickDuration(tickMS / 1000.0)
                                       , mClockRemainder(0.0f)
 {
@@ -12,6 +13,14 @@ Gameclock::Start()
 {
     assert(mTimestamp == 0);
     mClock.Reset();
+}
+
+unsigned
+Gameclock::Then() const
+{
+    assert(mLastStep != 0);
+    assert(mTimestamp >= mLastStep);
+    return mTimestamp - mLastStep;
 }
 
 void
@@ -37,4 +46,7 @@ Gameclock::Tick()
     mClockRemainder = elapsedTime - nTicks * mTickDuration;
     assert(mClockRemainder >= 0.0f);
     assert(mClockRemainder < mTickDuration);
+
+    // Remember the step we took
+    mLastStep = nTicks;
 }

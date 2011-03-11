@@ -72,9 +72,6 @@ int main(int argc, char** argv) {
     // Start the clock
     clock.Start();
 
-    // We need to track how many steps the clock ticks forward each iteration
-    unsigned lastNow;
-
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
 
@@ -89,15 +86,12 @@ int main(int argc, char** argv) {
         // necessary updates.
         communicator.Synchronize(world);
 
-        // Save the current value of clock.Now()
-        lastNow = clock.Now();
-
         // Tick the clock
         clock.Tick();
 
         // Step the world
-        world.Step(clock.Now() - lastNow, renderContext.GetShaderID());
-        
+        world.Step(clock.Now() - clock.Then(), renderContext.GetShaderID());
+
         // Render the scenegraph
         renderContext.Render(sceneGraph);
 

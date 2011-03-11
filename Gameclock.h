@@ -39,11 +39,19 @@ class Gameclock {
      */
     unsigned Now() const { return mTimestamp; };
 
+    /*
+     * Gets the timestamp before the most recent Tick() call.
+     */
+    unsigned Then() const;
+
 
     protected:
 
-    // Current timestamp
+    // Timestamp
     unsigned mTimestamp;
+
+    // Size of the last step we took
+    unsigned mLastStep;
 
     // Number of seconds per tick
     float mTickDuration;
