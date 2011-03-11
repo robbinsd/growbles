@@ -27,10 +27,11 @@ Timeline::Timeline() : mWorld(NULL)
 }
 
 void
-Timeline::Init(WorldModel& model)
+Timeline::Init(WorldModel& model, CommunicatorMode mode)
 {
-    // Store a reference to the worldmodel
+    // Store parameters
     mWorld = &model;
+    mMode = mode;
 
     // Grab the initial world state
     WorldState initialState;

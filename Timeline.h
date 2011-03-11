@@ -3,6 +3,7 @@
 
 #include "WorldModel.h"
 #include "UserInput.h"
+#include "Communicator.h"
 #include <list>
 #include <vector>
 
@@ -45,12 +46,15 @@ class Timeline {
     /*
      * Initialize the timeline. Must be called at t=0.
      */
-    void Init(WorldModel& model);
+    void Init(WorldModel& model, CommunicatorMode mode);
 
     protected:
 
     // Pointer to our worldmodel
     WorldModel* mWorld;
+
+    // Client or server?
+    CommunicatorMode mMode;
 
     // Our set of keyframes, from newest to oldest
     std::vector<Keyframe*> mKeyframes;

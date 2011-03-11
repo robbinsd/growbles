@@ -403,7 +403,7 @@ Communicator::Bootstrap(WorldModel& world)
     }
 
     // Start our timeline
-    mTimeline->Init(world);
+    mTimeline->Init(world, mMode);
 }
 
 void
