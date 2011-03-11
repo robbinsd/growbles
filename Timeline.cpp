@@ -115,7 +115,7 @@ Timeline::Rectify(KeyframeIterator lastGood)
 void
 Timeline::GenerateCurrentKeyframe()
 {
-    assert(mKeyframes.size() == 0 || UpToDate());
+    assert(mKeyframes.size() == 0 || !UpToDate());
 
     // Grab the world state
     WorldState state;
