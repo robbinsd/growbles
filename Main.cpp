@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
         // is recorded so that we can send it over the network.
         UserInput input(communicator.GetPlayerID(), clock.Now());
         input.LoadInput(renderContext);
-        world.ApplyInput(input);
-        communicator.SendInput(input);
+        if (input.inputs != 0)
+            communicator.ApplyInput(input);
 
         // Apply any state updates that may have come in, and send off any
         // necessary updates.

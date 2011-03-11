@@ -164,13 +164,6 @@ class Communicator {
     void Connect();
 
     /*
-     * Sends client input to the server.
-     *
-     * No-op if we're the server.
-     */
-    void SendInput(UserInput& input);
-
-    /*
      * For clients: Send any new input to the server, apply world updates.
      * For server: Handle input updates, send world updates.
      */
@@ -185,6 +178,12 @@ class Communicator {
      * Gets our player ID.
      */
     unsigned GetPlayerID() { return mPlayerID; } ;
+
+    /*
+     * Applies input. This adds the input to our timeline, and forwards
+     * it to all connected sockets as well.
+     */
+    void ApplyInput(UserInput& input);
 
     protected:
 

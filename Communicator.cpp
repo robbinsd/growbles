@@ -349,13 +349,14 @@ Communicator::Synchronize()
             // Worldstate dumps should only come from the server.
             case PAYLOAD_TYPE_WORLDSTATE:
                 assert(mMode == COMMUNICATOR_MODE_CLIENT);
+                assert(0); // We don't send these yet
                 //model.SetState(*(WorldState*)incoming.data);
                 break;
 
             // User inputs can come from anyone. The server forwards received
             // inputs to everyone else.
             case PAYLOAD_TYPE_USERINPUT:
-                //model.ApplyInput(*(UserInput*)incoming.data);
+                mTimeline->AddInput(*(UserInput*)incoming.data);
                 if (mMode == COMMUNICATOR_MODE_SERVER)
                     mSocketHandler.SendToAllExcept(incoming,
                                                    ((UserInput*)incoming.data)
@@ -407,8 +408,11 @@ Communicator::Bootstrap(WorldModel& world)
 }
 
 void
-Communicator::SendInput(UserInput& input)
+Communicator::ApplyInput(UserInput& input)
 {
+    // Apply it to our timeline
+    mTimeline->AddInput(input);
+
     // Create the payload
     Payload outgoing;
     outgoing.type = PAYLOAD_TYPE_USERINPUT;
