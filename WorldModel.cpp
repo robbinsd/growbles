@@ -153,29 +153,6 @@ WorldModel::Step(unsigned numTicks)
     float fallingRingPos = platform->getFallingRingPos();
     MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
 
-    /* Drawing should not happen in WorldModel.
-
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // Disable the shader so we can draw the platform using the fixed pipeline
-    GL_CHECK(glUseProgram(0));
-    
-    // Draw debug wireframes
-    dynamicsWorld->debugDrawWorld();
-    
-    // Draw platform
-    platform->render();
-    
-    // Flush
-    GL_CHECK(glFlush());
-    
-    // Reenable the shader
-    GL_CHECK(glUseProgram(shaderID));
-    // EOF update platform
-    //
-    */
-
     // Update the current timestamp
     mCurrentTimestamp += numTicks;
 }

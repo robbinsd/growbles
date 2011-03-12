@@ -2,7 +2,6 @@
 #define PLATFORM_H
 
 #include "Framework.h"
-#include "RenderContext.h"
 #include <math.h>
 
 const float START_RADIUS = 15.0;    // Radius to start with

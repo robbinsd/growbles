@@ -7,6 +7,7 @@
 #include "SceneGraph.h"
 #include "Shader.h"
 #include <vector>
+#include "WorldModel.h"
 
 /*
  * General parameters.
@@ -116,6 +117,11 @@ public:
     // Publicly accessible vector of the materials loaded for this rendering
     // context.
     std::vector<Material> materials;
+    
+    /*
+     * Renders the platform for debugging
+     */
+    void RenderPlatform(WorldModel& world);
 
 protected:
 

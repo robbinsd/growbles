@@ -103,7 +103,7 @@ RenderContext::Render(SceneGraph& sceneGraph)
         ShadowPass(sceneGraph);
 
     // Clear the buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind the shadow texture
     GL_CHECK(glActiveTexture(SHADOW_TEXTURE_UNIT));
@@ -118,6 +118,28 @@ RenderContext::Render(SceneGraph& sceneGraph)
 
     // Flush
     glFlush();
+}
+
+void
+RenderContext::RenderPlatform(WorldModel& world)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // Disable the shader so we can draw the platform using the fixed pipeline
+    GL_CHECK(glUseProgram(0));
+    
+    // Draw platform
+    world.GetPlatform()->render();
+    
+    // Draw debug wireframes
+    world.GetDynamicsWorld()->debugDrawWorld();
+    
+    // Flush
+    GL_CHECK(glFlush());
+    
+    // Reenable the shader
+    GL_CHECK(glUseProgram(GetShaderID()));
+    // EOF update platform
 }
 
 void
@@ -398,3 +420,5 @@ RenderContext::RenderShadowQuad()
     GL_CHECK(glMatrixMode(GL_PROJECTION));
     GL_CHECK(glPopMatrix());
 }
+
+

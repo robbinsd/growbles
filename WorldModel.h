@@ -86,6 +86,16 @@ class WorldModel {
      * Gets the current timestamp.
      */
     unsigned GetCurrentTimestamp() { return mCurrentTimestamp; };
+    
+    /*
+     * Gets the platform for debugging
+     */
+    Platform* GetPlatform() { return platform; };
+    
+    /*
+     * Gets the dynamicsWorld for physics debug drawing
+     */
+    btDiscreteDynamicsWorld* GetDynamicsWorld() { return dynamicsWorld; };
 
     protected:
 

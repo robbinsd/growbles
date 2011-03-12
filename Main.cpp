@@ -91,9 +91,12 @@ int main(int argc, char** argv) {
 
         // Step the world
         world.Step(clock.Now() - clock.Then());
+        
+        // Render the platform for debugging
+        renderContext.RenderPlatform(world);
 
         // Render the scenegraph
-        renderContext.Render(sceneGraph);
+        //renderContext.Render(sceneGraph);
 
         // Display the window
         renderContext.GetWindow()->Display();
