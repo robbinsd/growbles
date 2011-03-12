@@ -12,6 +12,9 @@
 
 #include "Framework.h"
 #include "SceneGraph.h"
+#ifdef _WIN32
+#include <stdint.h>
+#endif
 
 class UserInput;
 
