@@ -13,6 +13,17 @@ using std::stringstream;
 
 #define ARMADILLO_BASE_Y 3.3
 
+/*
+ * Helper function to move a rigid body to a certain location
+ */
+static void MoveRigidBody(btRigidBody* body, float x, float y, float z)
+{
+    btTransform transform;
+    transform.setIdentity();
+    transform.setOrigin(btVector3(btScalar(x), btScalar(y), btScalar(z)));
+    body->setWorldTransform(transform);
+}
+
 void
 WorldModel::Init(SceneGraph& sceneGraph)
 {
@@ -109,8 +120,10 @@ WorldModel::~WorldModel()
 }
 
 void
-WorldModel::Step(sf::Clock& clck, GLint shaderID)
+WorldModel::Step(unsigned numTicks)
 {
+    assert(numTicks > 0);
+
     // BOF step physics
     dynamicsWorld->stepSimulation(1/60.f, 10);
 
@@ -132,17 +145,16 @@ WorldModel::Step(sf::Clock& clck, GLint shaderID)
     // BOF update platform
     
     // update platform position
-    float time = clck.GetElapsedTime();
-    if(time > 0.05) {
-        clck.Reset();
-        platform->update();
-        
-        // move the platform rigid bodies along with the rings
-        int fallingRing = platform->getFallingRing();
-        std::cout << "falling ring: " << fallingRing << "\n";
-        float fallingRingPos = platform->getFallingRingPos();
-        MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
-    }
+    platform->update();
+    
+    // move the platform rigid bodies along with the rings
+    int fallingRing = platform->getFallingRing();
+    std::cout << "falling ring: " << fallingRing << "\n";
+    float fallingRingPos = platform->getFallingRingPos();
+    MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
+
+    /* Drawing should not happen in WorldModel.
+
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -161,6 +173,11 @@ WorldModel::Step(sf::Clock& clck, GLint shaderID)
     // Reenable the shader
     GL_CHECK(glUseProgram(shaderID));
     // EOF update platform
+    //
+    */
+
+    // Update the current timestamp
+    mCurrentTimestamp += numTicks;
 }
 
 void
@@ -170,10 +187,12 @@ WorldModel::GetState(WorldState& stateOut)
     for (size_t i=0; i<mPlayers.size(); i++) {
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
+        playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
         playerInfo.pos =  mPlayers[i]->getPosition();
         playerInfoVec.push_back(playerInfo);
     }
     stateOut.playerVec = playerInfoVec;
+    stateOut.timestamp = mCurrentTimestamp;
 }
 
 void
@@ -188,7 +207,9 @@ WorldModel::SetState(WorldState& stateIn)
         }
         //Vector playerPos = playerInfoVec[i].pos;
         //player->moveTo(playerPos);
+        // HANDLE activeInputs!
     }
+    mCurrentTimestamp = stateIn.timestamp;
 }
 
 static float sInitialPositions[][3] = { {-8.0, 5.0, 0.0},

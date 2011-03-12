@@ -10,7 +10,8 @@ LIBS = -framework sfml-audio \
 	-L/opt/local/lib -lassimp -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath -lSockets
 
 OBJS = Main.o Shader.o RenderContext.o Texture.o Material.o DepthRenderTarget.o \
-       Vector.o Matrix.o SceneGraph.o WorldModel.o Communicator.o UserInput.o Player.o GLDebugDrawer.o Platform.o
+       Vector.o Matrix.o SceneGraph.o WorldModel.o Communicator.o UserInput.o \
+       Player.o GLDebugDrawer.o Platform.o Timeline.o Gameclock.o
 
 %.o: %.cpp *.h
 	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $< -o $@

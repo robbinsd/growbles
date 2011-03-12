@@ -1,5 +1,6 @@
 #include "Communicator.h"
 #include "WorldModel.h"
+#include "Timeline.h"
 #include "assert.h"
 
 #include <Sockets/Lock.h>
@@ -240,7 +241,9 @@ GrowblesHandler::ReceivePayload(Payload& payload)
  * Communicator Methods.
  */
 
-Communicator::Communicator(CommunicatorMode mode) : mMode(mode)
+Communicator::Communicator(Timeline& timeline,
+                           CommunicatorMode mode) : mTimeline(&timeline)
+                                                  , mMode(mode)
                                                   , mPlayerID(0)
                                                   , mNextPlayerID(1)
                                                   , mNumClientsExpected(0)
@@ -328,7 +331,7 @@ Communicator::ConnectAsServer()
 }
 
 void
-Communicator::Synchronize(WorldModel& model)
+Communicator::Synchronize()
 {
     // Queue up any input we might have, but don't wait
     mSocketHandler.Select(0, 0);
@@ -346,13 +349,14 @@ Communicator::Synchronize(WorldModel& model)
             // Worldstate dumps should only come from the server.
             case PAYLOAD_TYPE_WORLDSTATE:
                 assert(mMode == COMMUNICATOR_MODE_CLIENT);
-                model.SetState(*(WorldState*)incoming.data);
+                assert(0); // We don't send these yet
+                //model.SetState(*(WorldState*)incoming.data);
                 break;
 
             // User inputs can come from anyone. The server forwards received
             // inputs to everyone else.
             case PAYLOAD_TYPE_USERINPUT:
-                model.ApplyInput(*(UserInput*)incoming.data);
+                mTimeline->AddInput(*(UserInput*)incoming.data);
                 if (mMode == COMMUNICATOR_MODE_SERVER)
                     mSocketHandler.SendToAllExcept(incoming,
                                                    ((UserInput*)incoming.data)
@@ -367,12 +371,9 @@ Communicator::Synchronize(WorldModel& model)
 }
 
 void
-Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
+Communicator::Bootstrap(WorldModel& world)
 {
-    // Initialize the world
-    world.Init(sceneGraph);
-
-    // If we're a server, add the players to the world, then send the worldstate
+    // If we're the server
     if (mMode == COMMUNICATOR_MODE_SERVER) {
 
         // Add the server player
@@ -388,7 +389,7 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
         mSocketHandler.SendToAll(payload);
     }
 
-    // Otherwise, we're the client. Receive a worldstate from the server.
+    // If we're the client
     else {
 
         // Receive the worldstate payload
@@ -402,11 +403,16 @@ Communicator::InitWorld(WorldModel& world, SceneGraph& sceneGraph)
         world.SetState(*(WorldState*)received.data);
     }
 
+    // Start our timeline
+    mTimeline->Init(world, mMode);
 }
 
 void
-Communicator::SendInput(UserInput& input)
+Communicator::ApplyInput(UserInput& input)
 {
+    // Apply it to our timeline
+    mTimeline->AddInput(input);
+
     // Create the payload
     Payload outgoing;
     outgoing.type = PAYLOAD_TYPE_USERINPUT;

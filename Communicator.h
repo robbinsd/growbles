@@ -12,6 +12,7 @@ class UserInput;
 class GrowblesSocket;
 struct SceneGraph;
 class Communicator;
+class Timeline;
 
 typedef enum {
     PAYLOAD_TYPE_NONE = 0,
@@ -139,7 +140,7 @@ class Communicator {
     /*
      * Constructor.
      */
-    Communicator(CommunicatorMode mode);
+    Communicator(Timeline& timeline, CommunicatorMode mode);
 
     /*
      * Sets the server IP address. Only valid for client mode.
@@ -163,27 +164,26 @@ class Communicator {
     void Connect();
 
     /*
-     * Sends client input to the server.
-     *
-     * No-op if we're the server.
-     */
-    void SendInput(UserInput& input);
-
-    /*
      * For clients: Send any new input to the server, apply world updates.
      * For server: Handle input updates, send world updates.
      */
-    void Synchronize(WorldModel& model);
+    void Synchronize();
 
     /*
-     * Initializes a world.
+     * Bootstraps the client and server and gets everyone on the same page.
      */
-    void InitWorld(WorldModel& world, SceneGraph& sceneGraph);
+    void Bootstrap(WorldModel& world);
 
     /*
      * Gets our player ID.
      */
     unsigned GetPlayerID() { return mPlayerID; } ;
+
+    /*
+     * Applies input. This adds the input to our timeline, and forwards
+     * it to all connected sockets as well.
+     */
+    void ApplyInput(UserInput& input);
 
     protected:
 
@@ -192,6 +192,9 @@ class Communicator {
      */
     void ConnectAsClient();
     void ConnectAsServer();
+
+    // Timeline
+    Timeline* mTimeline;
 
     // Client or server?
     CommunicatorMode mMode;

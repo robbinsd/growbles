@@ -12,7 +12,8 @@ class UserInput;
 
 // struct containing information about a player
 struct PlayerInfo {
-    int playerID;
+    unsigned playerID;
+    unsigned activeInputs;
     Vector pos;
 };
 
@@ -25,11 +26,19 @@ struct WorldState {
     unsigned dummy1;
     unsigned dummy2;
     std::vector<PlayerInfo> playerVec;
+
+    // Timestamp of this worldstate
+    unsigned timestamp;
 };
 
 class WorldModel {
 
     public:
+
+    /*
+     * Dummy constructor.
+     */
+    WorldModel() : mCurrentTimestamp(0) {};
 
     /*
      * Initializes the world model.
@@ -44,7 +53,7 @@ class WorldModel {
     /*
      * Steps the model forward in time.
      */
-    void Step(sf::Clock& clck, GLint shaderID);
+    void Step(unsigned numTicks);
 
     /*
      * Get/Set world state. Allows for rewinding.
@@ -72,6 +81,11 @@ class WorldModel {
      * Applies inputs.
      */
     void ApplyInput(UserInput& input);
+
+    /*
+     * Gets the current timestamp.
+     */
+    unsigned GetCurrentTimestamp() { return mCurrentTimestamp; };
 
     protected:
 
@@ -109,17 +123,9 @@ class WorldModel {
     
     // Debug drawer
     GLDebugDrawer debugDrawer;
-};
 
-/*
- * Helper function to move a rigid body to a certain location
- */
-static void MoveRigidBody(btRigidBody* body, float x, float y, float z)
-{
-    btTransform transform;
-    transform.setIdentity();
-    transform.setOrigin(btVector3(btScalar(x), btScalar(y), btScalar(z)));
-    body->setWorldTransform(transform);
-}
+    // Current timestamp
+    unsigned mCurrentTimestamp;
+};
 
 #endif /* WORLDMODEL_H */
