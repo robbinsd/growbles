@@ -13,8 +13,9 @@ class UserInput;
 // struct containing information about a player
 struct PlayerInfo {
     unsigned playerID;
-    unsigned activeInputs;
+    uint32_t activeInputs;
     Vector pos;
+    Matrix rotation;
 };
 
 // Struct containing all mutable world state
@@ -51,9 +52,13 @@ class WorldModel {
     ~WorldModel();
 
     /*
-     * Steps the model forward in time.
+     * Steps the model forward in time. The bullet physics engine needs
+     * an exact amount of time in order to interpolate the state if it
+     * does not fall exactly on an integer timestep.
+     * @param numTicks: number of timesteps to go forward
+     * @param deltaSeconds: exact amount of time to step forward in time
      */
-    void Step(unsigned numTicks);
+    void Step(int numTicks, float deltaSeconds=-1);
 
     /*
      * Get/Set world state. Allows for rewinding.
@@ -92,7 +97,7 @@ class WorldModel {
     /*
      * Internal-only method. Adds a player at a specified position.
      */
-    void AddPlayer(unsigned playerID, Vector position);
+    void AddPlayer(unsigned playerID, Vector position, Matrix rotation);
 
     /*
      * Applies forces for the current inputs.

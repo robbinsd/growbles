@@ -368,6 +368,12 @@ SceneNode::ApplyTransform(Matrix transform) {
     mTransform = mTransform.MMProduct(transform);
 }
 
+void 
+SceneNode::LoadIdentityTransform()
+{
+    mTransform.LoadIdentity();
+}
+
 void
 SceneNode::Render(RenderContext& renderContext, Matrix base)
 {

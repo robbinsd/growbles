@@ -44,6 +44,13 @@ class Gameclock {
      */
     unsigned Then() const;
 
+    /*
+     * Gets the exact number of seconds elapsed between the
+     * current tick and the previous tick. This includes 
+     * leftovers.
+     */
+    float GetDeltaTime() const;
+
 
     protected:
 

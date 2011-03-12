@@ -23,6 +23,12 @@ Gameclock::Then() const
     return mTimestamp - mLastStep;
 }
 
+float
+Gameclock::GetDeltaTime() const
+{
+    return mLastStep*mTickDuration + mClockRemainder;
+}
+
 void
 Gameclock::Tick()
 {

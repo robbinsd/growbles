@@ -129,6 +129,11 @@ class SceneNode {
     void ApplyTransform(Matrix transform);
 
     /*
+     * Loads the identity matrix into this node's transform.
+     */
+    void LoadIdentityTransform();
+
+    /*
      * Stores the geometry of this node in worldspace.
      */
     //void StoreGeometry(CollisionDetector& detector, Matrix modelMat);

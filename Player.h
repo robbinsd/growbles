@@ -25,22 +25,28 @@ public:
     /*
      * constructor
      */
-    Player(unsigned playerID, SceneNode* playerSceneNode, Vector initialPosition);
-
-    /*
-     * move the player by a translation vector
-     */
-    void move(Vector moveVec);
+    Player(unsigned playerID, SceneNode* playerSceneNode, Vector initialPosition, 
+        Matrix initialRotation);
     
     /*
      * move the player to a specified location
      */
-    void moveTo(Vector pos);
+    void setPosition(Vector pos);
     
     /*
      * Get the current position of the player
      */
     Vector getPosition();
+    
+    /*
+     * move the player to a specified location
+     */
+    void setRotation(Matrix rotation);
+    
+    /*
+     * Get the current position of the player
+     */
+    Matrix getRotation();
 
     /*
      * Apply an input.
@@ -55,9 +61,13 @@ public:
     /*
      * Get the active inputs.
      */
-    uint32_t GetActiveInputs() { return activeInputs; };
+    uint32_t GetActiveInputs() { return mActiveInputs; };
 
-    protected:
+protected:
+
+    // Updates player's transformation matrix.
+    // Used after setting the player's position and/or rotation.
+    void updateTransform();
 
     // The ID of the player
     unsigned mPlayerID;
@@ -66,12 +76,15 @@ public:
     SceneNode* mPlayerNode;
 
     // The current position of the player
-    Vector position;
+    Vector mPosition;
+
+    // Quaternion representing player's rotation
+    Matrix mRotation;
 
     // The current active inputs applied to this player.
     // This is a bitfield of the USERINPUT_* variety, with only begin
     // bits defined.
-    uint32_t activeInputs;
+    uint32_t mActiveInputs;
 };
 
 #endif /* PLAYER_H */

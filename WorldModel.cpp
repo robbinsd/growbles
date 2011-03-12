@@ -2,6 +2,7 @@
 #include "UserInput.h"
 #include <string>
 #include <sstream>
+#include "Gameclock.h"
 
 using std::vector;
 using std::string;
@@ -33,7 +34,7 @@ WorldModel::Init(SceneGraph& sceneGraph)
     // Load the static parts of the scene into the scenegraph
     sceneGraph.LoadScene(WORLDMESH_PATH, "WorldMesh", &sceneGraph.rootNode);
     Matrix armTransform;
-    armTransform.Translate(0.0, ARMADILLO_BASE_Y, 0.0);
+    armTransform.Translate(0.0f, ARMADILLO_BASE_Y, 0.0f);
     SceneNode* armParent = sceneGraph.AddNode(&sceneGraph.rootNode, armTransform,
                                               "armadilloParent");
     sceneGraph.LoadScene(ARMADILLO_PATH, "Armadillo", armParent);
@@ -65,8 +66,8 @@ WorldModel::Init(SceneGraph& sceneGraph)
         btDefaultMotionState* platformMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,1,0)));
         
         btRigidBody::btRigidBodyConstructionInfo platformRigidBodyCI(0, platformMotionState, platformShape, btVector3(0,0,0));
-        platformRigidBodyCI.m_friction = 0.5;
-        platformRigidBodyCI.m_restitution = 0.1;
+        platformRigidBodyCI.m_friction = 0.5f;
+        platformRigidBodyCI.m_restitution = 0.1f;
         btRigidBody* platformRigidBody = new btRigidBody(platformRigidBodyCI);
         dynamicsWorld->addRigidBody(platformRigidBody);
         platformRigidBodies.push_back(platformRigidBody);
@@ -120,12 +121,15 @@ WorldModel::~WorldModel()
 }
 
 void
-WorldModel::Step(unsigned numTicks)
+WorldModel::Step(int numTicks, float deltaSeconds)
 {
     assert(numTicks > 0);
 
+    if(deltaSeconds < 0)
+        deltaSeconds = numTicks*GAMECLOCK_TICK_MS/1000.0f;
+
     // BOF step physics
-    dynamicsWorld->stepSimulation(1/60.f, 10);
+    dynamicsWorld->stepSimulation(deltaSeconds, 10);
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
@@ -134,9 +138,11 @@ WorldModel::Step(unsigned numTicks)
         HandleInputForPlayer(player->GetPlayerID());
         btTransform trans;
         mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
-        Vector playerPos(trans.getOrigin().getX(), trans.getOrigin().getY()-3.0, trans.getOrigin().getZ(), 1.0);
-        //std::cout << "player y: " << trans.getOrigin().getY() << "\n";
-        player->moveTo(playerPos);
+
+        Vector playerPos = trans.getOrigin();
+        Matrix playerRot = trans.getBasis();
+        player->setPosition(playerPos);
+        player->setRotation(playerRot);
     }
 
     //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
@@ -228,31 +234,34 @@ WorldModel::AddPlayer(unsigned playerID)
                            sInitialPositions[posIndex][1],
                            sInitialPositions[posIndex][2],
                            0.0f);
+    Matrix initialRotation;
 
     // Call the internal helper
-    AddPlayer(playerID, initialPosition);
+    AddPlayer(playerID, initialPosition, initialRotation);
 }
 
 void
-WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
+WorldModel::AddPlayer(unsigned playerID, Vector initialPosition, Matrix initialRotation)
 {
     // Make sure we don't already have a player by this ID
     assert(GetPlayer(playerID) == NULL);
 
     // Add the player to the scenegraph
-    Matrix playerTransform;
-    //playerTransform.Translate(initialPosition.x, initialPosition.y, initialPosition.z);
     stringstream numSS;
     numSS << playerID;
     string nodeName = string("PlayerNode_") + numSS.str();
     string rootName = string("PlayerRoot_") + numSS.str();
+
+    // WARNING: Any transform you pass into AddNode is not used. Each
+    // Player object sets his own node's transform.
+    Matrix identityTransform;
     SceneNode* playerNode = mSceneGraph->AddNode(&mSceneGraph->rootNode,
-                                                 playerTransform,
+                                                 identityTransform,
                                                  nodeName.c_str());
     mSceneGraph->LoadScene(SPHERE_PATH, rootName.c_str(), playerNode);
 
     // Initialize the model representation of the player
-    Player* player = new Player(playerID, playerNode, initialPosition);
+    Player* player = new Player(playerID, playerNode, initialPosition, initialRotation);
 
     // Add it to our list of players
     mPlayers.push_back(player);
@@ -269,9 +278,9 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
     playerShape->calculateLocalInertia(playerMass,playerInertia);
 
     btRigidBody::btRigidBodyConstructionInfo playerRigidBodyCI(playerMass, playerMotionState, playerShape, playerInertia);
-    playerRigidBodyCI.m_friction = 0.5;
-    playerRigidBodyCI.m_restitution = 0.1;
-    playerRigidBodyCI.m_angularDamping = 0.5;
+    playerRigidBodyCI.m_friction = 0.5f;
+    playerRigidBodyCI.m_restitution = 0.1f;
+    playerRigidBodyCI.m_angularDamping = 0.5f;
     btRigidBody *playerRigidBody = new btRigidBody(playerRigidBodyCI);
     mPlayerRigidBodies[player] = playerRigidBody;
     playerRigidBody->setActivationState(DISABLE_DEACTIVATION);

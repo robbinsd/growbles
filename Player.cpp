@@ -12,30 +12,45 @@
 
 Player::Player(unsigned playerID,
                SceneNode* playerSceneNode,
-               Vector initialPosition) : mPlayerID(playerID)
+               Vector initialPosition,
+               Matrix initialRotation) : mPlayerID(playerID)
                                        , mPlayerNode(playerSceneNode)
-                                       , position(Vector(0.0, 0.0, 0.0, 0.0))
-                                       , activeInputs(0)
+                                       , mRotation()
+                                       , mActiveInputs(0)
 {
-    this->moveTo(initialPosition);
+    this->setPosition(initialPosition);
+    this->setRotation(initialRotation);
 }
 
 void
-Player::move(Vector moveVec) {
-    Matrix moveMatrix;
-    moveMatrix.Translate(moveVec.x, moveVec.y, moveVec.z);
-    mPlayerNode->ApplyTransform(moveMatrix);
-    position = position + moveVec;
+Player::updateTransform(){
+    Matrix translationMatrix;
+    translationMatrix.Translate(mPosition.x, mPosition.y, mPosition.z);
+    mPlayerNode->LoadIdentityTransform();
+    mPlayerNode->ApplyTransform(translationMatrix);
+    mPlayerNode->ApplyTransform(mRotation);
 }
 
 void
-Player::moveTo(Vector pos) {
-    this->move(pos - position);
+Player::setPosition(Vector pos) {
+    mPosition = pos;
+    updateTransform();
 }
 
 Vector
 Player::getPosition() {
-    return position;
+    return mPosition;
+}
+
+void 
+Player::setRotation(Matrix rotation){
+    mRotation = rotation;
+    updateTransform();
+}
+
+Matrix
+Player::getRotation(){
+    return mRotation;
 }
 
 void
@@ -55,11 +70,11 @@ Player::applyInput(UserInput& input)
     // assert((begins & activeInputs) == 0);
 
     // Sanity check - We shouldn't end anything not begun
-    assert(((ends >> 1) | activeInputs) == activeInputs);
+    assert(((ends >> 1) | mActiveInputs) == mActiveInputs);
 
     // Apply our begins
-    activeInputs |= begins;
+    mActiveInputs |= begins;
 
     // Apply our ends
-    activeInputs &= ~(ends >> 1);
+    mActiveInputs &= ~(ends >> 1);
 }

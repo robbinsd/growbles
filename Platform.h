@@ -5,11 +5,11 @@
 #include "RenderContext.h"
 #include <math.h>
 
-const float START_RADIUS = 15.0;    // Radius to start with
-const float RADIUS_DECREASE = 3.0;  // Radius of each ring that falls
+const float START_RADIUS = 15.0f;    // Radius to start with
+const float RADIUS_DECREASE = 3.0f;  // Radius of each ring that falls
 const int NUM_DROPS = 4;            // Number of drops
 const int BLINK_TICKS = 10;         // Time to switch blink color
-const float GRAVITY = 0.05;         // Gravity
+const float GRAVITY = 0.05f;         // Gravity
 
 enum {IDLE, BLINKING, FALLING};
 

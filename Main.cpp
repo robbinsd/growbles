@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
         clock.Tick();
 
         // Step the world
-        world.Step(clock.Now() - clock.Then());
+        world.Step(clock.Now() - clock.Then(), clock.GetDeltaTime());
 
         // Render the scenegraph
         renderContext.Render(sceneGraph);
