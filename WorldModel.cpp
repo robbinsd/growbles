@@ -125,7 +125,7 @@ WorldModel::Step(unsigned numTicks)
     assert(numTicks > 0);
 
     // BOF step physics
-    dynamicsWorld->stepSimulation(numTicks*(GAMECLOCK_TICK_MS/1000.0), 10);
+    dynamicsWorld->stepSimulation(numTicks*(4*GAMECLOCK_TICK_MS/1000.0), 10);
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
@@ -147,9 +147,9 @@ WorldModel::Step(unsigned numTicks)
     
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
-    std::cout << "falling ring: " << fallingRing << "\n";
+    //std::cout << "falling ring: " << fallingRing << "\n";
     float fallingRingPos = platform->getFallingRingPos();
-    MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos, 0.0);
+    MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos+1.0, 0.0);
 
     // Update the current timestamp
     mCurrentTimestamp += numTicks;

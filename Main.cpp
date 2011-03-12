@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 
         // Tick the clock
         clock.Tick();
-
+        
         // Step the world
         world.Step(clock.Now() - clock.Then());
         
@@ -100,7 +100,6 @@ int main(int argc, char** argv) {
 
         // Display the window
         renderContext.GetWindow()->Display();
-
     }
 
     return 0;
