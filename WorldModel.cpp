@@ -122,7 +122,9 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
-    assert(numTicks > 0);
+    PRINTD(numTicks);
+    if (numTicks <= 0) return;
+    //assert(numTicks > 0);
 
     // BOF step physics
     dynamicsWorld->stepSimulation(numTicks*(4*GAMECLOCK_TICK_MS/1000.0), 10);
@@ -187,12 +189,13 @@ WorldModel::SetState(WorldState& stateIn)
     // Set info for each of the players
     for (unsigned i=0; i<numPlayers; i++) {
         std::cout << "received: " << playerArray[i].playerID << "\n";
-        //Player* player = GetPlayer(playerInfoVec[i].playerID);
-        //if (player == NULL) { // Add players to the client if they have not yet been added
-            //AddPlayer(playerInfoVec[i].playerID);
-        //}
-        //Vector playerPos = playerInfoVec[i].pos;
-        //player->moveTo(playerPos);
+        if (mPlayers.size() < numPlayers) { // Add players to the client if they have not yet been added
+            AddPlayer(playerArray[i].playerID);
+        }
+        
+        Player* player = GetPlayer(playerArray[i].playerID);
+        Vector playerPos = playerArray[i].pos;
+        player->moveTo(playerPos);
         // HANDLE activeInputs!
     }
     mCurrentTimestamp = stateIn.timestamp;

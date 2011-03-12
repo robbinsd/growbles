@@ -67,4 +67,8 @@
 
 #define IN_RANGE(val, low, high) ((low <= val) && (val <= high))
 
+#ifndef PRINTD
+#define PRINTD(a) printf("value = %d\n", a);
+#endif
+
 #endif
