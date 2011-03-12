@@ -158,28 +158,39 @@ WorldModel::Step(unsigned numTicks)
 void
 WorldModel::GetState(WorldState& stateOut)
 {
-    std::vector<PlayerInfo> playerInfoVec;
-    for (size_t i=0; i<mPlayers.size(); i++) {
+    // Get the number of players in play
+    stateOut.numPlayers = mPlayers.size();
+    
+    // Get the ID, inputs and position of each of the players
+    for (unsigned i=0; i<mPlayers.size(); i++) {
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
         playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
         playerInfo.pos =  mPlayers[i]->getPosition();
-        playerInfoVec.push_back(playerInfo);
+        stateOut.playerArray[i] = playerInfo;
     }
-    stateOut.playerVec = playerInfoVec;
+    
+    // Get the timestamp
     stateOut.timestamp = mCurrentTimestamp;
 }
 
 void
 WorldModel::SetState(WorldState& stateIn)
 {
-    std::vector<PlayerInfo> playerInfoVec = stateIn.playerVec;
-    for (size_t i=0; i< playerInfoVec.size(); i++) {
-        std::cout << "received: " << playerInfoVec[i].playerID << "\n";
-        Player* player = GetPlayer(playerInfoVec[i].playerID);
-        if (player == NULL) { // Add players to the client if they have not yet been added
+    // Set the number of players
+    unsigned numPlayers = stateIn.numPlayers;
+    
+    // Copy the player array
+    PlayerInfo playerArray[numPlayers];
+    memcpy(playerArray, stateIn.playerArray, numPlayers*sizeof(PlayerInfo));
+    
+    // Set info for each of the players
+    for (unsigned i=0; i<numPlayers; i++) {
+        std::cout << "received: " << playerArray[i].playerID << "\n";
+        //Player* player = GetPlayer(playerInfoVec[i].playerID);
+        //if (player == NULL) { // Add players to the client if they have not yet been added
             //AddPlayer(playerInfoVec[i].playerID);
-        }
+        //}
         //Vector playerPos = playerInfoVec[i].pos;
         //player->moveTo(playerPos);
         // HANDLE activeInputs!

@@ -23,10 +23,13 @@ struct WorldState {
 
     // We want some values here so that this structure
     // takes up room in order to test the network code.
-    WorldState() : dummy1(12), dummy2(33) {};
-    unsigned dummy1;
-    unsigned dummy2;
-    std::vector<PlayerInfo> playerVec;
+    WorldState(){};
+    
+    // The array of players, increase the size to allow more players
+    PlayerInfo playerArray[2];
+    
+    // The number of players in play
+    int numPlayers;
 
     // Timestamp of this worldstate
     unsigned timestamp;
