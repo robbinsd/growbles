@@ -5,6 +5,7 @@
 #include "Platform.h"
 #include "GLDebugDrawer.h"
 #include "Player.h"
+#include "Gameclock.h"
 #include <vector>
 
 class SceneGraph;

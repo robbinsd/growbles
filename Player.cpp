@@ -1,12 +1,3 @@
-/*
- *  Player.cpp
- *  CS248-Final-Project
- *
- *  Created by Freeman Fan on 3/5/11.
- *  Copyright 2011 Stanford University. All rights reserved.
- *
- */
-
 #include "Player.h"
 #include "UserInput.h"
 

@@ -125,7 +125,7 @@ WorldModel::Step(unsigned numTicks)
     assert(numTicks > 0);
 
     // BOF step physics
-    dynamicsWorld->stepSimulation(1/60.f, 10);
+    dynamicsWorld->stepSimulation(numTicks*(GAMECLOCK_TICK_MS/1000.0), 10);
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
@@ -141,8 +141,6 @@ WorldModel::Step(unsigned numTicks)
 
     //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
     // EOF step physics
-    
-    // BOF update platform
     
     // update platform position
     platform->update();
@@ -180,7 +178,7 @@ WorldModel::SetState(WorldState& stateIn)
         std::cout << "received: " << playerInfoVec[i].playerID << "\n";
         Player* player = GetPlayer(playerInfoVec[i].playerID);
         if (player == NULL) { // Add players to the client if they have not yet been added
-            AddPlayer(playerInfoVec[i].playerID);
+            //AddPlayer(playerInfoVec[i].playerID);
         }
         //Vector playerPos = playerInfoVec[i].pos;
         //player->moveTo(playerPos);
