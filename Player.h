@@ -44,6 +44,7 @@ public:
      * Get the active inputs.
      */
     uint32_t GetActiveInputs() { return activeInputs; };
+    void SetActiveInputs(uint32_t inputs) { activeInputs = inputs; };
 
     protected:
 

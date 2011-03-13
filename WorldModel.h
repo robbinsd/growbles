@@ -15,7 +15,7 @@ class UserInput;
 // struct containing information about a player
 struct PlayerInfo {
     unsigned playerID;
-    uint32_t inputs;
+    uint32_t activeInputs;
     unsigned timestamp;
     Vector pos;
 };
