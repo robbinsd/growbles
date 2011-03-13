@@ -1,4 +1,5 @@
 #include "RenderContext.h"
+#include "Text.h"
 #ifdef _WIN32
 #define _USE_MATH_DEFINES
 #endif
@@ -133,6 +134,10 @@ RenderContext::RenderPlatform(WorldModel& world)
     
     // Draw debug wireframes
     world.GetDynamicsWorld()->debugDrawWorld();
+    
+    // draw text
+    Text t(mWindow);
+    t.displayAt();
     
     // Flush
     GL_CHECK(glFlush());
