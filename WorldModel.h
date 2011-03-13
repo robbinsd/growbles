@@ -33,6 +33,8 @@ struct WorldState {
 
     // Timestamp of this worldstate
     unsigned timestamp;
+    
+    int dummy;
 };
 
 class WorldModel {

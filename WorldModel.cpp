@@ -122,7 +122,7 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
-    PRINTD(numTicks);
+    //PRINTD(numTicks);
     if (numTicks <= 0) return;
     //assert(numTicks > 0);
 
@@ -145,7 +145,7 @@ WorldModel::Step(unsigned numTicks)
     // EOF step physics
     
     // update platform position
-    platform->update();
+    //platform->update();
     
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
@@ -174,11 +174,17 @@ WorldModel::GetState(WorldState& stateOut)
     
     // Get the timestamp
     stateOut.timestamp = mCurrentTimestamp;
+    
+    // test
+    stateOut.dummy = 54321;
 }
 
 void
 WorldModel::SetState(WorldState& stateIn)
 {
+    // test
+    PRINTD(stateIn.dummy);
+    
     // Set the number of players
     unsigned numPlayers = stateIn.numPlayers;
     
