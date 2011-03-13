@@ -75,8 +75,10 @@ UserInput::LoadInput(RenderContext& context)
                 // positive yaw looks right.
                 // Y is relative to the top of the window, X is relative to the
                 // left of the window.
+                /*
                 context.PanCamera(-(evt.MouseMove.Y - sLastMouseY),
                                   evt.MouseMove.X - sLastMouseX);
+                                  */
 
                 // Save the new current value for next time
                 sLastMouseX = evt.MouseMove.X;

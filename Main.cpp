@@ -80,11 +80,11 @@ int main(int argc, char** argv) {
         UserInput input(communicator.GetPlayerID(), clock.Now());
         input.LoadInput(renderContext);
         if (input.inputs != 0)
-            communicator.ApplyInput(input);
+            communicator.ApplyInput(world, input);
 
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
-        communicator.Synchronize();
+        communicator.Synchronize(world);
 
         // Tick the clock
         clock.Tick();

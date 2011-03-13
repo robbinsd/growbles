@@ -331,7 +331,7 @@ Communicator::ConnectAsServer()
 }
 
 void
-Communicator::Synchronize()
+Communicator::Synchronize(WorldModel& model)
 {
     // Queue up any input we might have, but don't wait
     mSocketHandler.Select(0, 0);
@@ -356,7 +356,8 @@ Communicator::Synchronize()
             // User inputs can come from anyone. The server forwards received
             // inputs to everyone else.
             case PAYLOAD_TYPE_USERINPUT:
-                mTimeline->AddInput(*(UserInput*)incoming.data);
+                // mTimeline->AddInput(*(UserInput*)incoming.data);
+                model.ApplyInput(*(UserInput*)incoming.data);
                 if (mMode == COMMUNICATOR_MODE_SERVER)
                     mSocketHandler.SendToAllExcept(incoming,
                                                    ((UserInput*)incoming.data)
@@ -408,10 +409,11 @@ Communicator::Bootstrap(WorldModel& world)
 }
 
 void
-Communicator::ApplyInput(UserInput& input)
+Communicator::ApplyInput(WorldModel& model, UserInput& input)
 {
     // Apply it to our timeline
-    mTimeline->AddInput(input);
+    model.ApplyInput(input);
+    //mTimeline->AddInput(input);
 
     // Create the payload
     Payload outgoing;
