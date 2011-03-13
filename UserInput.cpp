@@ -32,9 +32,6 @@ UserInput::LoadInput(RenderContext& context)
                 break;
             case sf::Event::KeyPressed:
                 switch(evt.Key.Code) {
-
-                    /* Disabled for now because it was a pain. */
-#if 0
                     case sf::Key::W:
                         context.MoveCamera(1.0, 0.0);
                         break;
@@ -47,7 +44,6 @@ UserInput::LoadInput(RenderContext& context)
                     case sf::Key::D:
                         context.MoveCamera(0.0, 1.0);
                         break;
-#endif
                     case sf::Key::Left:
                         context.MoveLight(0.0, -0.1);
                         break;
@@ -79,8 +75,10 @@ UserInput::LoadInput(RenderContext& context)
                 // positive yaw looks right.
                 // Y is relative to the top of the window, X is relative to the
                 // left of the window.
+                /*
                 context.PanCamera(-(evt.MouseMove.Y - sLastMouseY),
                                   evt.MouseMove.X - sLastMouseX);
+                                  */
 
                 // Save the new current value for next time
                 sLastMouseX = evt.MouseMove.X;
