@@ -167,24 +167,20 @@ WorldModel::GetState(WorldState& stateOut)
     for (unsigned i=0; i<mPlayers.size(); i++) {
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
-        playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
         playerInfo.pos =  mPlayers[i]->getPosition();
+        // store input along with timestamp
+        playerInfo.inputs = mPlayers[i]->GetActiveInputs();
+        playerInfo.timestamp = mCurrentTimestamp;
         stateOut.playerArray[i] = playerInfo;
     }
     
     // Get the timestamp
     stateOut.timestamp = mCurrentTimestamp;
-    
-    // test
-    stateOut.dummy = 54321;
 }
 
 void
 WorldModel::SetState(WorldState& stateIn)
 {
-    // test
-    PRINTD(stateIn.dummy);
-    
     // Set the number of players
     unsigned numPlayers = stateIn.numPlayers;
     
@@ -195,14 +191,26 @@ WorldModel::SetState(WorldState& stateIn)
     // Set info for each of the players
     for (unsigned i=0; i<numPlayers; i++) {
         std::cout << "received: " << playerArray[i].playerID << "\n";
-        if (mPlayers.size() < numPlayers) { // Add players to the client if they have not yet been added
+        
+        // Add players to the client if they have not yet been added
+        if (mPlayers.size() < numPlayers) {
             AddPlayer(playerArray[i].playerID);
         }
         
+        // Get our local copy of the player
         Player* player = GetPlayer(playerArray[i].playerID);
+        
+        // Get and set the player's location
         Vector playerPos = playerArray[i].pos;
-        player->moveTo(playerPos);
-        // HANDLE activeInputs!
+        //player->moveTo(playerPos);
+        
+        // Get and set the player's activeInputs
+        unsigned timestamp = playerArray[i].timestamp;
+        UserInput ui(playerArray[i].playerID, timestamp);
+        uint32_t activeInputs = playerArray[i].inputs;
+        ui.inputs = activeInputs;
+        PRINTD(ui.inputs);
+        player->applyInput(ui);
     }
     mCurrentTimestamp = stateIn.timestamp;
 }

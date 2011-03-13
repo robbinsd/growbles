@@ -6,6 +6,7 @@
 #include "GLDebugDrawer.h"
 #include "Player.h"
 #include "Gameclock.h"
+#include "UserInput.h"
 #include <vector>
 
 class SceneGraph;
@@ -14,7 +15,8 @@ class UserInput;
 // struct containing information about a player
 struct PlayerInfo {
     unsigned playerID;
-    unsigned activeInputs;
+    uint32_t inputs;
+    unsigned timestamp;
     Vector pos;
 };
 
@@ -33,8 +35,6 @@ struct WorldState {
 
     // Timestamp of this worldstate
     unsigned timestamp;
-    
-    int dummy;
 };
 
 class WorldModel {
