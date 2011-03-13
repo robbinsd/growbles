@@ -433,7 +433,6 @@ RenderContext::MakeString(std::string str)
      // Error...
      }
      */
-    
     myText.SetText(str);
     myText.SetFont(sf::Font::GetDefaultFont());
     myText.SetSize(30);
@@ -466,6 +465,6 @@ RenderContext::DrawString()
 {
     GL_CHECK(glUseProgram(0));
     glActiveTexture(GL_TEXTURE0);
-    GetWindow()->Draw(myText);
+    mWindow.Draw(myText);
     GL_CHECK(glUseProgram(GetShaderID()));
 }

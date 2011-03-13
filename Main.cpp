@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Timeline.h"
 #include "Gameclock.h"
+#include "Game.h"
 #include <stdlib.h>
 
 char* getOption(int argc, char** argv, const char* flag);
@@ -71,6 +72,8 @@ int main(int argc, char** argv) {
 
     // Start the clock
     clock.Start();
+    
+    Game growblesGame(renderContext);
 
     // Top level game loop
     while (renderContext.GetWindow()->IsOpened()) {
@@ -95,8 +98,8 @@ int main(int argc, char** argv) {
         // Render the platform for debugging
         renderContext.RenderPlatform(world);
         
-        renderContext.MakeString("hellou");
-        renderContext.DrawString();
+        // Step the game
+        growblesGame.Step(world);
 
         // Render the scenegraph
         renderContext.Render(sceneGraph);

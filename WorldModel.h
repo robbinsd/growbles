@@ -141,6 +141,8 @@ class WorldModel {
 
     // Current timestamp
     unsigned mCurrentTimestamp;
+    
+    friend class Game;
 };
 
 #endif /* WORLDMODEL_H */
