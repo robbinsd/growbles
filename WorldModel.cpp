@@ -185,7 +185,7 @@ WorldModel::SetState(WorldState& stateIn)
     unsigned numPlayers = stateIn.numPlayers;
     
     // Copy the player array
-    PlayerInfo playerArray[numPlayers];
+    PlayerInfo *playerArray = new PlayerInfo[numPlayers];
     memcpy(playerArray, stateIn.playerArray, numPlayers*sizeof(PlayerInfo));
     
     // Set info for each of the players
@@ -205,6 +205,7 @@ WorldModel::SetState(WorldState& stateIn)
         player->SetActiveInputs(playerArray[i].activeInputs);
     }
     mCurrentTimestamp = stateIn.timestamp;
+    delete playerArray;
 }
 
 static float sInitialPositions[][3] = { {-8.0, 5.0, 0.0},
