@@ -3,6 +3,7 @@
 
 #include "Framework.h"
 #include "SceneGraph.h"
+#include <stdint.h>
 
 class UserInput;
 
