@@ -168,9 +168,7 @@ WorldModel::GetState(WorldState& stateOut)
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
         playerInfo.pos =  mPlayers[i]->getPosition();
-        // store input along with timestamp
         playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
-        playerInfo.timestamp = mCurrentTimestamp;
         stateOut.playerArray[i] = playerInfo;
     }
     

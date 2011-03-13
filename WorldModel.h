@@ -16,7 +16,6 @@ class UserInput;
 struct PlayerInfo {
     unsigned playerID;
     uint32_t activeInputs;
-    unsigned timestamp;
     Vector pos;
 };
 
