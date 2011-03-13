@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include <vector>
 #include "WorldModel.h"
+#include <string>
 
 /*
  * General parameters.
@@ -122,6 +123,17 @@ public:
      * Renders the platform for debugging
      */
     void RenderPlatform(WorldModel& world);
+    
+    /*
+     * Draw a text string on screen
+     * Use MakeString() to pass in the string to draw,
+     * and then user DrawString() to draw it
+     */
+    void MakeString(std::string str);
+    void SetSize(unsigned size);
+    void SetColor(unsigned r, unsigned g, unsigned b);
+    void SetPosition(float x, float y);
+    void DrawString();
 
 protected:
 
@@ -198,6 +210,10 @@ protected:
 
     // Shader
     Shader mShader;
+    
+    // Text to draw, one sf::String object is good enough for
+    // drawing arbitrary number of strings on screen
+    sf::String myText;
 };
 
 /*
@@ -224,6 +240,5 @@ protected:
     assert(location >= 0); \
     GL_CHECK(glUniformMatrix##suffix(location, 1, GL_FALSE, val)); \
 }
-
 
 #endif /* RENDERCONTEXT_H */

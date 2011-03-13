@@ -94,9 +94,12 @@ int main(int argc, char** argv) {
         
         // Render the platform for debugging
         renderContext.RenderPlatform(world);
+        
+        renderContext.MakeString("hellou");
+        renderContext.DrawString();
 
         // Render the scenegraph
-        //renderContext.Render(sceneGraph);
+        renderContext.Render(sceneGraph);
 
         // Display the window
         renderContext.GetWindow()->Display();

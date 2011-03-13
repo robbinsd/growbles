@@ -1,5 +1,4 @@
 #include "RenderContext.h"
-#include "Text.h"
 #ifdef _WIN32
 #define _USE_MATH_DEFINES
 #endif
@@ -14,6 +13,7 @@ RenderContext::RenderContext() : mDoingShadowPass(false)
                                          sf::Style::Close, mWindowSettings)
                                , mShader(SHADER_PATH)
 {
+    mWindow.PreserveOpenGLStates(true);
     /*
      * Lighting Defaults.
      */
@@ -134,11 +134,7 @@ RenderContext::RenderPlatform(WorldModel& world)
     
     // Draw debug wireframes
     world.GetDynamicsWorld()->debugDrawWorld();
-    
-    // draw text
-    Text t(mWindow);
-    t.displayAt();
-    
+
     // Flush
     GL_CHECK(glFlush());
     
@@ -426,4 +422,50 @@ RenderContext::RenderShadowQuad()
     GL_CHECK(glPopMatrix());
 }
 
+void
+RenderContext::MakeString(std::string str)
+{
+    /*
+     // Load the font from a file, if we want other fonts
+     sf::Font MyFont;
+     if (!MyFont.LoadFromFile("arial.ttf", 50))
+     {
+     // Error...
+     }
+     */
+    
+    myText.SetText(str);
+    myText.SetFont(sf::Font::GetDefaultFont());
+    myText.SetSize(30);
+    myText.SetColor(sf::Color(128, 0, 128));
+    //myText.SetRotation(90.f);
+    //myText.SetScale(2.f, 2.f);
+    myText.SetPosition(100.f, 100.f);
+}
 
+void
+RenderContext::SetSize(unsigned size)
+{
+    myText.SetSize(size);
+}
+
+void
+RenderContext::SetColor(unsigned r, unsigned g, unsigned b)
+{
+    myText.SetColor(sf::Color(r, g, b));
+}
+
+void
+RenderContext::SetPosition(float x, float y)
+{
+    myText.SetPosition(x, y);
+}
+
+void
+RenderContext::DrawString()
+{
+    GL_CHECK(glUseProgram(0));
+    glActiveTexture(GL_TEXTURE0);
+    GetWindow()->Draw(myText);
+    GL_CHECK(glUseProgram(GetShaderID()));
+}

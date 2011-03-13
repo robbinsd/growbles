@@ -145,7 +145,7 @@ WorldModel::Step(unsigned numTicks)
     // EOF step physics
     
     // update platform position
-    //platform->update();
+    platform->update();
     
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
