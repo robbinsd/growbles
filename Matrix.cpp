@@ -10,6 +10,15 @@ Matrix::Matrix()
     LoadIdentity();
 }
 
+Matrix::Matrix(const btMatrix3x3 &mat){
+    LoadIdentity();
+    for(int row = 0; row < 3; row ++){
+        for(int col = 0; col < 3; col ++){
+            (*this)[row][col] = mat[row][col];
+        }
+    }
+}
+
 void
 Matrix::LoadIdentity()
 {
