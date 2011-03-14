@@ -136,9 +136,7 @@ WorldModel::Step(unsigned numTicks)
         HandleInputForPlayer(player->GetPlayerID());
         btTransform trans;
         mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
-        Vector playerPos(trans.getOrigin().getX(), trans.getOrigin().getY()-3.0, trans.getOrigin().getZ(), 1.0);
-        //std::cout << "player y: " << trans.getOrigin().getY() << "\n";
-        player->moveTo(playerPos);
+        player->setTransform(trans);
     }
 
     //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
@@ -200,6 +198,7 @@ WorldModel::SetState(WorldState& stateIn)
 
         // Physics
         mPlayerRigidBodies[player]->setWorldTransform(playerArray[i].transform);
+        player->setTransform(playerArray[i].transform);
         mPlayerRigidBodies[player]->setLinearVelocity(playerArray[i].linearVel);
         mPlayerRigidBodies[player]->setAngularVelocity(playerArray[i].angularVel);
 

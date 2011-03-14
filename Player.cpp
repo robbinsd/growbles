@@ -24,6 +24,16 @@ Player::moveTo(Vector pos) {
     this->move(pos - position);
 }
 
+void
+Player::setTransform(btTransform trans)
+{
+    // TODO - this should probably be update to handle rotation as well.
+    Vector playerPos(trans.getOrigin().getX(),
+                     trans.getOrigin().getY()-3.0,
+                     trans.getOrigin().getZ(), 1.0);
+    moveTo(playerPos);
+}
+
 Vector
 Player::getPosition() {
     return position;

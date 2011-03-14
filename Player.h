@@ -25,6 +25,11 @@ public:
      * move the player to a specified location
      */
     void moveTo(Vector pos);
+
+    /*
+     * Sets the player location based on a btTransform.
+     */
+    void setTransform(btTransform transform);
     
     /*
      * Get the current position of the player
