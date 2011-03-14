@@ -5,38 +5,20 @@ Player::Player(unsigned playerID,
                SceneNode* playerSceneNode,
                Vector initialPosition) : mPlayerID(playerID)
                                        , mPlayerNode(playerSceneNode)
-                                       , position(Vector(0.0, 0.0, 0.0, 0.0))
                                        , activeInputs(0)
 {
-    this->moveTo(initialPosition);
-}
-
-void
-Player::move(Vector moveVec) {
-    Matrix moveMatrix;
-    moveMatrix.Translate(moveVec.x, moveVec.y, moveVec.z);
-    mPlayerNode->ApplyTransform(moveMatrix);
-    position = position + moveVec;
-}
-
-void
-Player::moveTo(Vector pos) {
-    this->move(pos - position);
 }
 
 void
 Player::setTransform(btTransform trans)
 {
-    // TODO - this should probably be update to handle rotation as well.
-    Vector playerPos(trans.getOrigin().getX(),
-                     trans.getOrigin().getY()-3.0,
-                     trans.getOrigin().getZ(), 1.0);
-    moveTo(playerPos);
-}
-
-Vector
-Player::getPosition() {
-    return position;
+    Matrix transform;
+    Vector origin(trans.getOrigin());
+    transform.Translate(origin.x, origin.y, origin.z);
+    btMatrix3x3 rotation(trans.getRotation());
+    Matrix ourRotation(rotation);
+    transform = transform.MMProduct(ourRotation);
+    mPlayerNode->SetTransform(transform);
 }
 
 void

@@ -129,6 +129,11 @@ class SceneNode {
     void ApplyTransform(Matrix transform);
 
     /*
+     * Sets the transform at a node.
+     */
+    void SetTransform(Matrix transform) { mTransform = transform; };
+
+    /*
      * Stores the geometry of this node in worldspace.
      */
     //void StoreGeometry(CollisionDetector& detector, Matrix modelMat);
