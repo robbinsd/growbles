@@ -20,8 +20,11 @@ struct Keyframe {
     /*
      * Constructors.
      */
-    Keyframe() {};
-    Keyframe(WorldState& s) : state(s) {};
+    Keyframe(unsigned t) : timestamp(t) {};
+    Keyframe(unsigned t, WorldState& s) : timestamp(t), state(s) {};
+
+    // Timestamp
+    unsigned timestamp;
 
     // state snapshot
     WorldState state;

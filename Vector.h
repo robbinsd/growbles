@@ -11,6 +11,15 @@
 struct Vector {
 
     float x, y, z, w;
+    
+    /*
+    * Access a mutable reference to one of the Vector's elements
+    */
+    float &operator[](int i){   assert(i>=0 && i < 4); return (&x)[i]; }
+    /*
+    * Access a const reference to one of the Vector's elements
+    */
+    const float &operator[](int i) const{   assert(i>=0 && i < 4); return (&x)[i]; }
 
     /*
     * Constructor.

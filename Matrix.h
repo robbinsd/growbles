@@ -2,6 +2,7 @@
 #define MATRIX_H
 
 #include "Vector.h"
+#include "Framework.h"
 
 /*
  * Simple 4x4 Matrix implementation.
@@ -20,6 +21,21 @@ class Matrix {
     * Constructor. Initializes a matrix to the identity.
     */
     Matrix();
+
+    /*
+    * Construct from a 3x3 bullet matrix. The rest of the
+    * 4x4 Matrix will be the identity.
+    */
+    Matrix(const btMatrix3x3 &mat);
+
+    /*
+    * Access a mutable reference to one of the Matrix's rows
+    */
+    Vector &operator[](int i){   assert(i>=0 && i < 4); return (&a)[i]; }
+    /*
+    * Access a const reference to one of the Matrix's row
+    */
+    const Vector &operator[](int i) const{   assert(i>=0 && i < 4); return (&a)[i]; }
 
     /*
     * Sets from a column-major array.
