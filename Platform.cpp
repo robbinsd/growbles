@@ -129,20 +129,6 @@ Platform::render()
 	glRotatef(90.0, 1, 0, 0);
 	gluCylinder(innerCylinder, curDrawRadius-RADIUS_DECREASE, curDrawRadius-RADIUS_DECREASE, 30.0, 64, 1);
 	glPopMatrix();
-
-    // Render the blue "water" quad
-    glPushMatrix();
-    glTranslatef(0, -15.0, 0);
-    float darkBlue[] = {0.172, 0.254, 0.596, 1.0};
-    float size = 40.0;
-    glColor3f(darkBlue[0], darkBlue[1], darkBlue[2]);
-    glBegin(GL_QUADS);
-        glVertex3f(-size, 0, -size);
-        glVertex3f(size, 0, -size);
-        glVertex3f(size, 0, size);
-        glVertex3f(-size, 0, size);
-    glEnd();
-    glPopMatrix();
 }
 
 float
@@ -161,4 +147,36 @@ float
 Platform::getFallingRingPos()
 {
     return -dropY;
+}
+
+platformState
+Platform::GetPlatformState()
+{
+    platformState pinfo;
+    pinfo.dropTimer = dropTimer;
+    pinfo.blinkTimer = blinkTimer;
+    pinfo.dropCount = dropCount;
+    pinfo.fallingRing = fallingRing;
+    pinfo.blinkOn = blinkOn;
+    pinfo.curRadius = curRadius;
+    pinfo.curDrawRadius = curDrawRadius;
+    pinfo.dropVelocity = dropVelocity;
+    pinfo.dropY = dropY;
+    pinfo.dropState = dropState;
+    return pinfo;
+}
+
+void
+Platform::SetPlatformState(platformState pinfo)
+{
+    dropTimer = pinfo.dropTimer;
+    blinkTimer = pinfo.blinkTimer;
+    dropCount = pinfo.dropCount;
+    fallingRing = pinfo.fallingRing;
+    blinkOn = pinfo.blinkOn;
+    curRadius = pinfo.curRadius;
+    curDrawRadius = pinfo.curDrawRadius;
+    dropVelocity = pinfo.dropVelocity;
+    dropY = pinfo.dropY;
+    dropState = pinfo.dropState;
 }

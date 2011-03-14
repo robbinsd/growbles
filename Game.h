@@ -48,6 +48,7 @@ protected:
     Communicator* communicator;
     Menu* mainMenu;
     unsigned state;
+    float prevPlayerX, prevPlayerZ;
 };
 
 #endif

@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #endif
 #include <math.h>
+#include <fstream>
 
 using std::vector;
 
@@ -94,6 +95,44 @@ RenderContext::Init()
 
     // Apply the camera
     SetViewToCamera();
+    
+    // BOF load skybox textures
+    std::string fullPath0 = "scenefiles/skyft.bmp";
+    // If the file exists, initialize the appropriate texture
+    std::ifstream file0(fullPath0.c_str(), std::ifstream::in);
+    if (file0)
+        skyboxTextures[0].Init(fullPath0);
+    
+    std::string fullPath1 = "scenefiles/skylf.bmp";
+    // If the file exists, initialize the appropriate texture
+    std::ifstream file1(fullPath1.c_str(), std::ifstream::in);
+    if (file1)
+        skyboxTextures[1].Init(fullPath1);
+    
+    std::string fullPath2 = "scenefiles/skybk.bmp";
+    // If the file exists, initialize the appropriate texture
+    std::ifstream file2(fullPath2.c_str(), std::ifstream::in);
+    if (file2)
+        skyboxTextures[2].Init(fullPath2);
+    
+    std::string fullPath3 = "scenefiles/skyrt.bmp";
+    // If the file exists, initialize the appropriate texture
+    std::ifstream file3(fullPath3.c_str(), std::ifstream::in);
+    if (file3)
+        skyboxTextures[3].Init(fullPath3);
+    
+    std::string fullPath4 = "scenefiles/skyup.bmp";
+    // If the file exists, initialize the appropriate texture
+    std::ifstream file4(fullPath4.c_str(), std::ifstream::in);
+    if (file4)
+        skyboxTextures[4].Init(fullPath4);
+    
+    std::string fullPath5 = "scenefiles/skydn.bmp";
+    // If the file exists, initialize the appropriate texture
+    std::ifstream file5(fullPath5.c_str(), std::ifstream::in);
+    if (file5)
+        skyboxTextures[5].Init(fullPath5);
+    // EOF load skybox textures
 }
 
 void
@@ -122,10 +161,108 @@ RenderContext::Render(SceneGraph& sceneGraph)
 }
 
 void
-RenderContext::RenderPlatform(WorldModel& world)
-{
+RenderContext::RenderSkybox()
+{	
+    // Clear the buffers here because the skybox is always the first thing drawn
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    // Use fixed pipeline
+    GL_CHECK(glUseProgram(0));
+    
+    // Store the current matrix
+    glPushMatrix();
+
+    // Reset and transform the matrix.
+    glLoadIdentity();
+    gluLookAt(0, 0, 0, mCameraPos.x, mCameraPos.y, mCameraPos.z, 0, 1, 0);
+
+    // Enable/Disable features
+    glPushAttrib(GL_ENABLE_BIT);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_BLEND);
+
+    // Just in case we set all vertices to white.
+    glColor4f(1,1,1,1);
+    
+    // Render the front quad
+    //glBindTexture(GL_TEXTURE_2D, _skybox[0]);
+    skyboxTextures[0].SetEnabled(true, GL_TEXTURE0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
+        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
+    glEnd();
+    skyboxTextures[0].SetEnabled(false, GL_TEXTURE0);
+    
+    // Render the left quad
+    //glBindTexture(GL_TEXTURE_2D, _skybox[1]);
+    skyboxTextures[1].SetEnabled(true, GL_TEXTURE0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(  0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
+        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
+    glEnd();
+    skyboxTextures[1].SetEnabled(false, GL_TEXTURE0);
+    
+    // Render the back quad
+    //glBindTexture(GL_TEXTURE_2D, _skybox[2]);
+    skyboxTextures[2].SetEnabled(true, GL_TEXTURE0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
+        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
+    glEnd();
+    skyboxTextures[2].SetEnabled(false, GL_TEXTURE0);
+    
+    // Render the right quad
+    //glBindTexture(GL_TEXTURE_2D, _skybox[3]);
+    skyboxTextures[3].SetEnabled(true, GL_TEXTURE0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 0); glVertex3f( -0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
+        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
+    glEnd();
+    skyboxTextures[3].SetEnabled(false, GL_TEXTURE0);
+    
+    // Render the top quad
+    //glBindTexture(GL_TEXTURE_2D, _skybox[4]);
+    skyboxTextures[4].SetEnabled(true, GL_TEXTURE0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
+        glTexCoord2f(0, 0); glVertex3f( -0.5f,  0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f,  0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
+    glEnd();
+    skyboxTextures[4].SetEnabled(false, GL_TEXTURE0);
+    
+    // Render the bottom quad
+    //glBindTexture(GL_TEXTURE_2D, _skybox[5]);
+    skyboxTextures[5].SetEnabled(true, GL_TEXTURE0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
+        glTexCoord2f(0, 1); glVertex3f( -0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
+    glEnd();
+    skyboxTextures[5].SetEnabled(false, GL_TEXTURE0);
+    
+    // Restore enable bits and matrix
+    glPopAttrib();
+    glPopMatrix();
+    
+    // Renable the shader
+    GL_CHECK(glUseProgram(GetShaderID()));
+}
+
+void
+RenderContext::RenderPlatform(WorldModel& world)
+{
     // Disable the shader so we can draw the platform using the fixed pipeline
     GL_CHECK(glUseProgram(0));
     
@@ -145,9 +282,7 @@ RenderContext::RenderPlatform(WorldModel& world)
 void
 RenderContext::RenderAllElse()
 {
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // Disable the shader so we can draw the platform using the fixed pipeline
+    // Use fixed pipeline
     GL_CHECK(glUseProgram(0));
     
     // Draw all the strings in myTexts
@@ -156,7 +291,7 @@ RenderContext::RenderAllElse()
     // Flush
     GL_CHECK(glFlush());
     
-    // Reenable the shader
+    // Renable the shader
     GL_CHECK(glUseProgram(GetShaderID()));
 }
 

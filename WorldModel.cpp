@@ -144,7 +144,7 @@ WorldModel::SingleStep()
     }
 
     // update platform position
-    //platform->update();
+    platform->update();
 
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
@@ -172,6 +172,9 @@ WorldModel::GetState(WorldState& stateOut)
         playerInfo.angularVel = mPlayerRigidBodies[mPlayers[i]]->getAngularVelocity();
         stateOut.playerArray[i] = playerInfo;
     }
+    
+    // Get platform state
+    stateOut.pstate = platform->GetPlatformState();
     
     // Get the timestamp
     stateOut.timestamp = mCurrentTimestamp;
@@ -217,6 +220,9 @@ WorldModel::SetState(WorldState& stateIn)
     // Reset some cached state
     dynamicsWorld->getBroadphase()->resetPool(dynamicsWorld->getDispatcher());
     dynamicsWorld->getConstraintSolver()->reset();
+
+    // Set the platform state
+    platform->SetPlatformState(stateIn.pstate);
 
     mCurrentTimestamp = stateIn.timestamp;
     delete playerArray;
