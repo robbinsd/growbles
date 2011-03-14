@@ -45,6 +45,11 @@ struct LightInfo {
     Vector specular;
 };
 
+struct myText {
+    sf::String str;
+    int duration;
+};
+
 typedef enum {
     SCENELIGHT_DIRECTIONAL = 0,
     SCENELIGHT_POINT,
@@ -129,7 +134,7 @@ public:
      * Use MakeString() to pass in the string to draw,
      * and then user DrawString() to draw it
      */
-    void MakeString(std::string str);
+    void MakeString(std::string str, int duration);
     void SetSize(unsigned size);
     void SetColor(unsigned r, unsigned g, unsigned b);
     void SetPosition(float x, float y);
@@ -213,7 +218,7 @@ protected:
     
     // Text to draw, one sf::String object is good enough for
     // drawing arbitrary number of strings on screen
-    sf::String myText;
+    std::vector<myText> myTexts;
 };
 
 /*

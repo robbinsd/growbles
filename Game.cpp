@@ -3,6 +3,7 @@
 Game::Game(RenderContext& renderContext)
 {
     rc = &renderContext;
+    rc->MakeString("Game Start", 1000);
 }
 
 Game::~Game()
@@ -17,8 +18,7 @@ Game::Step(WorldModel& world)
         
         // if height of player is below a certain point, mark player as lost
         if (player->getPosition().y < 1) {
-            rc->MakeString("You Lost");
-            rc->DrawString();
+            rc->MakeString("You Lost", 1000);
         }
     }
 }
