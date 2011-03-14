@@ -95,7 +95,6 @@ WorldModel::~WorldModel()
         assert(player);
         btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
         dynamicsWorld->removeRigidBody(playerRigidBody);
-        delete playerRigidBody->getMotionState();
         delete playerRigidBody;
         delete mPlayerShapes[player];
     }
@@ -140,13 +139,12 @@ WorldModel::SingleStep()
     for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *player = mPlayers[i];
         assert(player);
-        btTransform trans;
-        mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
+        btTransform trans = mPlayerRigidBodies[player]->getWorldTransform();
         player->setTransform(trans);
     }
 
     // update platform position
-    platform->update();
+    //platform->update();
 
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
@@ -260,15 +258,15 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
     // Create the player rigidBody
     btCollisionShape* playerShape = new btSphereShape(1);
     mPlayerShapes[player] = playerShape;
-    btDefaultMotionState* playerMotionState =
-    new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),
-    btVector3(initialPosition.x,initialPosition.y,initialPosition.z)));
 
     btScalar playerMass = 1;
     btVector3 playerInertia(0, 0, 0);
     playerShape->calculateLocalInertia(playerMass,playerInertia);
 
-    btRigidBody::btRigidBodyConstructionInfo playerRigidBodyCI(playerMass, playerMotionState, playerShape, playerInertia);
+    btRigidBody::btRigidBodyConstructionInfo playerRigidBodyCI(playerMass, NULL, playerShape, playerInertia);
+    playerRigidBodyCI.m_startWorldTransform = btTransform(btQuaternion(0,0,0,1), btVector3(initialPosition.x,
+                                                                                           initialPosition.y,
+                                                                                           initialPosition.z));
     playerRigidBodyCI.m_friction = 0.5;
     playerRigidBodyCI.m_restitution = 0.1;
     playerRigidBodyCI.m_angularDamping = 0.5;
@@ -296,8 +294,7 @@ WorldModel::GetPlayerPosition(unsigned playerID)
 {
     Player* player = GetPlayer(playerID);
     assert(player);
-    btTransform trans;
-    mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
+    btTransform trans = mPlayerRigidBodies[player]->getWorldTransform();
     Vector rv(trans.getOrigin());
     return rv;
 }
