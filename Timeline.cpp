@@ -16,7 +16,7 @@ Timeline::~Timeline()
     if (mKeyframes.size() == 0)
         return;
 
-    Prune(mKeyframes.back()->state.timestamp + 1);
+    Prune(mKeyframes.back()->timestamp + 1);
 }
 
 void
@@ -39,21 +39,21 @@ Timeline::AddInput(UserInput& input)
         GenerateCurrentKeyframe();
 
     // If the input is before our first keyframe, we can't do anything about it.
-    if (input.timestamp < mKeyframes.front()->state.timestamp) {
+    if (input.timestamp < mKeyframes.front()->timestamp) {
         printf("Warning - Received input for player %u with timestamp %u, but "
                "we only have keyframes dating back to %u. Dropping.\n",
-               input.playerID, input.timestamp, mKeyframes.front()->state.timestamp);
+               input.playerID, input.timestamp, mKeyframes.front()->timestamp);
         return;
     }
 
     // If the input is ahead of our current worldstate...
-    if (input.timestamp > mKeyframes.back()->state.timestamp) {
+    if (input.timestamp > mKeyframes.back()->timestamp) {
 
         // TODO - we should probably handle this better. Servers should discard
         // input, and clients should sync their game clocks.
         printf("Warning - Received input for player %u with timestamp %u, but "
                "we only have keyframes dating up to %u. Dropping.\n",
-               input.playerID, input.timestamp, mKeyframes.back()->state.timestamp);
+               input.playerID, input.timestamp, mKeyframes.back()->timestamp);
         return;
     }
 
@@ -70,8 +70,8 @@ Timeline::AddInputInternal(UserInput& input)
 
     // If there isn't a keyframe already there, we have to make one.
     // Note that we're about to Rectify(), so the state snapshot can be garbage.
-    if ((*nearest)->state.timestamp < input.timestamp) {
-        Keyframe* newFrame = new Keyframe();
+    if ((*nearest)->timestamp < input.timestamp) {
+        Keyframe* newFrame = new Keyframe(input.timestamp);
         newFrame->inputs.push_back(input);
         KeyframeIterator pos = nearest;
         ++pos;
@@ -110,8 +110,8 @@ Timeline::Rectify(KeyframeIterator lastGood)
 
         // Step the world, if necessary
         if (upcoming != mKeyframes.end()) {
-            unsigned stepSize = (*upcoming)->state.timestamp -
-                                  (*curr)->state.timestamp;
+            assert((*upcoming)->timestamp > (*curr)->timestamp);
+            unsigned stepSize = (*upcoming)->timestamp - (*curr)->timestamp;
             mWorld->Step(stepSize);
         }
 
@@ -130,15 +130,15 @@ Timeline::GenerateCurrentKeyframe()
     mWorld->GetState(state);
 
     // Append our keyframe
-    Keyframe* frame = new Keyframe(state);
+    Keyframe* frame = new Keyframe(state.timestamp, state);
     mKeyframes.push_back(frame);
 }
 
 bool
 Timeline::UpToDate()
 {
-    assert (mWorld->GetCurrentTimestamp() >= mKeyframes.back()->state.timestamp);
-    return (mWorld->GetCurrentTimestamp() == mKeyframes.back()->state.timestamp);
+    assert (mWorld->GetCurrentTimestamp() >= mKeyframes.back()->timestamp);
+    return (mWorld->GetCurrentTimestamp() == mKeyframes.back()->timestamp);
 }
 
 void
@@ -146,7 +146,7 @@ Timeline::Prune(unsigned timestamp)
 {
     KeyframeIterator it = mKeyframes.begin();
     while (it != mKeyframes.end()) {
-        if ((*it)->state.timestamp >= timestamp)
+        if ((*it)->timestamp >= timestamp)
             return;
         mKeyframes.erase(it++);
     }
@@ -160,7 +160,7 @@ Timeline::FindKeyframe(unsigned timestamp)
     for (KeyframeIterator it = mKeyframes.begin();
          it != mKeyframes.end(); ++it) {
 
-        if ((*it)->state.timestamp <= timestamp)
+        if ((*it)->timestamp <= timestamp)
             lastGood = it;
         else
             break;
