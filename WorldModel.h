@@ -63,6 +63,7 @@ class WorldModel {
      * Steps the model forward in time.
      */
     void Step(unsigned numTicks);
+    void SingleStep();
 
     /*
      * Get/Set world state. Allows for rewinding.

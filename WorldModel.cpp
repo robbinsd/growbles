@@ -122,16 +122,19 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
-    //PRINTD(numTicks);
-    if (numTicks <= 0) return;
-    //assert(numTicks > 0);
+    for (unsigned i = 0; i < numTicks; ++i)
+        SingleStep();
+}
 
+void
+WorldModel::SingleStep()
+{
     // Apply the input forces
     for(unsigned i = 0; i < mPlayers.size(); ++i)
         HandleInputForPlayer(mPlayers[i]->GetPlayerID());
 
     // BOF step physics
-    dynamicsWorld->stepSimulation(numTicks*(4*GAMECLOCK_TICK_MS/1000.0), 10);
+    dynamicsWorld->stepSimulation(4*GAMECLOCK_TICK_MS/1000.0, 10);
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
@@ -142,12 +145,9 @@ WorldModel::Step(unsigned numTicks)
         player->setTransform(trans);
     }
 
-    //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
-    // EOF step physics
-    
     // update platform position
     //platform->update();
-    
+
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
     //std::cout << "falling ring: " << fallingRing << "\n";
@@ -155,7 +155,7 @@ WorldModel::Step(unsigned numTicks)
     MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos+1.0, 0.0);
 
     // Update the current timestamp
-    mCurrentTimestamp += numTicks;
+    mCurrentTimestamp += 1;
 }
 
 void
