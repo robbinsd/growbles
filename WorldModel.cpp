@@ -122,31 +122,32 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
-    //PRINTD(numTicks);
-    if (numTicks <= 0) return;
-    //assert(numTicks > 0);
+    for (unsigned i = 0; i < numTicks; ++i)
+        SingleStep();
+}
+
+void
+WorldModel::SingleStep()
+{
+    // Apply the input forces
+    for(unsigned i = 0; i < mPlayers.size(); ++i)
+        HandleInputForPlayer(mPlayers[i]->GetPlayerID());
 
     // BOF step physics
-    dynamicsWorld->stepSimulation(numTicks*(4*GAMECLOCK_TICK_MS/1000.0), 10);
+    dynamicsWorld->stepSimulation(4*GAMECLOCK_TICK_MS/1000.0, 10);
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *player = mPlayers[i];
         assert(player);
-        HandleInputForPlayer(player->GetPlayerID());
         btTransform trans;
         mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
-        Vector playerPos(trans.getOrigin().getX(), trans.getOrigin().getY()-3.0, trans.getOrigin().getZ(), 1.0);
-        //std::cout << "player y: " << trans.getOrigin().getY() << "\n";
-        player->moveTo(playerPos);
+        player->setTransform(trans);
     }
 
-    //std::cout << "sphere x: " << trans.getOrigin().getX() << std::endl;
-    // EOF step physics
-    
     // update platform position
     platform->update();
-    
+
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
     //std::cout << "falling ring: " << fallingRing << "\n";
@@ -154,7 +155,7 @@ WorldModel::Step(unsigned numTicks)
     MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos+1.0, 0.0);
 
     // Update the current timestamp
-    mCurrentTimestamp += numTicks;
+    mCurrentTimestamp += 1;
 }
 
 void
@@ -167,8 +168,10 @@ WorldModel::GetState(WorldState& stateOut)
     for (unsigned i=0; i<mPlayers.size(); i++) {
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
-        playerInfo.pos =  mPlayers[i]->getPosition();
         playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
+        playerInfo.transform = mPlayerRigidBodies[mPlayers[i]]->getWorldTransform();
+        playerInfo.linearVel = mPlayerRigidBodies[mPlayers[i]]->getLinearVelocity();
+        playerInfo.angularVel = mPlayerRigidBodies[mPlayers[i]]->getAngularVelocity();
         stateOut.playerArray[i] = playerInfo;
     }
     
@@ -196,8 +199,11 @@ WorldModel::SetState(WorldState& stateIn)
         // Get our local copy of the player
         Player* player = GetPlayer(playerArray[i].playerID);
 
-        // Get and set the player's location
-        player->moveTo(playerArray[i].pos);
+        // Physics
+        mPlayerRigidBodies[player]->setWorldTransform(playerArray[i].transform);
+        player->setTransform(playerArray[i].transform);
+        mPlayerRigidBodies[player]->setLinearVelocity(playerArray[i].linearVel);
+        mPlayerRigidBodies[player]->setAngularVelocity(playerArray[i].angularVel);
 
         // Active inputs
         player->SetActiveInputs(playerArray[i].activeInputs);
@@ -283,6 +289,17 @@ WorldModel::GetPlayer(unsigned playerID)
 
     // None found. Return null.
     return NULL;
+}
+
+Vector
+WorldModel::GetPlayerPosition(unsigned playerID)
+{
+    Player* player = GetPlayer(playerID);
+    assert(player);
+    btTransform trans;
+    mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
+    Vector rv(trans.getOrigin());
+    return rv;
 }
 
 void

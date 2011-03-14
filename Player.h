@@ -17,19 +17,9 @@ public:
     Player(unsigned playerID, SceneNode* playerSceneNode, Vector initialPosition);
 
     /*
-     * move the player by a translation vector
+     * Sets the player location based on a btTransform.
      */
-    void move(Vector moveVec);
-    
-    /*
-     * move the player to a specified location
-     */
-    void moveTo(Vector pos);
-    
-    /*
-     * Get the current position of the player
-     */
-    Vector getPosition();
+    void setTransform(btTransform transform);
 
     /*
      * Apply an input.
@@ -54,9 +44,6 @@ public:
 
     // the node in the scene that contains the mesh for the player
     SceneNode* mPlayerNode;
-
-    // The current position of the player
-    Vector position;
 
     // The current active inputs applied to this player.
     // This is a bitfield of the USERINPUT_* variety, with only begin

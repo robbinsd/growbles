@@ -16,7 +16,11 @@ class UserInput;
 struct PlayerInfo {
     unsigned playerID;
     uint32_t activeInputs;
-    Vector pos;
+
+    // physics
+    btTransform transform;
+    btVector3 linearVel;
+    btVector3 angularVel;
 };
 
 // Struct containing all mutable world state
@@ -59,6 +63,7 @@ class WorldModel {
      * Steps the model forward in time.
      */
     void Step(unsigned numTicks);
+    void SingleStep();
 
     /*
      * Get/Set world state. Allows for rewinding.
@@ -81,6 +86,11 @@ class WorldModel {
      * Returns NULL if none is found.
      */
     Player* GetPlayer(unsigned playerID);
+
+    /*
+     * Gets the position of a player.
+     */
+    Vector GetPlayerPosition(unsigned playerID);
 
     /*
      * Applies inputs.

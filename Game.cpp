@@ -96,11 +96,11 @@ Game::Step()
         UserInput input(communicator->GetPlayerID(), clock->Now());
         input.LoadInput(*renderContext);
         if (input.inputs != 0)
-            communicator->ApplyInput(*world, input);
+            communicator->ApplyInput(input);
         
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
-        communicator->Synchronize(*world);
+        communicator->Synchronize();
         
         // Tick the clock
         clock->Tick();
@@ -121,7 +121,7 @@ Game::Step()
             Player* player = world->mPlayers[i];
             
             // if height of player is below a certain point, mark player as lost
-            if (player->getPosition().y < 1) {
+            if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
                 if (player->GetPlayerID() == communicator->GetPlayerID()) { // this is ourselves
                     renderContext->RenderString("You Lost", 100000);
                     
@@ -149,11 +149,11 @@ Game::Step()
         UserInput input(communicator->GetPlayerID(), clock->Now());
         input.LoadInput(*renderContext);
         if (input.inputs != 0)
-            communicator->ApplyInput(*world, input);
+            communicator->ApplyInput(input);
         
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
-        communicator->Synchronize(*world);
+        communicator->Synchronize();
         
         // Tick the clock
         clock->Tick();
