@@ -131,6 +131,7 @@ Platform::render()
 	glPopMatrix();
 
     // Render the blue "water" quad
+    /*
     glPushMatrix();
     glTranslatef(0, -15.0, 0);
     float darkBlue[] = {0.172, 0.254, 0.596, 1.0};
@@ -143,6 +144,7 @@ Platform::render()
         glVertex3f(-size, 0, size);
     glEnd();
     glPopMatrix();
+     */
 }
 
 float

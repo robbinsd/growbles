@@ -108,6 +108,9 @@ Game::Step()
         // Step the world
         world->Step(clock->Now() - clock->Then());
         
+        // Render the skybox
+        renderContext->RenderSkybox();
+        
         // Render the platform for debugging
         renderContext->RenderPlatform(*world);
         
@@ -157,6 +160,9 @@ Game::Step()
         
         // Step the world
         world->Step(clock->Now() - clock->Then());
+        
+        // Render the skybox
+        renderContext->RenderSkybox();
         
         // Render the platform for debugging
         renderContext->RenderPlatform(*world);

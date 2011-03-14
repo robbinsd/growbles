@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include <vector>
 #include "WorldModel.h"
+#include "Texture.h"
 #include <string>
 
 /*
@@ -125,6 +126,11 @@ public:
     std::vector<Material> materials;
     
     /*
+     * Renders the skybox
+     */
+    void RenderSkybox();
+    
+    /*
      * Renders the platform for debugging
      */
     void RenderPlatform(WorldModel& world);
@@ -221,6 +227,9 @@ protected:
     // Text to draw, one sf::String object is good enough for
     // drawing arbitrary number of strings on screen
     std::vector<myText> myTexts;
+    
+    // Our array of skybox textures
+    Texture skyboxTextures[6];
 };
 
 /*

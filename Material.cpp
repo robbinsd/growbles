@@ -86,7 +86,7 @@ Material::SetEnabled(bool enabled)
 }
 
 static const char* sSuffixes[] = {"_d.jpg", "_s.jpg", "_n.jpg"};
-static const char* sPrefix = "scene/";
+static const char* sPrefix = "scenefiles/";
 
 void
 Material::TryLoadTexture(const char* prefix, TextureType type)
