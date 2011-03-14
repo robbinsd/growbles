@@ -48,7 +48,8 @@ Player::applyInput(UserInput& input)
     uint32_t ends = input.inputs & 0xAAAAAAAA;
 
     // Sanity check - We shouldn't begin and end the same input
-    assert(((ends >> 1) & begins) == 0);
+    // NOTE - apparently SFML does this sometimes. Oh well!
+    //assert(((ends >> 1) & begins) == 0);
 
     // Sanity check - We shouldn't begin anything already begun
     // NOTE - this is disabled because operating systems actually send multiple
