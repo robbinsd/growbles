@@ -62,6 +62,29 @@ Timeline::AddInput(UserInput& input)
 }
 
 void
+Timeline::AddAuthoritativeState(WorldState& state)
+{
+    // We should be a client
+    assert(mMode == COMMUNICATOR_MODE_CLIENT);
+
+    // Prune everything before the given state
+    Prune(state.timestamp);
+
+    // If we don't have a keyframe for this timestamp, make one
+    if (!mKeyframes.size() ||
+        (*mKeyframes.begin())->timestamp != state.timestamp) {
+        Keyframe* frame = new Keyframe(state.timestamp, state);
+        mKeyframes.push_front(frame);
+    }
+    // Otherwise, just update the statedump on the first keyframes
+    else
+        (*mKeyframes.begin())->state = state;
+
+    // Rectify, starting at the front
+    Rectify(mKeyframes.begin());
+}
+
+void
 Timeline::AddInputInternal(UserInput& input)
 {
     // Find the newest keyframe with a timestamp less than or equal to this one
@@ -155,7 +178,6 @@ Timeline::Prune(unsigned timestamp)
 KeyframeIterator
 Timeline::FindKeyframe(unsigned timestamp)
 {
-    assert(mKeyframes.size() > 0);
     KeyframeIterator lastGood = mKeyframes.end();
     for (KeyframeIterator it = mKeyframes.begin();
          it != mKeyframes.end(); ++it) {

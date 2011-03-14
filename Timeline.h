@@ -59,6 +59,11 @@ class Timeline {
      */
     void AddInput(UserInput& input);
 
+    /*
+     * Adds authoritative server state to the timeline.
+     */
+    void AddAuthoritativeState(WorldState& state);
+
     protected:
 
     /*

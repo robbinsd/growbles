@@ -354,8 +354,7 @@ Communicator::Synchronize()
             // Worldstate dumps should only come from the server.
             case PAYLOAD_TYPE_WORLDSTATE:
                 assert(mMode == COMMUNICATOR_MODE_CLIENT);
-                assert(0); // We don't send these yet
-                //model.SetState(*(WorldState*)incoming.data);
+                mTimeline->AddAuthoritativeState(*(WorldState*)incoming.data);
                 break;
 
             // User inputs can come from anyone. The server forwards received
@@ -376,6 +375,14 @@ Communicator::Synchronize()
 }
 
 void
+Communicator::SendAuthoritativeState(WorldState& state)
+{
+    assert(mMode == COMMUNICATOR_MODE_SERVER);
+    Payload payload(PAYLOAD_TYPE_WORLDSTATE, &state);
+    mSocketHandler.SendToAll(payload);
+}
+
+void
 Communicator::Bootstrap(WorldModel& world)
 {
     // If we're the server
@@ -390,8 +397,7 @@ Communicator::Bootstrap(WorldModel& world)
         // Send the state to all clients
         WorldState state;
         world.GetState(state);
-        Payload payload(PAYLOAD_TYPE_WORLDSTATE, &state);
-        mSocketHandler.SendToAll(payload);
+        SendAuthoritativeState(state);
     }
 
     // If we're the client
