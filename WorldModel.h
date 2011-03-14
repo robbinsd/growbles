@@ -35,6 +35,9 @@ struct WorldState {
     
     // The number of players in play
     int numPlayers;
+    
+    // The platform state
+    platformState pstate;
 
     // Timestamp of this worldstate
     unsigned timestamp;

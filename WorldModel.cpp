@@ -175,6 +175,9 @@ WorldModel::GetState(WorldState& stateOut)
         stateOut.playerArray[i] = playerInfo;
     }
     
+    // Get platform state
+    stateOut.pstate = platform->GetPlatformState();
+    
     // Get the timestamp
     stateOut.timestamp = mCurrentTimestamp;
 }
@@ -208,6 +211,10 @@ WorldModel::SetState(WorldState& stateIn)
         // Active inputs
         player->SetActiveInputs(playerArray[i].activeInputs);
     }
+    
+    // Set the platform state
+    platform->SetPlatformState(stateIn.pstate);
+    
     mCurrentTimestamp = stateIn.timestamp;
     delete playerArray;
 }

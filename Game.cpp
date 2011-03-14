@@ -87,6 +87,15 @@ Game::Step()
         
         // Go to next state
         state = PLAYING;
+        
+        // Get initial player location
+        for(unsigned i=0; i < world->mPlayers.size(); ++i){
+            Player* player = world->mPlayers[i];
+            if (player->GetPlayerID() == communicator->GetPlayerID()) { // This is ourselves
+                prevPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
+                prevPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
+            }
+        }
     } // EOF state == START
     
     else if (state == PLAYING) {
@@ -120,21 +129,32 @@ Game::Step()
         for(unsigned i=0; i < world->mPlayers.size(); ++i){
             Player* player = world->mPlayers[i];
             
-            // if height of player is below a certain point, mark player as lost
-            if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
-                if (player->GetPlayerID() == communicator->GetPlayerID()) { // this is ourselves
+            if (player->GetPlayerID() == communicator->GetPlayerID()) { // This is ourselves
+                // Move the camera if necessary
+                float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
+                float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
+                renderContext->MoveCamera(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
+                prevPlayerX = newPlayerX;
+                prevPlayerZ = newPlayerZ;
+                
+                // If height of player is below a certain point, mark player as lost
+                if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
                     renderContext->RenderString("You Lost", 100000);
-                    
                     // Go to next state
                     state = END;
                 }
-                else { // the other player lost, we win
+                
+                
+            }
+            else { // The other player lost, we win
+                if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
                     renderContext->RenderString("You Win", 100000);
                     
                     // Go to next state
                     state = END;
                 }
             }
+            
         }
         
         // Render all strings
@@ -169,6 +189,19 @@ Game::Step()
         
         // Render the scenegraph
         //renderContext->Render(*sceneGraph);
+        
+        for(unsigned i=0; i < world->mPlayers.size(); ++i){
+            Player* player = world->mPlayers[i];
+            
+            if (player->GetPlayerID() == communicator->GetPlayerID()) { // This is ourselves
+                // Move the camera if necessary
+                float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
+                float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
+                renderContext->MoveCamera(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
+                prevPlayerX = newPlayerX;
+                prevPlayerZ = newPlayerZ;
+            }
+        }
         
         // Render all strings
         renderContext->RenderAllElse();

@@ -12,6 +12,14 @@ const float GRAVITY = 0.05;         // Gravity
 
 enum {IDLE, BLINKING, FALLING};
 
+struct platformState {
+    int dropTimer, blinkTimer, dropCount, fallingRing;
+    bool blinkOn;
+    float curRadius, curDrawRadius;
+    float dropVelocity, dropY;
+    int dropState;
+};
+
 class Platform
 {
 public:
@@ -23,6 +31,8 @@ public:
     float getRadius();
     int getFallingRing();
     float getFallingRingPos();
+    platformState GetPlatformState();
+    void SetPlatformState(platformState pinfo);
 
 private:
     int dropTicks, dropTimer, blinkTimer, dropCount, fallingRing; // Timers and counters
