@@ -6,6 +6,7 @@
 
 class RenderContext;
 class WorldModel;
+class Communicator;
 
 typedef enum {
     USERINPUT_INDEX_GROW = 0,
@@ -38,7 +39,7 @@ struct UserInput {
      * applied immediately. All other inputs are stored as instance data
      * for later application.
      */
-    void LoadInput(RenderContext& context);
+    void LoadInput(RenderContext& context, Communicator& communicator);
 
     // Bitfield of inputs
     uint32_t inputs;

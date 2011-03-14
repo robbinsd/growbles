@@ -248,6 +248,7 @@ Communicator::Communicator(Timeline& timeline,
                                                   , mNextPlayerID(1)
                                                   , mNumClientsExpected(0)
                                                   , mSocketHandler(*this)
+                                                  , mSimulatingOutage(false)
 {
     // If we're a server, assign ourselves a player ID
     if (mode == COMMUNICATOR_MODE_SERVER)
@@ -333,6 +334,10 @@ Communicator::ConnectAsServer()
 void
 Communicator::Synchronize()
 {
+    // If we're simulating an outage, pretend like nothing arrived
+    if (mSimulatingOutage)
+        return;
+
     // Queue up any input we might have, but don't wait
     mSocketHandler.Select(0, 0);
 

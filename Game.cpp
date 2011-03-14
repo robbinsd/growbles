@@ -94,7 +94,7 @@ Game::Step()
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
         UserInput input(communicator->GetPlayerID(), clock->Now());
-        input.LoadInput(*renderContext);
+        input.LoadInput(*renderContext, *communicator);
         if (input.inputs != 0)
             communicator->ApplyInput(input);
         
@@ -144,7 +144,7 @@ Game::Step()
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
         UserInput input(communicator->GetPlayerID(), clock->Now());
-        input.LoadInput(*renderContext);
+        input.LoadInput(*renderContext, *communicator);
         if (input.inputs != 0)
             communicator->ApplyInput(input);
         

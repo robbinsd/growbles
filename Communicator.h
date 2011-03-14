@@ -184,8 +184,16 @@ class Communicator {
      * it to all connected sockets as well.
      */
     void ApplyInput(UserInput& input);
-    
+
+    /*
+     * Gets the mode of this communicator.
+     */
     CommunicatorMode GetMode() { return mMode; };
+
+    /*
+     * Begins/ends a simulated network outage.
+     */
+    void SetSimulatingOutage(bool outage) { mSimulatingOutage = outage; };
 
     protected:
 
@@ -215,6 +223,9 @@ class Communicator {
 
     // Our socket handler
     GrowblesHandler mSocketHandler;
+
+    // Network outage simulation
+    bool mSimulatingOutage;
 };
 
 #endif /* COMMUNICATOR_H */

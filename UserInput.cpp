@@ -1,6 +1,7 @@
 #include "UserInput.h"
 #include "RenderContext.h"
 #include "WorldModel.h"
+#include "Communicator.h"
 
 UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
                                                               , timestamp(timestamp_)
@@ -10,7 +11,7 @@ UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
 
 
 void
-UserInput::LoadInput(RenderContext& context)
+UserInput::LoadInput(RenderContext& context, Communicator& communicator)
 {
     static int sLastMouseX = 0;
     static int sLastMouseY = 0;
@@ -55,6 +56,14 @@ UserInput::LoadInput(RenderContext& context)
                         break;
                     case sf::Key::Up:
                         context.MoveLight(0.1, 0.0);
+                        break;
+
+                    // Network outage simulation
+                    case sf::Key::Num0:
+                        communicator.SetSimulatingOutage(true);
+                        break;
+                    case sf::Key::Num9:
+                        communicator.SetSimulatingOutage(false);
                         break;
 
                     default:
