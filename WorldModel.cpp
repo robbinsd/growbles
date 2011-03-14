@@ -197,6 +197,13 @@ WorldModel::SetState(WorldState& stateIn)
         // Get our local copy of the player
         Player* player = GetPlayer(playerArray[i].playerID);
 
+        // Clean cached broadphase state
+        if (dynamicsWorld->getBroadphase()->getOverlappingPairCache())
+            dynamicsWorld->getBroadphase()
+                         ->getOverlappingPairCache()
+                         ->cleanProxyFromPairs(mPlayerRigidBodies[player]->getBroadphaseHandle(),
+                                               dynamicsWorld->getDispatcher());
+
         // Physics
         mPlayerRigidBodies[player]->setWorldTransform(playerArray[i].transform);
         player->setTransform(playerArray[i].transform);
@@ -206,6 +213,11 @@ WorldModel::SetState(WorldState& stateIn)
         // Active inputs
         player->SetActiveInputs(playerArray[i].activeInputs);
     }
+
+    // Reset some cached state
+    dynamicsWorld->getBroadphase()->resetPool(dynamicsWorld->getDispatcher());
+    dynamicsWorld->getConstraintSolver()->reset();
+
     mCurrentTimestamp = stateIn.timestamp;
     delete playerArray;
 }
