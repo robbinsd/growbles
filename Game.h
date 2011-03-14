@@ -1,26 +1,53 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include "Framework.h"
 #include "RenderContext.h"
+#include "SceneGraph.h"
+#include "Communicator.h"
+#include "Gameclock.h"
+#include "Timeline.h"
+#include "UserInput.h"
+#include "Menu.h"
 
 class Game {
     
 public:
     
     /*
-     * Dummy constructor.
+     * Constructor
      */
-    Game(RenderContext& renderContext);
+    Game(Timeline& tl, Communicator& comm);
     
     /*
-     * Destructor.
+     * Destructor
      */
     ~Game();
+    
+    void Setup();
     
     /*
      * Steps the model forward in time.
      */
-    void Step(WorldModel& world);
+    void Step();
+    
+    enum STATE {
+        MENU,
+        START,
+        PLAYING,
+        END
+    };
     
 protected:
     
-    RenderContext* rc;
+    Gameclock* clock;
+    RenderContext* renderContext;
+    SceneGraph* sceneGraph;
+    WorldModel* world;
+    Timeline* timeline;
+    Communicator* communicator;
+    Menu* mainMenu;
+    unsigned state;
 };
+
+#endif

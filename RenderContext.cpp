@@ -134,15 +134,30 @@ RenderContext::RenderPlatform(WorldModel& world)
     
     // Draw debug wireframes
     world.GetDynamicsWorld()->debugDrawWorld();
-    
-    DrawString();
 
     // Flush
     GL_CHECK(glFlush());
     
     // Reenable the shader
     GL_CHECK(glUseProgram(GetShaderID()));
-    // EOF update platform
+}
+
+void
+RenderContext::RenderAllElse()
+{
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // Disable the shader so we can draw the platform using the fixed pipeline
+    GL_CHECK(glUseProgram(0));
+    
+    // Draw all the strings in myTexts
+    DrawString();
+    
+    // Flush
+    GL_CHECK(glFlush());
+    
+    // Reenable the shader
+    GL_CHECK(glUseProgram(GetShaderID()));
 }
 
 void
@@ -425,7 +440,7 @@ RenderContext::RenderShadowQuad()
 }
 
 void
-RenderContext::MakeString(std::string str, int duration)
+RenderContext::RenderString(std::string str, unsigned duration, unsigned size, float x, float y, unsigned r, unsigned g, unsigned b)
 {
     /*
      // Load the font from a file, if we want other fonts
@@ -438,31 +453,13 @@ RenderContext::MakeString(std::string str, int duration)
     myText text;
     text.str.SetText(str);
     text.str.SetFont(sf::Font::GetDefaultFont());
-    text.str.SetSize(30);
-    text.str.SetColor(sf::Color(128, 0, 128));
+    text.str.SetSize(size);
+    text.str.SetColor(sf::Color(r, g, b));
     //myText.SetRotation(90.f);
     //myText.SetScale(2.f, 2.f);
-    text.str.SetPosition(100.f, 100.f);
+    text.str.SetPosition(x, y);
     text.duration = duration;
     myTexts.push_back(text);
-}
-
-void
-RenderContext::SetSize(unsigned size)
-{
-    //myText.SetSize(size);
-}
-
-void
-RenderContext::SetColor(unsigned r, unsigned g, unsigned b)
-{
-    //myText.SetColor(sf::Color(r, g, b));
-}
-
-void
-RenderContext::SetPosition(float x, float y)
-{
-    //myText.SetPosition(x, y);
 }
 
 void
@@ -474,7 +471,6 @@ RenderContext::DrawString()
     mWindow.Draw(myText);
     GL_CHECK(glUseProgram(GetShaderID()));
      */
-    
     glActiveTexture(GL_TEXTURE0);
     for (unsigned i=0; i<myTexts.size(); i++) {
         if (myTexts[i].duration <= 0) {
@@ -485,16 +481,3 @@ RenderContext::DrawString()
         myTexts[i].duration -= 32;
     }
 }
-/*
-void
-RenderContext::DrawString(int msToDisplay)
-{
-    if(textCountdown == -1) textCountdown = msToDisplay;
-    else {textCountdown -= 32};
-
-    GL_CHECK(glUseProgram(0));
-    glActiveTexture(GL_TEXTURE0);
-    mWindow.Draw(myText);
-    GL_CHECK(glUseProgram(GetShaderID()));
-}
-*/

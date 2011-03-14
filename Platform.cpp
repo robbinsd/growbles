@@ -91,65 +91,56 @@ Platform::render()
     // Render the outer disk
 	glPushMatrix();
 	if(blinkOn) {
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, brightColor);
         glColor3f(brightColor[0], brightColor[1], brightColor[2]);
     }
 	else {
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, topColor);
         glColor3f(topColor[0], topColor[1], topColor[2]);
     }
 	glTranslatef(0, -dropY+4, 0);
-	glRotatef(-90.0, 1,0,0);
-	gluDisk  ( innerDisk , curDrawRadius-RADIUS_DECREASE, curDrawRadius, 64 , 1 ); 
+	glRotatef(-90.0, 1, 0, 0);
+	gluDisk (innerDisk, curDrawRadius-RADIUS_DECREASE, curDrawRadius, 64, 1); 
 	glPopMatrix();
     
 	// Render the outer cylinder
     glPushMatrix();
 	if(blinkOn) {
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, brightColor);
         glColor3f(brightColor[0], brightColor[1], brightColor[2]);
     }
 	else {
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, regularColor);
         glColor3f(regularColor[0], regularColor[1], regularColor[2]);
     }
 	glTranslatef(0, -dropY+4, 0);
-	glRotatef(90.0, 1,0,0);
-	gluCylinder  ( outerCylinder, curDrawRadius,
-						curDrawRadius, 30.0, 64, 1);
+	glRotatef(90.0, 1, 0 ,0);
+	gluCylinder(outerCylinder, curDrawRadius, curDrawRadius, 30.0, 64, 1);
 	glPopMatrix();
 
     // Render the inner disk
 	glPushMatrix();
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, topColor);
     glColor3f(topColor[0], topColor[1], topColor[2]);
     glTranslatef(0, 4, 0);
-	glRotatef(-90.0, 1,0,0);
-	gluDisk  ( innerDisk , 0.0, curDrawRadius-RADIUS_DECREASE , 64 , 1 ); 
+	glRotatef(-90.0, 1, 0, 0);
+	gluDisk(innerDisk, 0.0, curDrawRadius-RADIUS_DECREASE, 64, 1); 
 	glPopMatrix();
 
 	// Render the inner cylinder
     glPushMatrix();
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, regularColor);
     glColor3f(regularColor[0], regularColor[1], regularColor[2]);
     glTranslatef(0, 4, 0);
-	glRotatef(90.0, 1,0,0);
-	gluCylinder  ( innerCylinder, curDrawRadius-RADIUS_DECREASE,
-						curDrawRadius-RADIUS_DECREASE, 30.0, 64, 1);
+	glRotatef(90.0, 1, 0, 0);
+	gluCylinder(innerCylinder, curDrawRadius-RADIUS_DECREASE, curDrawRadius-RADIUS_DECREASE, 30.0, 64, 1);
 	glPopMatrix();
 
     // Render the blue "water" quad
     glPushMatrix();
     glTranslatef(0, -15.0, 0);
-    float darkBlue[] = { 0.172, 0.254, 0.596, 1.0};
+    float darkBlue[] = {0.172, 0.254, 0.596, 1.0};
     float size = 40.0;
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, darkBlue);
     glColor3f(darkBlue[0], darkBlue[1], darkBlue[2]);
     glBegin(GL_QUADS);
-        glVertex3f( -size, 0, -size);
-        glVertex3f( size, 0, -size);
-        glVertex3f( size, 0, size);
-        glVertex3f( -size, 0, size);
+        glVertex3f(-size, 0, -size);
+        glVertex3f(size, 0, -size);
+        glVertex3f(size, 0, size);
+        glVertex3f(-size, 0, size);
     glEnd();
     glPopMatrix();
 }

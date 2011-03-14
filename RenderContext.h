@@ -130,14 +130,16 @@ public:
     void RenderPlatform(WorldModel& world);
     
     /*
+     * Render all the strings
+     */
+    void RenderAllElse();
+    
+    /*
      * Draw a text string on screen
      * Use MakeString() to pass in the string to draw,
      * and then user DrawString() to draw it
      */
-    void MakeString(std::string str, int duration);
-    void SetSize(unsigned size);
-    void SetColor(unsigned r, unsigned g, unsigned b);
-    void SetPosition(float x, float y);
+    void RenderString(std::string str, unsigned duration=32, unsigned size=30, float x=100.0, float y=100.0, unsigned r=128, unsigned g=0, unsigned b=128);
     void DrawString();
 
 protected:
