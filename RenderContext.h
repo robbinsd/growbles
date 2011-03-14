@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include <vector>
 #include "WorldModel.h"
+#include <string>
 
 /*
  * General parameters.
@@ -42,6 +43,11 @@ struct LightInfo {
     Vector ambient;
     Vector diffuse;
     Vector specular;
+};
+
+struct myText {
+    sf::String str;
+    int duration;
 };
 
 typedef enum {
@@ -122,6 +128,19 @@ public:
      * Renders the platform for debugging
      */
     void RenderPlatform(WorldModel& world);
+    
+    /*
+     * Render all the strings
+     */
+    void RenderAllElse();
+    
+    /*
+     * Draw a text string on screen
+     * Use MakeString() to pass in the string to draw,
+     * and then user DrawString() to draw it
+     */
+    void RenderString(std::string str, unsigned duration=32, unsigned size=30, float x=100.0, float y=100.0, unsigned r=128, unsigned g=0, unsigned b=128);
+    void DrawString();
 
 protected:
 
@@ -198,6 +217,10 @@ protected:
 
     // Shader
     Shader mShader;
+    
+    // Text to draw, one sf::String object is good enough for
+    // drawing arbitrary number of strings on screen
+    std::vector<myText> myTexts;
 };
 
 /*
@@ -224,6 +247,5 @@ protected:
     assert(location >= 0); \
     GL_CHECK(glUniformMatrix##suffix(location, 1, GL_FALSE, val)); \
 }
-
 
 #endif /* RENDERCONTEXT_H */

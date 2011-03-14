@@ -146,7 +146,7 @@ WorldModel::SingleStep()
     }
 
     // update platform position
-    //platform->update();
+    platform->update();
 
     // move the platform rigid bodies along with the rings
     int fallingRing = platform->getFallingRing();
@@ -289,6 +289,17 @@ WorldModel::GetPlayer(unsigned playerID)
 
     // None found. Return null.
     return NULL;
+}
+
+Vector
+WorldModel::GetPlayerPosition(unsigned playerID)
+{
+    Player* player = GetPlayer(playerID);
+    assert(player);
+    btTransform trans;
+    mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
+    Vector rv(trans.getOrigin());
+    return rv;
 }
 
 void

@@ -88,6 +88,11 @@ class WorldModel {
     Player* GetPlayer(unsigned playerID);
 
     /*
+     * Gets the position of a player.
+     */
+    Vector GetPlayerPosition(unsigned playerID);
+
+    /*
      * Applies inputs.
      */
     void ApplyInput(UserInput& input);
@@ -146,6 +151,8 @@ class WorldModel {
 
     // Current timestamp
     unsigned mCurrentTimestamp;
+    
+    friend class Game;
 };
 
 #endif /* WORLDMODEL_H */

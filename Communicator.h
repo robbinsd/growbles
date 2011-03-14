@@ -177,13 +177,15 @@ class Communicator {
     /*
      * Gets our player ID.
      */
-    unsigned GetPlayerID() { return mPlayerID; } ;
+    unsigned GetPlayerID() { return mPlayerID; };
 
     /*
      * Applies input. This adds the input to our timeline, and forwards
      * it to all connected sockets as well.
      */
     void ApplyInput(UserInput& input);
+    
+    CommunicatorMode GetMode() { return mMode; };
 
     protected:
 

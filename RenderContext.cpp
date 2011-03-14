@@ -13,6 +13,7 @@ RenderContext::RenderContext() : mDoingShadowPass(false)
                                          sf::Style::Close, mWindowSettings)
                                , mShader(SHADER_PATH)
 {
+    mWindow.PreserveOpenGLStates(true);
     /*
      * Lighting Defaults.
      */
@@ -133,13 +134,30 @@ RenderContext::RenderPlatform(WorldModel& world)
     
     // Draw debug wireframes
     world.GetDynamicsWorld()->debugDrawWorld();
+
+    // Flush
+    GL_CHECK(glFlush());
+    
+    // Reenable the shader
+    GL_CHECK(glUseProgram(GetShaderID()));
+}
+
+void
+RenderContext::RenderAllElse()
+{
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // Disable the shader so we can draw the platform using the fixed pipeline
+    GL_CHECK(glUseProgram(0));
+    
+    // Draw all the strings in myTexts
+    DrawString();
     
     // Flush
     GL_CHECK(glFlush());
     
     // Reenable the shader
     GL_CHECK(glUseProgram(GetShaderID()));
-    // EOF update platform
 }
 
 void
@@ -421,4 +439,45 @@ RenderContext::RenderShadowQuad()
     GL_CHECK(glPopMatrix());
 }
 
+void
+RenderContext::RenderString(std::string str, unsigned duration, unsigned size, float x, float y, unsigned r, unsigned g, unsigned b)
+{
+    /*
+     // Load the font from a file, if we want other fonts
+     sf::Font MyFont;
+     if (!MyFont.LoadFromFile("arial.ttf", 50))
+     {
+     // Error...
+     }
+     */
+    myText text;
+    text.str.SetText(str);
+    text.str.SetFont(sf::Font::GetDefaultFont());
+    text.str.SetSize(size);
+    text.str.SetColor(sf::Color(r, g, b));
+    //myText.SetRotation(90.f);
+    //myText.SetScale(2.f, 2.f);
+    text.str.SetPosition(x, y);
+    text.duration = duration;
+    myTexts.push_back(text);
+}
 
+void
+RenderContext::DrawString()
+{
+    /*
+    GL_CHECK(glUseProgram(0));
+    glActiveTexture(GL_TEXTURE0);
+    mWindow.Draw(myText);
+    GL_CHECK(glUseProgram(GetShaderID()));
+     */
+    glActiveTexture(GL_TEXTURE0);
+    for (unsigned i=0; i<myTexts.size(); i++) {
+        if (myTexts[i].duration <= 0) {
+            myTexts.erase(myTexts.begin()+i);
+            continue;
+        }
+        mWindow.Draw(myTexts[i].str);
+        myTexts[i].duration -= 32;
+    }
+}
