@@ -126,6 +126,10 @@ WorldModel::Step(unsigned numTicks)
     if (numTicks <= 0) return;
     //assert(numTicks > 0);
 
+    // Apply the input forces
+    for(unsigned i = 0; i < mPlayers.size(); ++i)
+        HandleInputForPlayer(mPlayers[i]->GetPlayerID());
+
     // BOF step physics
     dynamicsWorld->stepSimulation(numTicks*(4*GAMECLOCK_TICK_MS/1000.0), 10);
 
@@ -133,7 +137,6 @@ WorldModel::Step(unsigned numTicks)
     for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *player = mPlayers[i];
         assert(player);
-        HandleInputForPlayer(player->GetPlayerID());
         btTransform trans;
         mPlayerRigidBodies[player]->getMotionState()->getWorldTransform(trans);
         player->setTransform(trans);
