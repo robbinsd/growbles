@@ -9,6 +9,9 @@
 #include "UserInput.h"
 #include <vector>
 
+#define BULLET_STEP_INTERVAL (1.0/60.0)
+#define BULLET_STEPS_PER_GROWBLE_STEP 8
+
 class SceneGraph;
 class UserInput;
 

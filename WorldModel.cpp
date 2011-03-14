@@ -128,12 +128,12 @@ WorldModel::Step(unsigned numTicks)
 void
 WorldModel::SingleStep()
 {
-    // Apply the input forces
-    for(unsigned i = 0; i < mPlayers.size(); ++i)
-        HandleInputForPlayer(mPlayers[i]->GetPlayerID());
-
     // BOF step physics
-    dynamicsWorld->stepSimulation(4*GAMECLOCK_TICK_MS/1000.0, 10);
+    for (unsigned i = 0; i < BULLET_STEPS_PER_GROWBLE_STEP; ++i) {
+        for(unsigned j = 0; j < mPlayers.size(); ++j)
+            HandleInputForPlayer(mPlayers[j]->GetPlayerID());
+        dynamicsWorld->stepSimulation(BULLET_STEP_INTERVAL, 1, BULLET_STEP_INTERVAL);
+    }
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
