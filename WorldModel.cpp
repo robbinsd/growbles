@@ -167,8 +167,10 @@ WorldModel::GetState(WorldState& stateOut)
     for (unsigned i=0; i<mPlayers.size(); i++) {
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
-        playerInfo.pos =  mPlayers[i]->getPosition();
         playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
+        playerInfo.transform = mPlayerRigidBodies[mPlayers[i]]->getWorldTransform();
+        playerInfo.linearVel = mPlayerRigidBodies[mPlayers[i]]->getLinearVelocity();
+        playerInfo.angularVel = mPlayerRigidBodies[mPlayers[i]]->getAngularVelocity();
         stateOut.playerArray[i] = playerInfo;
     }
     
@@ -196,8 +198,10 @@ WorldModel::SetState(WorldState& stateIn)
         // Get our local copy of the player
         Player* player = GetPlayer(playerArray[i].playerID);
 
-        // Get and set the player's location
-        player->moveTo(playerArray[i].pos);
+        // Physics
+        mPlayerRigidBodies[player]->setWorldTransform(playerArray[i].transform);
+        mPlayerRigidBodies[player]->setLinearVelocity(playerArray[i].linearVel);
+        mPlayerRigidBodies[player]->setAngularVelocity(playerArray[i].angularVel);
 
         // Active inputs
         player->SetActiveInputs(playerArray[i].activeInputs);

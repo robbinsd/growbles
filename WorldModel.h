@@ -16,7 +16,11 @@ class UserInput;
 struct PlayerInfo {
     unsigned playerID;
     uint32_t activeInputs;
-    Vector pos;
+
+    // physics
+    btTransform transform;
+    btVector3 linearVel;
+    btVector3 angularVel;
 };
 
 // Struct containing all mutable world state
