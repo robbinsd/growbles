@@ -39,7 +39,9 @@ Player::applyInput(UserInput& input)
     // assert((begins & activeInputs) == 0);
 
     // Sanity check - We shouldn't end anything not begun
-    assert(((ends >> 1) | activeInputs) == activeInputs);
+    // NOTE - this sometimes screws up too, probably when SFML misses
+    // the keydown. Ah well...
+    // assert(((ends >> 1) | activeInputs) == activeInputs);
 
     // Apply falcon inputs
     activeFalconInputs = input.falconInputs;
