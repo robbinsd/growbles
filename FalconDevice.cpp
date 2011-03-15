@@ -1,5 +1,8 @@
 #include "FalconDevice.h"
 
+void hapticsLoopCallback();
+static FalconDevice *hapticsLoopThisPtr = NULL;
+
 //DON"T CHANGE THE ORDER OF THESE
 enum SwitchIndexT{  SWITCH_INDEX_JUMP=0, SWITCH_INDEX_SHRINK, SWITCH_INDEX_DASH,
     SWITCH_INDEX_GROW };
@@ -7,6 +10,9 @@ enum SwitchIndexT{  SWITCH_INDEX_JUMP=0, SWITCH_INDEX_SHRINK, SWITCH_INDEX_DASH,
 FalconDevice::FalconDevice(){
     isReady = false;
 #ifdef FALCON
+    isFalling = false;
+    mSimulationRunning = false;
+    mSimulationFinished = false;
     mHapticHandler = new cHapticDeviceHandler();
 
     // get access to the first available haptic device
@@ -24,6 +30,7 @@ FalconDevice::FalconDevice(){
 	if (result == 0){
 		result = mHapticDevice->initialize();
 	}
+
 #endif
 }
 
@@ -32,6 +39,17 @@ FalconDevice::~FalconDevice(){
     if(!isConnected())
         return;
     mHapticDevice->close();
+    mSimulationRunning = false;
+    mSimulationFinished = true;
+#endif
+}
+
+void FalconDevice::Init(){
+#ifdef FALCON
+    cThread *hapticsThread = new cThread();
+    mSimulationRunning = true;
+    hapticsLoopThisPtr = this;
+    hapticsThread->set(hapticsLoopCallback, CHAI_THREAD_PRIORITY_HAPTICS);
 #endif
 }
 
@@ -78,36 +96,17 @@ void FalconDevice::getForce(float &up, float &right, float &forward){
 #endif
 }
 
-void FalconDevice::setVerticalForce(bool isFalling){
+void FalconDevice::setVerticalForce(bool _isFalling){
 #ifdef FALCON
-    if(!isConnected())
-        return;
-    float upPos = 0, upVel = 0, rightDummy, forwardDummy;
-    float up = 0;
-    if(!isFalling){
-        getPosition(upPos, rightDummy, forwardDummy);
-        up += -FALCON_VERTICAL_STIFFNESS*upPos;
-        /*getVelocity(upVel, rightDummy, forwardDummy);
-        float dampenTerm = -FALCON_DAMPENING*upVel;
-        if((up+dampenTerm)*up < 0)
-            up = 0;
-        else
-            up += dampenTerm;*/
+    isFalling = _isFalling;
+    if(_isFalling){
+        printf("oops\n");
     }
-    float upDummy, forwardForce = 0, rightForce = 0;
-    getForce(upDummy, rightForce, forwardForce);
-    mHapticDevice->setForce(cVector3d(-forwardForce, rightForce,up));
 #endif
 }
 
 void FalconDevice::setHorizontalForce(float right, float forward){
-#ifdef FALCON
-    if(!isConnected())
-        return;
-    float upForce = 0, forwardDummy, rightDummy;
-    getForce(upForce, forwardDummy, rightDummy);
-    mHapticDevice->setForce(cVector3d(-forward, right, upForce));
-#endif
+    forcesToApply.push_back(cVector3d(-forward, right, FALCON_IMPULSE_LENGTH));
 }
 
 bool FalconDevice::isConnected(){
@@ -186,3 +185,62 @@ float FalconDevice::getMaxStiffness() const{
 #endif
 }
 */
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
+float sinusoid(float t){
+    t = t*(2*M_PI)*FALCON_IMPULSE_LENGTH;
+    return sin(5*t)/t;
+}
+
+void FalconDevice::hapticsLoop(){
+#ifdef FALCON
+    cPrecisionClock pclock;
+    pclock.setTimeoutPeriodSeconds(1.0);
+    pclock.start(true);
+    int counter = 0;
+
+	double prevTimestepTime = pclock.getCPUTimeSeconds();
+
+    // main haptic simulation loop
+    while(mSimulationRunning){
+        if(!isConnected())
+            continue;
+        
+		double newtime = pclock.getCPUTimeSeconds();
+
+        cVector3d pos(0,0,0);
+        cVector3d vel(0,0,0);
+        cVector3d totalForce(0,0,0);
+        if(!isFalling){
+            mHapticDevice->getPosition(pos);
+            totalForce.z += -FALCON_VERTICAL_STIFFNESS*pos.z;
+            mHapticDevice->getLinearVelocity(vel);
+            float dampenTerm = -FALCON_DAMPENING*vel.z;
+            if((totalForce.z+dampenTerm)*totalForce.z < 0)
+                totalForce.z = 0;
+            else
+                totalForce.z += dampenTerm;
+        }
+        for(int i = 0; i < forcesToApply.size(); ++i){
+            cVector3d currForce = forcesToApply[i];
+            cVector3d currForceXY(currForce.x, currForce.y, 0);
+            totalForce += currForceXY*sinusoid(currForce.z);
+            //remember currForce.z is timestamp
+            currForce.z -= (newtime-prevTimestepTime);
+            if(currForce.z < 0)
+                forcesToApply.erase(forcesToApply.begin()+i);
+        }
+        mHapticDevice->setForce(totalForce);
+
+        prevTimestepTime = newtime;
+    }
+    mSimulationFinished = true;
+#endif
+}
+
+void hapticsLoopCallback(){
+    hapticsLoopThisPtr->hapticsLoop();
+}

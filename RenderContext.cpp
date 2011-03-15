@@ -90,6 +90,9 @@ RenderContext::Init()
     // Make sure the shadow pass starts disabled
     SetShadowPassEnabled(false);
 
+    // Initialize our falcon device
+    falcon.Init();
+
     // Bootstrap our light situation
     LightingChanged();
 
