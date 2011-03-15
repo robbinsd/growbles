@@ -9,6 +9,8 @@
 #include "UserInput.h"
 #include "FalconDevice.h"
 #include <vector>
+#include <map>
+using namespace std;
 
 #define BULLET_STEP_INTERVAL (1.0/60.0)
 #define BULLET_STEPS_PER_GROWBLE_STEP 8
