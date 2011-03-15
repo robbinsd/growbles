@@ -34,6 +34,7 @@ struct PlayerInfo {
     btTransform transform;
     btVector3 linearVel;
     btVector3 angularVel;
+    float scale;
 };
 
 // Struct containing all mutable world state
@@ -70,7 +71,7 @@ class WorldModel {
      * @param falcon: the falcon controlled by this player
      * @param playerID: this ID of the player on this computer
      */
-    void Init(SceneGraph& sceneGraph, FalconDevice &falcon, int playerID);
+    void Init(SceneGraph& sceneGraph);
 
     /*
      * Destructor.
@@ -129,6 +130,16 @@ class WorldModel {
      * Gets the dynamicsWorld for physics debug drawing
      */
     btDiscreteDynamicsWorld* GetDynamicsWorld() { return dynamicsWorld; };
+
+    /*
+     * Set the falcon controlled by this computer
+     */
+    void SetFalcon(FalconDevice &falcon){ mFalcon = &falcon; };
+
+    /*
+     * Set the player controlling this computer.
+     */
+    void SetThisPlayer(int playerID){ mPlayerID = playerID; };
 
     /*
      * Respond to collision between the player on this computer and

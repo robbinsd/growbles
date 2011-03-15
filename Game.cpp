@@ -31,7 +31,7 @@ Game::Setup()
     
     // Declare our world model, and point it to the scene graph
     world = new WorldModel;
-    world->Init(*sceneGraph, renderContext->falcon, communicator->GetPlayerID());
+    world->Init(*sceneGraph);
     
     // Setup main menu
     mainMenu = new Menu(renderContext);
@@ -76,6 +76,9 @@ Game::Step()
         
         // Put the players on the map and get people on the same page
         communicator->Bootstrap(*world);
+
+        world->SetFalcon(renderContext->falcon);
+        world->SetThisPlayer(communicator->GetPlayerID());
         
         // Start the clock
         clock->Start();
