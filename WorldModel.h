@@ -34,6 +34,7 @@ struct PlayerInfo {
     btTransform transform;
     btVector3 linearVel;
     btVector3 angularVel;
+    float scale;
 };
 
 // Struct containing all mutable world state
