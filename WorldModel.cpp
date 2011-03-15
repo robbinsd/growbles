@@ -512,12 +512,12 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
         float len = forceVector.length();
         if(len != 0)
             forceVector /= len;
-        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, true)) { // Jump
-            if (playerRigidBody->getWorldTransform().getOrigin().getY() <= 6.0) {
-                forceVector += btVector3(0,20,0);
-                //sf::Sound::Status Status2 = Sound2.GetStatus();
-                //if (Status2 != sf::Sound::Playing) Sound2.Play();
-            }
+    }
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, true)) { // Jump
+        if (playerRigidBody->getWorldTransform().getOrigin().getY() <= 6.0) {
+            forceVector += btVector3(0,20,0);
+            //sf::Sound::Status Status2 = Sound2.GetStatus();
+            //if (Status2 != sf::Sound::Playing) Sound2.Play();
         }
     }
     if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_GROW, true))
