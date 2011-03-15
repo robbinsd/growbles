@@ -81,6 +81,13 @@ UserInput::LoadInput(RenderContext& context, Communicator& communicator,
                     case sf::Key::Num9:
                         communicator.SetSimulatingOutage(false);
                         break;
+                    case sf::Key::Num8:
+                        communicator.SetIgnoringAuthoritativeDumps(true);
+                        break;
+                    case sf::Key::Num7:
+                        communicator.SetIgnoringAuthoritativeDumps(false);
+                        break;
+
 
                     default:
                         break;

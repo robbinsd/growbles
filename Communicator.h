@@ -204,6 +204,11 @@ class Communicator {
      */
     void SetSimulatingOutage(bool outage) { mSimulatingOutage = outage; };
 
+    /*
+     * Ignore/respect authoritative dumps.
+     */
+    void SetIgnoringAuthoritativeDumps(bool ignore) { mIgnoringAuthority = ignore; };
+
     protected:
 
     /*
@@ -235,6 +240,9 @@ class Communicator {
 
     // Network outage simulation
     bool mSimulatingOutage;
+
+    // Are we ignoring authoritative dumps?
+    bool mIgnoringAuthority;
 };
 
 #endif /* COMMUNICATOR_H */

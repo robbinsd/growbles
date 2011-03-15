@@ -251,6 +251,7 @@ Communicator::Communicator(Timeline& timeline,
                                                   , mNumClientsExpected(0)
                                                   , mSocketHandler(*this)
                                                   , mSimulatingOutage(false)
+                                                  , mIgnoringAuthority(false)
 {
     // If we're a server, assign ourselves a player ID
     if (mode == COMMUNICATOR_MODE_SERVER)
@@ -356,7 +357,8 @@ Communicator::Synchronize()
             // Worldstate dumps should only come from the server.
             case PAYLOAD_TYPE_WORLDSTATE:
                 assert(mMode == COMMUNICATOR_MODE_CLIENT);
-                mTimeline->AddAuthoritativeState(*(WorldState*)incoming.data);
+                if (!mIgnoringAuthority)
+                    mTimeline->AddAuthoritativeState(*(WorldState*)incoming.data);
                 break;
 
             // User inputs can come from anyone. The server forwards received
