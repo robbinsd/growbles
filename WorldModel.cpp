@@ -172,6 +172,7 @@ WorldModel::GetState(WorldState& stateOut)
         playerInfo.transform = mPlayerRigidBodies[mPlayers[i]]->getWorldTransform();
         playerInfo.linearVel = mPlayerRigidBodies[mPlayers[i]]->getLinearVelocity();
         playerInfo.angularVel = mPlayerRigidBodies[mPlayers[i]]->getAngularVelocity();
+        playerInfo.scale = mPlayerShapes[mPlayers[i]]->getLocalScaling().x();
         stateOut.playerArray[i] = playerInfo;
     }
     
@@ -214,6 +215,10 @@ WorldModel::SetState(WorldState& stateIn)
         player->setTransform(playerArray[i].transform);
         mPlayerRigidBodies[player]->setLinearVelocity(playerArray[i].linearVel);
         mPlayerRigidBodies[player]->setAngularVelocity(playerArray[i].angularVel);
+
+        //Scale
+        float scale = playerArray[i].scale;
+        mPlayerShapes[player]->setLocalScaling(btVector3(scale,scale,scale));
 
         // Active inputs
         player->SetActiveInputs(playerArray[i].activeInputs);
