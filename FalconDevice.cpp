@@ -171,6 +171,18 @@ void FalconDevice::setInputs(UserInput &input, uint32_t activeInputs){
         PressInputIfNotActive(USERINPUT_INDEX_SHRINK, input, activeInputs);
     else
         ReleaseInputIfActive(USERINPUT_INDEX_SHRINK, input, activeInputs);
+    
+    mHapticDevice->getUserSwitch(SWITCH_INDEX_JUMP, buttonIsOn);
+    if(buttonIsOn)
+        PressInputIfNotActive(USERINPUT_INDEX_JUMP, input, activeInputs);
+    else
+        ReleaseInputIfActive(USERINPUT_INDEX_JUMP, input, activeInputs);
+    
+    mHapticDevice->getUserSwitch(SWITCH_INDEX_DASH, buttonIsOn);
+    if(buttonIsOn)
+        PressInputIfNotActive(USERINPUT_INDEX_DASH, input, activeInputs);
+    else
+        ReleaseInputIfActive(USERINPUT_INDEX_DASH, input, activeInputs);
 #endif
 }
 
