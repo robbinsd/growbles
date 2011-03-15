@@ -25,10 +25,12 @@ static void MoveRigidBody(btRigidBody* body, float x, float y, float z)
 }
 
 void
-WorldModel::Init(SceneGraph& sceneGraph)
+WorldModel::Init(SceneGraph& sceneGraph, FalconDevice &falcon, int playerID)
 {
     // Save parameters
     mSceneGraph = &sceneGraph;
+    mFalcon = &falcon;
+    mPlayerID = playerID;
 
     // Load the static parts of the scene into the scenegraph
     sceneGraph.LoadScene(WORLDMESH_PATH, "WorldMesh", &sceneGraph.rootNode);
@@ -47,6 +49,7 @@ WorldModel::Init(SceneGraph& sceneGraph)
 
     collisionConfiguration = new btDefaultCollisionConfiguration();
     dispatcher = new btCollisionDispatcher(collisionConfiguration);
+    worldModels[dispatcher] = this;
 
     solver = new btSequentialImpulseConstraintSolver;
 
@@ -167,6 +170,7 @@ WorldModel::GetState(WorldState& stateOut)
         PlayerInfo playerInfo;
         playerInfo.playerID = mPlayers[i]->GetPlayerID();
         playerInfo.activeInputs = mPlayers[i]->GetActiveInputs();
+        playerInfo.activeFalconInputs = mPlayers[i]->GetActiveFalconInputs();
         playerInfo.transform = mPlayerRigidBodies[mPlayers[i]]->getWorldTransform();
         playerInfo.linearVel = mPlayerRigidBodies[mPlayers[i]]->getLinearVelocity();
         playerInfo.angularVel = mPlayerRigidBodies[mPlayers[i]]->getAngularVelocity();
@@ -215,6 +219,9 @@ WorldModel::SetState(WorldState& stateIn)
 
         // Active inputs
         player->SetActiveInputs(playerArray[i].activeInputs);
+
+        // Active Falcon inputs
+        player->SetActiveFalconInputs(playerArray[i].activeFalconInputs);
     }
 
     // Reset some cached state
@@ -277,7 +284,8 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
     btCollisionShape* playerShape = new btSphereShape(1);
     mPlayerShapes[player] = playerShape;
 
-    btScalar playerMass = 1;
+	btScalar playerScale = 1;
+    btScalar playerMass = PLAYER_MASS_DENSITY *playerScale*playerScale*playerScale;
     btVector3 playerInertia(0, 0, 0);
     playerShape->calculateLocalInertia(playerMass,playerInertia);
 
@@ -286,7 +294,7 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
                                                                                            initialPosition.y,
                                                                                            initialPosition.z));
     playerRigidBodyCI.m_friction = 0.5;
-    playerRigidBodyCI.m_restitution = 0.1;
+    playerRigidBodyCI.m_restitution = 0.6;
     playerRigidBodyCI.m_angularDamping = 0.5;
     btRigidBody *playerRigidBody = new btRigidBody(playerRigidBodyCI);
     mPlayerRigidBodies[player] = playerRigidBody;
@@ -337,20 +345,91 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
     btRigidBody* playerRigidBody = mPlayerRigidBodies[player];
 
     // Get the inputs
+    btVector3 forceVector(0,0,0);
+    int growthFactor = 0;
+    Vector activeFalconInputs = player->GetActiveFalconInputs();
     uint32_t activeInputs = player->GetActiveInputs();
+    if(activeFalconInputs.x != 0 || activeFalconInputs.y != 0 || activeFalconInputs.z != 0){
+        //if we have falcon input, use that. the maximum force magnitude
+        //we will have is 1.        
+        forceVector.setX(activeFalconInputs[FALCON_INPUT_FORWARD]);
+        forceVector.setZ(activeFalconInputs[FALCON_INPUT_RIGHT]);
+    }else{
+        //otherwise, use keyboard input and make sure the resulting force
+        //always has the same length (or 0 length)
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_UP, true))
+            forceVector += btVector3(1,0,0);
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_DOWN, true))
+            forceVector += btVector3(-1,0,0);
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_LEFT, true))
+            forceVector += btVector3(0,0,-1);
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_RIGHT, true))
+            forceVector += btVector3(0,0,1);
+        float len = forceVector.length();
+        if(len != 0)
+            forceVector /= len;
+    }
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_GROW, true))
+        growthFactor += 1;
+    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_SHRINK, true))
+        growthFactor += -1;
+    playerRigidBody->applyForce(forceVector*PLAYER_MAX_FORCE, btVector3(1.0, 1.0, 1.0));
+    btCollisionShape *collShape = mPlayerShapes[player];
+    if(growthFactor != 0){
+        float newScale = collShape->getLocalScaling().x() + growthFactor*PLAYER_SCALING_RATE;
+        if(newScale <= PLAYER_MAXIMUM_SCALE && newScale >= PLAYER_MINIMUM_SCALE){
+            float newMass = PLAYER_MASS_DENSITY * newScale*newScale*newScale;
+            btVector3 newInertia(0, 0, 0);
+            collShape->calculateLocalInertia(newMass,newInertia);
+            playerRigidBody->setMassProps(newMass, newInertia);
+            collShape->setLocalScaling(btVector3(newScale,newScale,newScale));
+        }
+    }
+}
 
-    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_UP, true))
-        playerRigidBody->applyForce(btVector3(1.0, 0.0, 0.0),
-                                    btVector3(1.0, 1.0, 1.0));
-    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_DOWN, true))
-        playerRigidBody->applyForce(btVector3(-1.0, 0.0, 0.0),
-                                    btVector3(1.0, 1.0, 1.0));
-    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_LEFT, true))
-        playerRigidBody->applyForce(btVector3(0.0, 0.0, -1.0),
-                                    btVector3(1.0, 1.0, 1.0));
-    if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_RIGHT, true))
-        playerRigidBody->applyForce(btVector3(1.0, 0.0, 1.0),
-                                    btVector3(1.0, 1.0, 1.0));
+void WorldModel::ApplyHapticGravityForce(){
+    Player *player = GetPlayer(mPlayerID);
+    assert(player);
+    btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
+    assert(playerRigidBody);
+    bool isFalling = false;
+    if(playerRigidBody->getLinearVelocity().y() < -.01 || playerRigidBody->getLinearVelocity().y() > .01){
+        isFalling = true;
+    }
+    mFalcon->setVerticalForce(isFalling);
+}
+
+void WorldModel::ApplyHapticCollisionForce(){
+    Player *player = GetPlayer(mPlayerID);
+    assert(player);
+    btVector3 impulse(0,0,0);
+    for(int i = 0; i < mPlayers.size(); ++i){
+        Player *otherPlayer = mPlayers[i];
+        if(otherPlayer == NULL || otherPlayer == player)
+            continue;
+
+        btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
+        assert(playerRigidBody);
+        btCollisionShape *playerShape = mPlayerShapes[player];
+        assert(playerShape);
+        btVector3 playerCenter = playerRigidBody->getWorldTransform().getOrigin();
+        float playerRadius = 1.1*playerShape->getLocalScaling().x();
+        btRigidBody *otherRigidBody = mPlayerRigidBodies[otherPlayer];
+        assert(otherRigidBody);
+        btCollisionShape *otherShape = mPlayerShapes[otherPlayer];
+        assert(otherShape);
+        btVector3 otherCenter = otherRigidBody->getWorldTransform().getOrigin();
+        float otherRadius = 1.1*otherShape->getLocalScaling().y();
+        if((otherCenter-playerCenter).length() <= otherRadius+playerRadius){
+            //player is colliding with other. need to add impulse.
+            btVector3 playerMomentum = (1/playerRigidBody->getInvMass())*playerRigidBody->getLinearVelocity();
+            btVector3 otherPlayerMomentum = (1/otherRigidBody->getInvMass())*otherRigidBody->getLinearVelocity();
+            float impulseMag = (playerMomentum-otherPlayerMomentum).length();
+            btVector3 impulseDir = playerCenter-otherCenter;
+            impulse += impulseMag*impulseDir;
+        }
+    }
+    mFalcon->setHorizontalForce(impulse.z(), impulse.x());
 }
 
 

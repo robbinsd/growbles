@@ -31,7 +31,7 @@ Game::Setup()
     
     // Declare our world model, and point it to the scene graph
     world = new WorldModel;
-    world->Init(*sceneGraph);
+    world->Init(*sceneGraph, renderContext->falcon, communicator->GetPlayerID());
     
     // Setup main menu
     mainMenu = new Menu(renderContext);
@@ -103,9 +103,11 @@ Game::Step()
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
         UserInput input(communicator->GetPlayerID(), clock->Now());
-        input.LoadInput(*renderContext, *communicator);
-        if (input.inputs != 0)
+        input.LoadInput(*renderContext, *communicator, *world);
+        if (input.inputs != 0 || input.falconInputs.x != 0 || 
+            input.falconInputs.y != 0 || input.falconInputs.z != 0){
             communicator->ApplyInput(input);
+        }
         
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
@@ -116,6 +118,10 @@ Game::Step()
         
         // Step the world
         world->Step(clock->Now() - clock->Then());
+		
+		// Apply Haptic Forces to Falcon
+        world->ApplyHapticGravityForce();
+        world->ApplyHapticCollisionForce();
         
         // Render the skybox
         renderContext->RenderSkybox();
@@ -167,9 +173,11 @@ Game::Step()
         // Handle input. Local input is applied immediately, global input
         // is recorded so that we can send it over the network.
         UserInput input(communicator->GetPlayerID(), clock->Now());
-        input.LoadInput(*renderContext, *communicator);
-        if (input.inputs != 0)
+        input.LoadInput(*renderContext, *communicator, *world);
+        if (input.inputs != 0 || input.falconInputs.x != 0 || 
+            input.falconInputs.y != 0 || input.falconInputs.z != 0){
             communicator->ApplyInput(input);
+        }
         
         // Apply any state updates that may have come in, and send off any
         // necessary updates.
@@ -180,6 +188,10 @@ Game::Step()
         
         // Step the world
         world->Step(clock->Now() - clock->Then());
+		
+		// Apply Haptic Forces to Falcon
+        world->ApplyHapticGravityForce();
+        world->ApplyHapticCollisionForce();
         
         // Render the skybox
         renderContext->RenderSkybox();

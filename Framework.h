@@ -30,6 +30,14 @@
 #include <assimp/aiMaterial.h>
 #endif
 
+// Define whether or not we want networking to be built
+//#define NETWORKING
+
+// Falcon Haptics Library
+#define FALCON
+#ifdef FALCON
+#include "chai3d.h"
+#endif
 // Bullet
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>

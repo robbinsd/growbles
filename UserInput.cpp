@@ -1,6 +1,10 @@
 #include "UserInput.h"
 #include "RenderContext.h"
 #include "WorldModel.h"
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
 #include "Communicator.h"
 
 UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
@@ -11,11 +15,20 @@ UserInput::UserInput(unsigned playerID_, unsigned timestamp_) : inputs(0)
 
 
 void
-UserInput::LoadInput(RenderContext& context, Communicator& communicator)
+UserInput::LoadInput(RenderContext& context, Communicator& communicator,
+    WorldModel &world)
 {
     static int sLastMouseX = 0;
     static int sLastMouseY = 0;
     static bool sMouseInitialized = false;
+
+#ifdef FALCON
+    if(context.falcon.isConnected()){
+        Player *player = world.GetPlayer(playerID);
+        if(player)
+            context.falcon.setInputs(*this, player->GetActiveInputs());
+    }
+#endif
 
     sf::Event evt;
     while (context.GetWindow()->GetEvent(evt)) {

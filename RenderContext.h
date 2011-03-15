@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include <vector>
 #include "WorldModel.h"
+#include "FalconDevice.h"
 #include "Texture.h"
 #include <string>
 
@@ -232,6 +233,10 @@ protected:
     
     // Our array of skybox textures
     Texture skyboxTextures[6];
+public:
+
+    // Falcon device
+    FalconDevice falcon;
 };
 
 /*
