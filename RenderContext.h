@@ -86,6 +86,7 @@ public:
      * Camera Movement.
      */
     void MoveCamera(float forward, float right);
+    void MoveCameraAbsolute(float x, float z);
     void PanCamera(float plusPitch, float plusYaw);
 
     /*

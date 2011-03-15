@@ -149,7 +149,7 @@ Game::Step()
                 // Move the camera if necessary
                 float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
                 float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
-                renderContext->MoveCamera(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
+                renderContext->MoveCameraAbsolute(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
                 prevPlayerX = newPlayerX;
                 prevPlayerZ = newPlayerZ;
                 
@@ -222,7 +222,7 @@ Game::Step()
                 // Move the camera if necessary
                 float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
                 float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
-                renderContext->MoveCamera(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
+                renderContext->MoveCameraAbsolute(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
                 prevPlayerX = newPlayerX;
                 prevPlayerZ = newPlayerZ;
             }
