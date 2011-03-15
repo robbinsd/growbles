@@ -110,6 +110,11 @@ class Timeline {
     void Prune(unsigned timestamp);
 
     /*
+     * Prune all keyframes.
+     */
+    void PruneAll();
+
+    /*
      * Finds the keyframe with the highest timestamp less than
      * or equal to timestamp.
      *
