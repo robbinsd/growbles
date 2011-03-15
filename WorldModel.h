@@ -13,14 +13,14 @@
 using namespace std;
 
 #define BULLET_STEP_INTERVAL (1.0/60.0)
-#define BULLET_STEPS_PER_GROWBLE_STEP 8
+#define BULLET_STEPS_PER_GROWBLE_STEP 6
 
 class SceneGraph;
 class UserInput;
 
 const double PLAYER_SCALING_RATE = .01;
 const double PLAYER_MAXIMUM_SCALE = 3;
-const double PLAYER_MINIMUM_SCALE = .3;
+const double PLAYER_MINIMUM_SCALE = 0.8;
 const double PLAYER_MAX_FORCE = 2;
 const double PLAYER_MASS_DENSITY = 1;
 
