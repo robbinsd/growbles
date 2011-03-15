@@ -13,7 +13,7 @@ enum SwitchIndexT{  SWITCH_INDEX_JUMP=0, SWITCH_INDEX_SHRINK, SWITCH_INDEX_DASH,
     SWITCH_INDEX_GROW };
 
 bool isAlreadyInUse(){
-    bool toReturn = true;
+    /*bool toReturn = true;
     ifstream fileReader(FALCON_USED_DUMMY_FILE);
     if(!fileReader.good())
         toReturn = false;
@@ -24,17 +24,18 @@ bool isAlreadyInUse(){
             toReturn = false;
     }
     fileReader.close();
-    return toReturn;
+    return toReturn;*/
+    return false;
 }
 
 void setAlreadyInUse(bool isInUse){
-    ofstream fileWriter(FALCON_USED_DUMMY_FILE);
+    /*ofstream fileWriter(FALCON_USED_DUMMY_FILE);
     if(fileWriter.good())
         if(isInUse)
             fileWriter.write("1", 1);
         else
             fileWriter.write("0", 1);
-    fileWriter.close();
+    fileWriter.close();*/
 }
 
 FalconDevice::FalconDevice(){
