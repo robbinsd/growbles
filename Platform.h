@@ -49,6 +49,11 @@ private:
 
     // Drop state variable
     int dropState;
+    
+    sf::SoundBuffer Buffer;
+    sf::Sound Sound;
+    sf::SoundBuffer Buffer2;
+    sf::Sound Sound2;
 };
 
 #endif

@@ -7,9 +7,12 @@ Platform::Platform(int timeToDrop) : dropTicks(timeToDrop)
 	regularColor[0] = 0.886;
 	regularColor[1] = 0.635;
 	regularColor[2] = 0.039;
-	brightColor[0] = 0.933;
-	brightColor[1] = 0.913;
-	brightColor[2] = 0.102;
+	//brightColor[0] = 0.933;
+	//brightColor[1] = 0.913;
+	//brightColor[2] = 0.102;
+    brightColor[0] = 1;
+	brightColor[1] = 0;
+	brightColor[2] = 0.45;
 	topColor[0] = 0;
 	topColor[1] = 0.624;
 	topColor[2] = 0;
@@ -19,6 +22,27 @@ Platform::Platform(int timeToDrop) : dropTicks(timeToDrop)
 	innerDisk = gluNewQuadric();
 	outerDisk = gluNewQuadric();
 	reset();
+    
+    // Load sound file into sound buffer, sound cannot be used for music
+    if (!Buffer.LoadFromFile("scenefiles/warning.wav"))
+    {
+        std::cout << "Error loading sound file\n";
+    }
+    // Bind sound buffer to sound
+    Sound.SetBuffer(Buffer);
+    //Sound.SetLoop(true);
+    //Sound.SetPitch(1.5f);
+    Sound.SetVolume(100.f);
+
+    if (!Buffer2.LoadFromFile("scenefiles/boom.ogg"))
+    {
+        std::cout << "Error loading sound file\n";
+    }
+    // Bind sound buffer to sound
+    Sound2.SetBuffer(Buffer2);
+    //Sound.SetLoop(true);
+    //Sound.SetPitch(1.5f);
+    Sound2.SetVolume(100.f);
 }
 
 Platform::~Platform()
@@ -49,7 +73,11 @@ Platform::update()
 			dropTimer++;
             // Set state to blinking to signal that a drop is imminent
 			if(dropState!=BLINKING && ((float)dropTimer/(float)dropTicks) > 0.5)
-															dropState = BLINKING;
+            {
+                dropState = BLINKING;
+                // Play warning sound
+                Sound.Play();
+            }
 			if(dropTimer>=dropTicks)
             { // If its time to drop switch to falling state
 				dropTimer = 0;
@@ -57,11 +85,14 @@ Platform::update()
 				blinkOn = true;
 				curRadius -= RADIUS_DECREASE; // Decrease the radius of the platform
 				dropState = FALLING;
+                // Play falling sound
+                Sound2.Play();
 			}
 		}
 	}
 	if(dropState == BLINKING)
     {
+        
 		blinkTimer++;
 		if(blinkTimer>BLINK_TICKS)
         {
@@ -71,8 +102,6 @@ Platform::update()
 	}
 	if(dropState == FALLING)
     {
-        // Play sound here
-        
         blinkOn = false;
 		dropVelocity += GRAVITY;
 		dropY+=dropVelocity;

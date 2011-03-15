@@ -56,18 +56,18 @@ Player::applyInput(UserInput& input)
 void
 Player::Render() {
     
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
-    GL_CHECK(glDisable(GL_TEXTURE_2D));
-    glEnable(GL_LIGHTING);
-    glEnable(GL_BLEND);
+    //GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    //GL_CHECK(glDisable(GL_TEXTURE_2D));
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_BLEND);
     
     //glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     //glLoadIdentity();
     
     glColor4f(1.0, 0.0, 0.0, 1.0);
-    float color1[] = {0.866, 0.113, 0.090};
-    float color2[] = {0.788, 0.913, 0.086};
+    //float color1[] = {0.866, 0.113, 0.090};
+    //float color2[] = {0.788, 0.913, 0.086};
     
     //move the ball to the current position
     //glTranslatef(curPos[0],curPos[1],curPos[2]);

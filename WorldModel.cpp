@@ -31,6 +31,28 @@ static void MoveRigidBody(btRigidBody* body, float x, float y, float z)
 void
 WorldModel::Init(SceneGraph& sceneGraph)
 {
+    
+    // Load sound file into sound buffer, sound cannot be used for music
+    if (!Buffer.LoadFromFile("scenefiles/bounce.wav"))
+    {
+        std::cout << "Error loading sound file\n";
+    }
+    // Bind sound buffer to sound
+    Sound.SetBuffer(Buffer);
+    //Sound.SetLoop(true);
+    //Sound.SetPitch(1.5f);
+    Sound.SetVolume(50.f);
+    
+    if (!Buffer2.LoadFromFile("scenefiles/ding.wav"))
+    {
+        std::cout << "Error loading sound file\n";
+    }
+    // Bind sound buffer to sound
+    Sound2.SetBuffer(Buffer2);
+    //Sound.SetLoop(true);
+    //Sound.SetPitch(1.5f);
+    Sound2.SetVolume(100.f);
+    
     // Save parameters
     mSceneGraph = &sceneGraph;
     
@@ -170,51 +192,54 @@ WorldModel::Step(unsigned numTicks)
 void
 WorldModel::SingleStep()
 {
-    for(unsigned j = 0; j < mPlayers.size(); ++j) HandleKinematicInputForPlayer(mPlayers[j]->GetPlayerID());
-    
     // BOF step physics
     for (unsigned i = 0; i < BULLET_STEPS_PER_GROWBLE_STEP; ++i) {
         for(unsigned j = 0; j < mPlayers.size(); ++j)
             HandleInputForPlayer(mPlayers[j]->GetPlayerID());
         dynamicsWorld->stepSimulation(BULLET_STEP_INTERVAL, 1, BULLET_STEP_INTERVAL);
+        
+        // Determine if a collision has taken place
+        int numManifolds = dispatcher->getNumManifolds();
+        for (int i=0;i<numManifolds;i++)
+        {
+            btPersistentManifold* contactManifold =  dispatcher->getManifoldByIndexInternal(i);
+            btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+            btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+            
+            int numContacts = contactManifold->getNumContacts();
+            for (int j=0;j<numContacts;j++)
+            {
+                btManifoldPoint& pt = contactManifold->getContactPoint(j);
+                if (pt.getDistance()<1)
+                {
+                    // If both collision shapes are 'SPHERE'
+                    if (!strcmp(obA->getCollisionShape()->getName(), obB->getCollisionShape()->getName())) {
+                        
+                        // A collision just happened
+                        DPS("COLLISION");
+                        DPF(pt.getDistance());
+                        
+                        sf::Sound::Status Status = Sound.GetStatus();
+                        if (Status != sf::Sound::Playing) Sound.Play();
+                    }
+                    //const btVector3& ptA = pt.getPositionWorldOnA();
+                    //const btVector3& ptB = pt.getPositionWorldOnB();
+                    //const btVector3& normalOnB = pt.m_normalWorldOnB;
+                }
+            }
+        }
+        // EOF Determine if a collision has taken place
     }
     
-    // Determine if a collision has taken place
-    int numManifolds = dispatcher->getNumManifolds();
-    for (int i=0;i<numManifolds;i++)
-    {
-        btPersistentManifold* contactManifold =  dispatcher->getManifoldByIndexInternal(i);
-        btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
-        btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
-        
-		int numContacts = contactManifold->getNumContacts();
-		for (int j=0;j<numContacts;j++)
-		{
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			if (pt.getDistance()<0.1)
-			{
-                // If both collision shapes are 'SPHERE'
-                if (!strcmp(obA->getCollisionShape()->getName(), obB->getCollisionShape()->getName())) {
-                    
-                    // A collision just happened
-                    //DPS("COLLISION");
-                    //DPF(pt.getDistance());
-                }
-				//const btVector3& ptA = pt.getPositionWorldOnA();
-				//const btVector3& ptB = pt.getPositionWorldOnB();
-				//const btVector3& normalOnB = pt.m_normalWorldOnB;
-			}
-		}
-        
-    }
-    // EOF Determine if a collision has taken place
-
+    
+    
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *player = mPlayers[i];
         assert(player);
         btTransform trans = mPlayerRigidBodies[player]->getWorldTransform();
         player->setTransform(trans);
+        HandleKinematicInputForPlayer(player->GetPlayerID());
     }
 
     // update platform position
@@ -490,6 +515,8 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
         if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, true)) { // Jump
             if (playerRigidBody->getWorldTransform().getOrigin().getY() <= 6.0) {
                 forceVector += btVector3(0,20,0);
+                //sf::Sound::Status Status2 = Sound2.GetStatus();
+                //if (Status2 != sf::Sound::Playing) Sound2.Play();
             }
         }
     }

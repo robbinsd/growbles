@@ -204,6 +204,11 @@ class WorldModel {
     
     // SceneNodes for the platform rings
     SceneNode* platformNodes[5];
+    
+    sf::SoundBuffer Buffer;
+    sf::Sound Sound;
+    sf::SoundBuffer Buffer2;
+    sf::Sound Sound2;
 };
 // used by Falcon
 static map<btCollisionDispatcher *, WorldModel *> worldModels;
