@@ -50,6 +50,14 @@ int main(int argc, char** argv) {
             printUsageAndExit(argv[0]);
         communicator.SetNumClientsExpected((unsigned) numClients);
     }
+    
+    // Test load sound
+    sf::SoundBuffer Buffer;
+    if (!Buffer.LoadFromFile("scenefiles/sound.wav"))
+    {
+        // Error...
+    }
+    
 
     Game growblesGame(timeline, communicator);
     growblesGame.Setup();
