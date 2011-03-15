@@ -273,7 +273,7 @@ RenderContext::RenderPlatform(WorldModel& world)
     world.GetPlatform()->render();
     
     // Draw debug wireframes
-    world.GetDynamicsWorld()->debugDrawWorld();
+    //world.GetDynamicsWorld()->debugDrawWorld();
 
     // Flush
     GL_CHECK(glFlush());

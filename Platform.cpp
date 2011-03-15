@@ -73,6 +73,7 @@ Platform::update()
     {
         // Play sound here
         
+        blinkOn = false;
 		dropVelocity += GRAVITY;
 		dropY+=dropVelocity;
 		if(dropY > 30.0) // If done dropping, go back to being idle
@@ -90,46 +91,15 @@ Platform::update()
 void
 Platform::render()
 {
-    // Render the outer disk
+    // Render the warning blink
 	glPushMatrix();
 	if(blinkOn) {
-        glColor3f(brightColor[0], brightColor[1], brightColor[2]);
+        glColor4f(brightColor[0], brightColor[1], brightColor[2], 0.2);
+        glTranslatef(0, -dropY+4.1, -0.4);
+        glRotatef(-90.0, 1, 0, 0);
+        gluDisk (innerDisk, curDrawRadius-RADIUS_DECREASE, curDrawRadius, 64, 1); 
     }
-	else {
-        glColor3f(topColor[0], topColor[1], topColor[2]);
-    }
-	glTranslatef(0, -dropY+4, 0);
-	glRotatef(-90.0, 1, 0, 0);
-	gluDisk (innerDisk, curDrawRadius-RADIUS_DECREASE, curDrawRadius, 64, 1); 
-	glPopMatrix();
-    
-	// Render the outer cylinder
-    glPushMatrix();
-	if(blinkOn) {
-        glColor3f(brightColor[0], brightColor[1], brightColor[2]);
-    }
-	else {
-        glColor3f(regularColor[0], regularColor[1], regularColor[2]);
-    }
-	glTranslatef(0, -dropY+4, 0);
-	glRotatef(90.0, 1, 0 ,0);
-	gluCylinder(outerCylinder, curDrawRadius, curDrawRadius, 30.0, 64, 1);
-	glPopMatrix();
 
-    // Render the inner disk
-	glPushMatrix();
-    glColor3f(topColor[0], topColor[1], topColor[2]);
-    glTranslatef(0, 4, 0);
-	glRotatef(-90.0, 1, 0, 0);
-	gluDisk(innerDisk, 0.0, curDrawRadius-RADIUS_DECREASE, 64, 1); 
-	glPopMatrix();
-
-	// Render the inner cylinder
-    glPushMatrix();
-    glColor3f(regularColor[0], regularColor[1], regularColor[2]);
-    glTranslatef(0, 4, 0);
-	glRotatef(90.0, 1, 0, 0);
-	gluCylinder(innerCylinder, curDrawRadius-RADIUS_DECREASE, curDrawRadius-RADIUS_DECREASE, 30.0, 64, 1);
 	glPopMatrix();
 }
 

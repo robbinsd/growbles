@@ -83,7 +83,7 @@ Game::Step()
         // Start the clock
         clock->Start();
         
-        renderContext->RenderString("Game Start", 1000, 40, 100, 100, 255, 0, 0);
+        renderContext->RenderString("Game Start", 1000, 40, 100, 100);
         
         // Render all strings
         renderContext->RenderAllElse();
@@ -132,9 +132,6 @@ Game::Step()
         // Render the platform for debugging
         renderContext->RenderPlatform(*world);
         
-        // Render the scenegraph
-        //renderContext->Render(*sceneGraph);
-        
         // Count how many players have lost the game
         unsigned numPlayersLost = 0;
         
@@ -143,6 +140,9 @@ Game::Step()
             
             // Get information of this player
             Player* player = world->mPlayers[i];
+            
+            // Render the player
+            player->Render();
             
             if (player->GetPlayerID() == communicator->GetPlayerID()) { // This is ourselves
                 
@@ -177,6 +177,9 @@ Game::Step()
                 state = END;
             }
         }
+        
+        // Render the scenegraph
+        renderContext->Render(*sceneGraph);
 
         // Render all strings
         renderContext->RenderAllElse();
@@ -215,10 +218,13 @@ Game::Step()
         renderContext->RenderPlatform(*world);
         
         // Render the scenegraph
-        //renderContext->Render(*sceneGraph);
+        renderContext->Render(*sceneGraph);
         
         for(unsigned i=0; i < world->mPlayers.size(); ++i){
             Player* player = world->mPlayers[i];
+            
+            // Render the player
+            player->Render();
             
             if (player->GetPlayerID() == communicator->GetPlayerID()) { // This is ourselves
                 // Move the camera if necessary

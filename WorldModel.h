@@ -201,6 +201,9 @@ class WorldModel {
     unsigned mCurrentTimestamp;
     
     friend class Game;
+    
+    // SceneNodes for the platform rings
+    SceneNode* platformNodes[5];
 };
 // used by Falcon
 static map<btCollisionDispatcher *, WorldModel *> worldModels;

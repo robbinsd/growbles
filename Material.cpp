@@ -22,7 +22,10 @@ Material::InitWithMaterial(const aiMaterial* material)
 
     // Load the texture prefix
     aiString prefix;
+    
+    
     material->GetTexture(aiTextureType_DIFFUSE, 0, &prefix);
+    prefix = "shiptex";
 
     // Try loading each texture. If it's not there, we just don't initialize
     // that texture object.

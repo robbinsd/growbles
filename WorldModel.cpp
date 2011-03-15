@@ -7,7 +7,11 @@ using std::vector;
 using std::string;
 using std::stringstream;
 
-#define WORLDMESH_PATH "scenefiles/worldmesh.3ds"
+#define WORLDMESH_PATH1 "scenefiles/ring1.3ds"
+#define WORLDMESH_PATH2 "scenefiles/ring2.3ds"
+#define WORLDMESH_PATH3 "scenefiles/ring3.3ds"
+#define WORLDMESH_PATH4 "scenefiles/ring4.3ds"
+#define WORLDMESH_PATH5 "scenefiles/ring5.3ds"
 #define ARMADILLO_PATH "scenefiles/armadillo.3ds"
 #define SPHERE_PATH "scenefiles/sphere.3ds"
 
@@ -29,9 +33,44 @@ WorldModel::Init(SceneGraph& sceneGraph)
 {
     // Save parameters
     mSceneGraph = &sceneGraph;
-
+    
     // Load the static parts of the scene into the scenegraph
-    sceneGraph.LoadScene(WORLDMESH_PATH, "WorldMesh", &sceneGraph.rootNode);
+    
+    // Add the platform rings to the scenegraph
+    Matrix platformTransform;
+    //playerTransform.Translate(initialPosition.x, initialPosition.y, initialPosition.z);
+    
+    string nodeName1 = string("PlatformNode_1");
+    platformNodes[0] = sceneGraph.AddNode(&(sceneGraph.rootNode),
+                                                 platformTransform,
+                                                 nodeName1.c_str());
+    sceneGraph.LoadScene(WORLDMESH_PATH1, "Ring1", platformNodes[0]);
+    
+    string nodeName2 = string("PlatformNode_2");
+    platformNodes[1] = sceneGraph.AddNode(&(sceneGraph.rootNode),
+                                                   platformTransform,
+                                                   nodeName2.c_str());
+    sceneGraph.LoadScene(WORLDMESH_PATH2, "Ring2", platformNodes[1]);
+    
+    string nodeName3 = string("PlatformNode_3");
+    platformNodes[2] = sceneGraph.AddNode(&(sceneGraph.rootNode),
+                                                   platformTransform,
+                                                   nodeName3.c_str());
+    sceneGraph.LoadScene(WORLDMESH_PATH3, "Ring3", platformNodes[2]);
+    
+    string nodeName4 = string("PlatformNode_4");
+    platformNodes[3] = sceneGraph.AddNode(&(sceneGraph.rootNode),
+                                                   platformTransform,
+                                                   nodeName4.c_str());
+    sceneGraph.LoadScene(WORLDMESH_PATH4, "Ring4", platformNodes[3]);
+    
+    string nodeName5 = string("PlatformNode_5");
+    platformNodes[4] = sceneGraph.AddNode(&(sceneGraph.rootNode),
+                                                   platformTransform,
+                                                   nodeName5.c_str());
+    sceneGraph.LoadScene(WORLDMESH_PATH5, "Ring5", platformNodes[4]);
+    
+    /*
     Matrix armTransform;
     armTransform.Translate(0.0, ARMADILLO_BASE_Y, 0.0);
     SceneNode* armParent = sceneGraph.AddNode(&sceneGraph.rootNode, armTransform,
@@ -41,6 +80,7 @@ WorldModel::Init(SceneGraph& sceneGraph)
     // Environment map
     Vector emapPos(0.0, 3.0 + ARMADILLO_BASE_Y, 0.0, 1.0);
     sceneGraph.FindMesh("Armadillo_0")->EnvironmentMap(emapPos);
+     */
 
     // Setup physics simulation
     broadphase = new btDbvtBroadphase();
@@ -122,7 +162,7 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
-    printf("numticks: %u\n", numTicks);
+    //printf("numticks: %u\n", numTicks);
     for (unsigned i = 0; i < numTicks; ++i)
         SingleStep();
 }
@@ -185,6 +225,14 @@ WorldModel::SingleStep()
     //std::cout << "falling ring: " << fallingRing << "\n";
     float fallingRingPos = platform->getFallingRingPos();
     MoveRigidBody(platformRigidBodies[fallingRing], 0.0, fallingRingPos+1.0, 0.0);
+    
+    // Move the platform ring meshes
+    Matrix transform;
+    transform.Translate(0, fallingRingPos, 0);
+    //btMatrix3x3 rotation(trans.getRotation());
+    //Matrix ourRotation(rotation);
+    //transform = transform.MMProduct(ourRotation);
+    platformNodes[fallingRing]->SetTransform(transform);
 
     // Update the current timestamp
     mCurrentTimestamp += 1;
@@ -300,19 +348,19 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
     assert(GetPlayer(playerID) == NULL);
 
     // Add the player to the scenegraph
-    Matrix playerTransform;
+    //Matrix playerTransform;
     //playerTransform.Translate(initialPosition.x, initialPosition.y, initialPosition.z);
-    stringstream numSS;
-    numSS << playerID;
-    string nodeName = string("PlayerNode_") + numSS.str();
-    string rootName = string("PlayerRoot_") + numSS.str();
-    SceneNode* playerNode = mSceneGraph->AddNode(&mSceneGraph->rootNode,
-                                                 playerTransform,
-                                                 nodeName.c_str());
-    mSceneGraph->LoadScene(SPHERE_PATH, rootName.c_str(), playerNode);
+    //stringstream numSS;
+    //numSS << playerID;
+    //string nodeName = string("PlayerNode_") + numSS.str();
+    //string rootName = string("PlayerRoot_") + numSS.str();
+    //SceneNode* playerNode = mSceneGraph->AddNode(&mSceneGraph->rootNode,
+    //                                             playerTransform,
+    //                                             nodeName.c_str());
+    //mSceneGraph->LoadScene(SPHERE_PATH, rootName.c_str(), playerNode);
 
     // Initialize the model representation of the player
-    Player* player = new Player(playerID, playerNode, initialPosition);
+    Player* player = new Player(playerID, initialPosition);
 
     // Add it to our list of players
     mPlayers.push_back(player);
@@ -459,6 +507,7 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
             collShape->calculateLocalInertia(newMass,newInertia);
             playerRigidBody->setMassProps(newMass, newInertia);
             collShape->setLocalScaling(btVector3(newScale,newScale,newScale));
+            player->SetScale(newScale);
         }
     }
 }
