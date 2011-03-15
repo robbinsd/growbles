@@ -75,7 +75,7 @@ WorldModel::Init(SceneGraph& sceneGraph)
     }
     
     // Create the temporary platform
-    platform = new Platform(200);
+    platform = new Platform(1000);
     
     // Enable the debug drawer
     debugDrawer.setDebugMode(btIDebugDraw::DBG_DrawWireframe);
