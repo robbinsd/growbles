@@ -41,6 +41,19 @@ However, we don't want to allow arbitrary backdating. Roughly every half second,
 the server declares a moratorium on inputs more than 300ms old, and sends a
 final and authoritative state snapshot of the world, 300ms prior.
 
+Growbles includes functionality for demonstrating the timeline architecture. By
+pressing 8 (and 7), the user can disable (and re-enable) authoritative snapshots,
+so that the network synchronization functions solely on the timeline of user
+inputs. Next, by pressing 0, the user can store all incoming inputs from
+other players in a buffer, without applying them (simulating network latency). Both
+players can then move their character, but only the inputs of the local player will
+appear on the test screen. When the user presses 9, the buffer user-input packets
+are processed, and the remote players jump to their correct positions, while the
+local player remains in its correct position. Any overdue collisions between the
+separate paths are applied as well. This demonstrates the timeline functionality
+that is otherwise hidden, since a perfect predictive network architecture is one
+with no visible artifacts.
+
 Growbles also synchronizes client clocks with the server. If a client can deduce
 from an authoritative state dump that the server clock is ahead of the client's,
 it fast-fowards its clock to a conservative estimate of the server's
