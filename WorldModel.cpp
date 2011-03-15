@@ -362,13 +362,13 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
         //otherwise, use keyboard input and make sure the resulting force
         //always has the same length (or 0 length)
         if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_UP, true))
-            forceVector += btVector3(1,0,0);
+            forceVector += btVector3(0.5,0,0);
         if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_DOWN, true))
-            forceVector += btVector3(-1,0,0);
+            forceVector += btVector3(-0.5,0,0);
         if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_LEFT, true))
-            forceVector += btVector3(0,0,-1);
+            forceVector += btVector3(0,0,-0.5);
         if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_RIGHT, true))
-            forceVector += btVector3(0,0,1);
+            forceVector += btVector3(0,0,0.5);
         float len = forceVector.length();
         if(len != 0)
             forceVector /= len;
