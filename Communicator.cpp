@@ -372,6 +372,10 @@ Communicator::Synchronize()
                 break;
         }
     }
+
+    // If we're the server, send any authoritative state updates
+    if (mMode == COMMUNICATOR_MODE_SERVER)
+        mTimeline->SendUpdates(*this);
 }
 
 void
