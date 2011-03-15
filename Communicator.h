@@ -6,6 +6,8 @@
 #include <Sockets/TcpSocket.h>
 
 #define GROWBLES_PORT 9323
+#define TCP_INPUT_BUFFER_SIZE 100000
+#define TCP_OUTPUT_BUFFER_SIZE 16000
 
 class WorldModel;
 class WorldState;
