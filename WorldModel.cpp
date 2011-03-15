@@ -403,7 +403,7 @@ void WorldModel::ApplyHapticCollisionForce(){
     Player *player = GetPlayer(mPlayerID);
     assert(player);
     btVector3 impulse(0,0,0);
-    for(int i = 0; i < mPlayers.size(); ++i){
+    for(unsigned i = 0; i < mPlayers.size(); ++i){
         Player *otherPlayer = mPlayers[i];
         if(otherPlayer == NULL || otherPlayer == player)
             continue;
