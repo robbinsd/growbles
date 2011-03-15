@@ -4,13 +4,14 @@
 #include "Framework.h"
 #include "Vector.h"
 #include "UserInput.h"
+using namespace std;
 
 const double FALCON_IMPULSE_STRENGTH = 1;
+const double FALCON_IMPULSE_LENGTH = 1; //length of time in seconds that the impulse lasts
 static const double FALCON_VERTICAL_STIFFNESS = 1000;
-static const double FALCON_DAMPENING = 20;
+static const double FALCON_DAMPENING = 5;
 
 enum FalconInputIndex{ FALCON_INPUT_FORWARD, FALCON_INPUT_RIGHT, FALCON_INPUT_UP };
-
 
 class FalconDevice{
 
@@ -24,6 +25,11 @@ public:
      * Destructor
      */
     ~FalconDevice();
+
+    /*
+     * Initialize haptic device. Start haptics thread.
+     */
+    void Init();
 
     /*
      * Returns whether or not the haptic device is connected
@@ -58,13 +64,25 @@ public:
      */
     void setInputs(UserInput &input, uint32_t activeInputs);
 
+    void hapticsLoop();
+
 protected:
-    
-    // Haptics
+
+
 #ifdef FALCON
+    //saves the horizontal forces being applied
+    vector<cVector3d> forcesToApply; //x is back, y is right, z is time remaining
+    
+    //saves whether or not the FalconDevice is currently falling.
+    //used to compute the vertical force.
+    bool isFalling;
+
+    // Haptics
     cHapticDeviceHandler *mHapticHandler;
     cGenericHapticDevice *mHapticDevice;
     cHapticDeviceInfo mHapticDeviceInfo;
+    bool mSimulationRunning;
+    bool mSimulationFinished;
 #endif 
     bool isReady;
 
