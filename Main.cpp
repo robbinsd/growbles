@@ -16,9 +16,6 @@ void printUsageAndExit(char* programName);
 
 int main(int argc, char** argv) {
 
-    printf("world state size: %u\n", sizeof(WorldState));
-    printf("playerinfo size: %u\n", sizeof(PlayerInfo));
-
     // Random seed
 #ifdef _WIN32
     srand(123456);

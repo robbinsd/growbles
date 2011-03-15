@@ -103,7 +103,9 @@ void FalconDevice::setVerticalForce(bool _isFalling){
 }
 
 void FalconDevice::setHorizontalForce(float right, float forward){
+#ifdef FALCON
     forcesToApply.push_back(cVector3d(-forward, right, FALCON_IMPULSE_LENGTH));
+#endif
 }
 
 bool FalconDevice::isConnected(){
