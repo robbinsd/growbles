@@ -1,0 +1,54 @@
+Group Members:
+    Freeman Fan - fwf
+    Robert Holley - bh10
+    Daniel Robbins - robbinsd
+
+                        Final Project Writeup - Growbles
+
+Supported Platforms: Mac OSX, Windows
+
+Installation Instructions (Mac):
+    1. Ensure that a compiler and appropriate development tools are installed.
+    2. Install the SFML frameworks into /Library/Frameworks
+    3. Install assimp via macports
+    4. Install bullet via macports
+    5. Install libsockets via macports
+    6. $ make -f Makefile.osx
+
+    NB - These instructions assume that your macports prefix is /opt/local. If
+    not, you'll need to modify Makefile.osx.
+
+
+Network Functionality:
+
+Growbles includes an advanced network architecture grounded in industry
+practices [1]. The game uses a client-server model where the server holds the
+authoritative state representation, and routes inputs between the clients.  For
+responsiveness, the clients run a predictive phsyics engine, designed to mirror
+the one on the server. Because clients necessarily receive inputs several
+timesteps after they've ocurred, clients maintain a timeline of Keyframes. Each
+keyframe contains a timestamp, a snapshot of world state at that timestamp, and
+a list of inputs that occured at that timestamp.
+
+This allows the game engine to efficiently apply inputs that ocurred earlier
+than the current world state. When an input is received, the timeline finds the
+most recent keyframe at or before the timestamp on the input, and resets the
+world to the attached state. It then applies all inputs and steps the world
+forward, keyframe by keyframe, applying inputs and generating updated snapshots.
+
+We allow backdated inputs to allow for smooth gameplay in the face of latency.
+However, we don't want to allow arbitrary backdating. Roughly every half second,
+the server declares a moratorium on inputs more than 300ms old, and sends a
+final and authoritative state snapshot of the world, 300ms prior.
+
+Growbles also synchronizes client clocks with the server. If a client can deduce
+from an authoritative state dump that the server clock is ahead of the client's,
+it fast-fowards its clock to a conservative estimate of the server's
+minimum clock time.
+
+Because Growbles is a quick game, we don't anticipate player it over high-latency
+connections, and thus opted for TCP over UDP for simplicity.
+
+
+References:
+[1] - http://gafferongames.com/networking-for-game-programmers/

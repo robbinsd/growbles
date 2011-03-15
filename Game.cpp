@@ -75,7 +75,7 @@ Game::Step()
         communicator->Connect();
         
         // Put the players on the map and get people on the same page
-        communicator->Bootstrap(*world);
+        communicator->Bootstrap(*world, *clock);
 
         world->SetFalcon(renderContext->falcon);
         world->SetThisPlayer(communicator->GetPlayerID());
@@ -149,7 +149,7 @@ Game::Step()
                 // Move the camera if necessary
                 float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
                 float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
-                renderContext->MoveCamera(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
+                renderContext->MoveCameraAbsolute(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
                 prevPlayerX = newPlayerX;
                 prevPlayerZ = newPlayerZ;
                 
@@ -224,7 +224,7 @@ Game::Step()
                 // Move the camera if necessary
                 float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
                 float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
-                renderContext->MoveCamera(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
+                renderContext->MoveCameraAbsolute(newPlayerX - prevPlayerX, newPlayerZ - prevPlayerZ);
                 prevPlayerX = newPlayerX;
                 prevPlayerZ = newPlayerZ;
             }

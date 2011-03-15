@@ -20,10 +20,11 @@ Timeline::~Timeline()
 }
 
 void
-Timeline::Init(WorldModel& model, CommunicatorMode mode)
+Timeline::Init(WorldModel& model, Gameclock& clock, CommunicatorMode mode)
 {
     // Store parameters
     mWorld = &model;
+    mGameclock = &clock;
     mMode = mode;
 
     // Generate an initial keyframe
@@ -102,6 +103,24 @@ Timeline::AddAuthoritativeState(WorldState& state)
     // there to propagate our state forward appropriately.
     if (!UpToDate())
         GenerateCurrentKeyframe();
+
+    // Synchronize clocks with the server.
+    //
+    // When the packet was sent, the server's clock was at least the timestamp
+    // on the dump + the minimum age of the dump (this excludes network travel
+    // time). If we can detect that we're behind the server, we should catch up.
+    unsigned minimumServerTime = state.timestamp + MIN_STATEUPDATE_AGE;
+    if (minimumServerTime > mWorld->GetCurrentTimestamp()) {
+        printf("Server clock is ahead of ours (>= %u, compared to %u). "
+               "Fast-forwarding\n",
+               minimumServerTime, mWorld->GetCurrentTimestamp());
+        PruneAll();
+        mWorld->SetState(state);
+        mWorld->Step(MIN_STATEUPDATE_AGE);
+        mGameclock->Set(minimumServerTime);
+        GenerateCurrentKeyframe();
+        return;
+    }
 
     // Prune everything before the given state
     Prune(state.timestamp);
@@ -207,8 +226,20 @@ Timeline::Prune(unsigned timestamp)
     while (it != mKeyframes.end()) {
         if ((*it)->timestamp >= timestamp)
             return;
+        delete (*it);
         mKeyframes.erase(it++);
     }
+}
+
+void
+Timeline::PruneAll()
+{
+    // If the timeline is empty, we have nothing to do
+    if (mKeyframes.size() == 0)
+        return;
+
+    // Remove everything
+    Prune(mKeyframes.back()->timestamp + 1);
 }
 
 KeyframeIterator

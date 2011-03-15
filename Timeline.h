@@ -58,7 +58,7 @@ class Timeline {
     /*
      * Initialize the timeline. Must be called at t=0.
      */
-    void Init(WorldModel& model, CommunicatorMode mode);
+    void Init(WorldModel& model, Gameclock& clock, CommunicatorMode mode);
 
     /*
      * Currently, this just sends authoritative state for the server
@@ -110,6 +110,11 @@ class Timeline {
     void Prune(unsigned timestamp);
 
     /*
+     * Prune all keyframes.
+     */
+    void PruneAll();
+
+    /*
      * Finds the keyframe with the highest timestamp less than
      * or equal to timestamp.
      *
@@ -119,6 +124,9 @@ class Timeline {
 
     // Pointer to our worldmodel
     WorldModel* mWorld;
+
+    // Gameclock
+    Gameclock* mGameclock;
 
     // Client or server?
     CommunicatorMode mMode;

@@ -341,6 +341,17 @@ RenderContext::MoveCamera(float forward, float right)
     SetViewToCamera();
 }
 
+void
+RenderContext::MoveCameraAbsolute(float x, float z)
+{
+    // Move the camera by absolute coordinates
+    mCameraPos.x += x;
+    mCameraPos.z += z;
+
+    // Re-send the camera info
+    SetViewToCamera();
+}
+
 static void ClampDegrees(float& input)
 {
     while (input > 180.0f)

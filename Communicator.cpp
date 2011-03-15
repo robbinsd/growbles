@@ -251,6 +251,7 @@ Communicator::Communicator(Timeline& timeline,
                                                   , mNumClientsExpected(0)
                                                   , mSocketHandler(*this)
                                                   , mSimulatingOutage(false)
+                                                  , mIgnoringAuthority(false)
 {
     // If we're a server, assign ourselves a player ID
     if (mode == COMMUNICATOR_MODE_SERVER)
@@ -356,7 +357,8 @@ Communicator::Synchronize()
             // Worldstate dumps should only come from the server.
             case PAYLOAD_TYPE_WORLDSTATE:
                 assert(mMode == COMMUNICATOR_MODE_CLIENT);
-                mTimeline->AddAuthoritativeState(*(WorldState*)incoming.data);
+                if (!mIgnoringAuthority)
+                    mTimeline->AddAuthoritativeState(*(WorldState*)incoming.data);
                 break;
 
             // User inputs can come from anyone. The server forwards received
@@ -389,7 +391,7 @@ Communicator::SendAuthoritativeState(WorldState& state)
 }
 
 void
-Communicator::Bootstrap(WorldModel& world)
+Communicator::Bootstrap(WorldModel& world, Gameclock& clock)
 {
     // If we're the server
     if (mMode == COMMUNICATOR_MODE_SERVER) {
@@ -421,7 +423,7 @@ Communicator::Bootstrap(WorldModel& world)
     }
 
     // Start our timeline
-    mTimeline->Init(world, mMode);
+    mTimeline->Init(world, clock, mMode);
 }
 
 void

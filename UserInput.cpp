@@ -46,6 +46,8 @@ UserInput::LoadInput(RenderContext& context, Communicator& communicator,
                 break;
             case sf::Event::KeyPressed:
                 switch(evt.Key.Code) {
+
+                    /*
                     case sf::Key::W:
                         context.MoveCamera(1.0, 0.0);
                         break;
@@ -58,6 +60,7 @@ UserInput::LoadInput(RenderContext& context, Communicator& communicator,
                     case sf::Key::D:
                         context.MoveCamera(0.0, 1.0);
                         break;
+                        */
                     case sf::Key::Left:
                         context.MoveLight(0.0, -0.1);
                         break;
@@ -78,6 +81,13 @@ UserInput::LoadInput(RenderContext& context, Communicator& communicator,
                     case sf::Key::Num9:
                         communicator.SetSimulatingOutage(false);
                         break;
+                    case sf::Key::Num8:
+                        communicator.SetIgnoringAuthoritativeDumps(true);
+                        break;
+                    case sf::Key::Num7:
+                        communicator.SetIgnoringAuthoritativeDumps(false);
+                        break;
+
 
                     default:
                         break;
@@ -131,16 +141,16 @@ UserInput::LoadInput(RenderContext& context, Communicator& communicator,
                     case sf::Key::K:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_SHRINK, isPress);
                         break;
-                    case sf::Key::T:
+                    case sf::Key::W:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_UP, isPress);
                         break;
-                    case sf::Key::G:
+                    case sf::Key::S:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_DOWN, isPress);
                         break;
-                    case sf::Key::F:
+                    case sf::Key::A:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_LEFT, isPress);
                         break;
-                    case sf::Key::H:
+                    case sf::Key::D:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_RIGHT, isPress);
                         break;
                     default:

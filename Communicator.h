@@ -16,6 +16,7 @@ class GrowblesSocket;
 struct SceneGraph;
 class Communicator;
 class Timeline;
+class Gameclock;
 
 typedef enum {
     PAYLOAD_TYPE_NONE = 0,
@@ -180,7 +181,7 @@ class Communicator {
     /*
      * Bootstraps the client and server and gets everyone on the same page.
      */
-    void Bootstrap(WorldModel& world);
+    void Bootstrap(WorldModel& world, Gameclock& clock);
 
     /*
      * Gets our player ID.
@@ -202,6 +203,11 @@ class Communicator {
      * Begins/ends a simulated network outage.
      */
     void SetSimulatingOutage(bool outage) { mSimulatingOutage = outage; };
+
+    /*
+     * Ignore/respect authoritative dumps.
+     */
+    void SetIgnoringAuthoritativeDumps(bool ignore) { mIgnoringAuthority = ignore; };
 
     protected:
 
@@ -234,6 +240,9 @@ class Communicator {
 
     // Network outage simulation
     bool mSimulatingOutage;
+
+    // Are we ignoring authoritative dumps?
+    bool mIgnoringAuthority;
 };
 
 #endif /* COMMUNICATOR_H */
