@@ -1,7 +1,7 @@
 #include "FalconDevice.h"
 
 //DON"T CHANGE THE ORDER OF THESE
-static enum SwitchIndexT{  SWITCH_INDEX_JUMP=0, SWITCH_INDEX_SHRINK, SWITCH_INDEX_DASH,
+enum SwitchIndexT{  SWITCH_INDEX_JUMP=0, SWITCH_INDEX_SHRINK, SWITCH_INDEX_DASH,
     SWITCH_INDEX_GROW };
 
 FalconDevice::FalconDevice(){
