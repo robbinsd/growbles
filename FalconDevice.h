@@ -52,10 +52,8 @@ public:
      */
     void setHorizontalForce(float right, float forward);
 
-    // Sets the vertical force, based on whether or not the falcon is
-    // in freefall. If not in freefall, it will be forced toward the vertical
-    // middle of its workspace.
-    void setVerticalForce(bool isFalling);
+    // Sets the vertical force
+    void setVerticalForce(float platformHeight);
 
     /*
      * Sets the input, given the previous tick's activeInputs.
@@ -75,7 +73,8 @@ protected:
     
     //saves whether or not the FalconDevice is currently falling.
     //used to compute the vertical force.
-    bool isFalling;
+    //float prevHeight;
+    float height;
 
     // Haptics
     cHapticDeviceHandler *mHapticHandler;

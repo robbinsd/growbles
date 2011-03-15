@@ -122,6 +122,7 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
+    printf("numticks: %u\n", numTicks);
     for (unsigned i = 0; i < numTicks; ++i)
         SingleStep();
 }
@@ -465,13 +466,7 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
 void WorldModel::ApplyHapticGravityForce(){
     Player *player = GetPlayer(mPlayerID);
     assert(player);
-    btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
-    assert(playerRigidBody);
-    bool isFalling = false;
-    if(playerRigidBody->getLinearVelocity().y() < -.2 || playerRigidBody->getLinearVelocity().y() > .2){
-        isFalling = true;
-    }
-    mFalcon->setVerticalForce(isFalling);
+    mFalcon->setVerticalForce((GetPlayerPosition(mPlayerID).y-4)/10);
 }
 
 void WorldModel::ApplyHapticCollisionForce(){
