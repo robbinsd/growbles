@@ -135,10 +135,17 @@ Game::Step()
         // Render the scenegraph
         //renderContext->Render(*sceneGraph);
         
+        // Count how many players have lost the game
+        unsigned numPlayersLost = 0;
+        
+        // Loop through all the players to check if any (and how many) has lost the game
         for(unsigned i=0; i < world->mPlayers.size(); ++i){
+            
+            // Get information of this player
             Player* player = world->mPlayers[i];
             
             if (player->GetPlayerID() == communicator->GetPlayerID()) { // This is ourselves
+                
                 // Move the camera if necessary
                 float newPlayerX = world->GetPlayerPosition(player->GetPlayerID()).x;
                 float newPlayerZ = world->GetPlayerPosition(player->GetPlayerID()).z;
@@ -146,26 +153,29 @@ Game::Step()
                 prevPlayerX = newPlayerX;
                 prevPlayerZ = newPlayerZ;
                 
-                // If height of player is below a certain point, mark player as lost
+                // Determine if we have lost
                 if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
                     renderContext->RenderString("You Lost", 100000);
                     // Go to next state
                     state = END;
                 }
-                
-                
-            }
-            else { // The other player lost, we win
-                if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
-                    renderContext->RenderString("You Win", 100000);
-                    
-                    // Go to next state
-                    state = END;
-                }
             }
             
+            else { // This is another player
+                // Determine if this player has lost
+                if (world->GetPlayerPosition(player->GetPlayerID()).y < 1) {
+                    numPlayersLost++;
+                }
+            }
         }
         
+        // If enough players have lost the game
+        if (numPlayersLost >= world->mPlayers.size()-1) {
+            renderContext->RenderString("You Win!", 100000);
+            // Go to next state
+            state = END;
+        }
+
         // Render all strings
         renderContext->RenderAllElse();
         

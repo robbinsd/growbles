@@ -42,6 +42,9 @@ public:
      */
     Vector GetActiveFalconInputs() { return activeFalconInputs; };
     void SetActiveFalconInputs(Vector inputs) { activeFalconInputs = inputs; };
+    
+    int GetWinLossState() { return winLossState; };
+    void SetWinLossState(int wlstate) { winLossState = wlstate; };
 
     protected:
 
@@ -59,6 +62,10 @@ public:
     // The current inputs from the falcon. Each float is equivalent
     // to two bits of activeInputs, but has much more precision.
     Vector activeFalconInputs;
+    
+    // Indicates whether a player has won or lost a game
+    // 0:Neither 1:Lost 2:Won
+    int winLossState;
 };
 
 #endif /* PLAYER_H */

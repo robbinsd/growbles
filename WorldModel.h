@@ -45,7 +45,7 @@ struct WorldState {
     WorldState(){};
     
     // The array of players, increase the size to allow more players
-    PlayerInfo playerArray[2];
+    PlayerInfo playerArray[3];
     
     // The number of players in play
     int numPlayers;

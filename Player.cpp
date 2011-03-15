@@ -6,6 +6,7 @@ Player::Player(unsigned playerID,
                Vector initialPosition) : mPlayerID(playerID)
                                        , mPlayerNode(playerSceneNode)
                                        , activeInputs(0)
+                                       , winLossState(0)
 {
 }
 

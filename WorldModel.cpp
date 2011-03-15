@@ -239,7 +239,8 @@ WorldModel::SetState(WorldState& stateIn)
 }
 
 static float sInitialPositions[][3] = { {-8.0, 5.0, 0.0},
-                                        {-4.0, 5.0, 4.0} };
+                                        {-4.0, 5.0, 4.0},
+                                        {4.0, 5.0, -4.0}};
 
 void
 WorldModel::AddPlayer(unsigned playerID)
@@ -249,7 +250,7 @@ WorldModel::AddPlayer(unsigned playerID)
     // We only have enough initial positions for two players. This can be trivially
     // fixed.
     unsigned posIndex = mPlayers.size();
-    assert(posIndex <= 1);
+    assert(posIndex <= 2);
     Vector initialPosition(sInitialPositions[posIndex][0],
                            sInitialPositions[posIndex][1],
                            sInitialPositions[posIndex][2],
