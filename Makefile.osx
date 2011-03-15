@@ -11,7 +11,7 @@ LIBS = -framework sfml-audio \
 
 OBJS = Main.o Menu.o Game.o Shader.o RenderContext.o Texture.o Material.o DepthRenderTarget.o \
        Vector.o Matrix.o SceneGraph.o WorldModel.o Communicator.o UserInput.o \
-       Player.o GLDebugDrawer.o Platform.o Timeline.o Gameclock.o Game.o
+       Player.o GLDebugDrawer.o Platform.o Timeline.o Gameclock.o Game.o FalconDevice.o
 
 %.o: %.cpp *.h
 	$(CXX) -c $(CXXFLAGS) $(CFLAGS) $< -o $@

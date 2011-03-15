@@ -7,7 +7,10 @@
 #include "Player.h"
 #include "Gameclock.h"
 #include "UserInput.h"
+#include "FalconDevice.h"
 #include <vector>
+#include <map>
+using namespace std;
 
 #define BULLET_STEP_INTERVAL (1.0/60.0)
 #define BULLET_STEPS_PER_GROWBLE_STEP 8
@@ -15,10 +18,17 @@
 class SceneGraph;
 class UserInput;
 
+const double PLAYER_SCALING_RATE = .01;
+const double PLAYER_MAXIMUM_SCALE = 3;
+const double PLAYER_MINIMUM_SCALE = .3;
+const double PLAYER_MAX_FORCE = 2;
+const double PLAYER_MASS_DENSITY = 1;
+
 // struct containing information about a player
 struct PlayerInfo {
     unsigned playerID;
     uint32_t activeInputs;
+    Vector activeFalconInputs;
 
     // physics
     btTransform transform;
@@ -57,8 +67,10 @@ class WorldModel {
 
     /*
      * Initializes the world model.
+     * @param falcon: the falcon controlled by this player
+     * @param playerID: this ID of the player on this computer
      */
-    void Init(SceneGraph& sceneGraph);
+    void Init(SceneGraph& sceneGraph, FalconDevice &falcon, int playerID);
 
     /*
      * Destructor.
@@ -118,6 +130,19 @@ class WorldModel {
      */
     btDiscreteDynamicsWorld* GetDynamicsWorld() { return dynamicsWorld; };
 
+    /*
+     * Respond to collision between the player on this computer and
+     * the player specified by otherPlayerID
+     * Apply a haptic impulse force to the falcon controlled by this player.
+     */
+    void ApplyHapticCollisionForce();
+
+    /*
+     * Apply gravity force to  the falcon controlled by the player on this
+     * computer.
+     */
+    void ApplyHapticGravityForce();
+
     protected:
 
     /*
@@ -152,6 +177,12 @@ class WorldModel {
     // The platform
     Platform* platform;
     
+    //this player (the one running this process)
+    int mPlayerID;
+
+    //falcon controlled by this player
+    FalconDevice *mFalcon;
+    
     // Debug drawer
     GLDebugDrawer debugDrawer;
 
@@ -160,5 +191,7 @@ class WorldModel {
     
     friend class Game;
 };
+// used by Falcon
+static map<btCollisionDispatcher *, WorldModel *> worldModels;
 
 #endif /* WORLDMODEL_H */

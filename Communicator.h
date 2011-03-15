@@ -8,6 +8,7 @@
 #define GROWBLES_PORT 9323
 
 class WorldModel;
+class WorldState;
 class UserInput;
 class GrowblesSocket;
 struct SceneGraph;
@@ -168,6 +169,11 @@ class Communicator {
      * For server: Handle input updates, send world updates.
      */
     void Synchronize();
+
+    /*
+     * Sends a statedump to clients. Only valid for the server.
+     */
+    void SendAuthoritativeState(WorldState& state);
 
     /*
      * Bootstraps the client and server and gets everyone on the same page.

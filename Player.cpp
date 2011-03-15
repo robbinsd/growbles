@@ -10,7 +10,7 @@ Player::Player(unsigned playerID,
 }
 
 void
-Player::setTransform(btTransform trans)
+Player::setTransform(const btTransform &trans)
 {
     Matrix transform;
     Vector origin(trans.getOrigin());
@@ -41,6 +41,8 @@ Player::applyInput(UserInput& input)
     // Sanity check - We shouldn't end anything not begun
     assert(((ends >> 1) | activeInputs) == activeInputs);
 
+    // Apply falcon inputs
+    activeFalconInputs = input.falconInputs;
     // Apply our begins
     activeInputs |= begins;
 

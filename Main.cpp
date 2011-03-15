@@ -9,7 +9,7 @@
 #include "Gameclock.h"
 #include "Game.h"
 #include <stdlib.h>
-#include <string>
+
 
 char* getOption(int argc, char** argv, const char* flag);
 void printUsageAndExit(char* programName);

@@ -19,7 +19,7 @@ public:
     /*
      * Sets the player location based on a btTransform.
      */
-    void setTransform(btTransform transform);
+    void setTransform(const btTransform &transform);
 
     /*
      * Apply an input.
@@ -36,6 +36,12 @@ public:
      */
     uint32_t GetActiveInputs() { return activeInputs; };
     void SetActiveInputs(uint32_t inputs) { activeInputs = inputs; };
+    
+    /*
+     * Get the active falcon inputs.
+     */
+    Vector GetActiveFalconInputs() { return activeFalconInputs; };
+    void SetActiveFalconInputs(Vector inputs) { activeFalconInputs = inputs; };
 
     protected:
 
@@ -49,6 +55,10 @@ public:
     // This is a bitfield of the USERINPUT_* variety, with only begin
     // bits defined.
     uint32_t activeInputs;
+
+    // The current inputs from the falcon. Each float is equivalent
+    // to two bits of activeInputs, but has much more precision.
+    Vector activeFalconInputs;
 };
 
 #endif /* PLAYER_H */

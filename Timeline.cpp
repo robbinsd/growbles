@@ -31,6 +31,36 @@ Timeline::Init(WorldModel& model, CommunicatorMode mode)
 }
 
 void
+Timeline::SendUpdates(Communicator& communicator)
+{
+    assert(mMode == COMMUNICATOR_MODE_SERVER);
+
+    // If we don't have any keyframes, we have nothing to do
+    if (mKeyframes.size() == 0)
+        return;
+
+    // Do we have a keyframe old enough to send as a state update?
+    if (mWorld->GetCurrentTimestamp() < MIN_STATEUPDATE_AGE)
+        return;
+    KeyframeIterator candidate = FindKeyframe(mWorld->GetCurrentTimestamp() -
+                                              MIN_STATEUPDATE_AGE);
+    if (candidate == mKeyframes.end())
+        return;
+
+    // Is the candidate different enough from the last statedump sent to be worth
+    // sending?
+    if (mKeyframes.front()->timestamp + MIN_STATEDUMP_SEPARATION >
+        (*candidate)->timestamp)
+        return;
+
+    // Send
+    communicator.SendAuthoritativeState((*candidate)->state);
+
+    // Prune
+    Prune((*candidate)->timestamp);
+}
+
+void
 Timeline::AddInput(UserInput& input)
 {
     // We may be fast-forwarding and rewinding, so make sure our timeline contains
@@ -59,6 +89,35 @@ Timeline::AddInput(UserInput& input)
 
     // Call the helper method
     AddInputInternal(input);
+}
+
+void
+Timeline::AddAuthoritativeState(WorldState& state)
+{
+    // We should be a client
+    assert(mMode == COMMUNICATOR_MODE_CLIENT);
+
+    // Make sure we have an up to date keyframe. This will get blown
+    // away by whatever state update we receive, but we need the marker
+    // there to propagate our state forward appropriately.
+    if (!UpToDate())
+        GenerateCurrentKeyframe();
+
+    // Prune everything before the given state
+    Prune(state.timestamp);
+
+    // If we don't have a keyframe for this timestamp, make one
+    if (!mKeyframes.size() ||
+        (*mKeyframes.begin())->timestamp != state.timestamp) {
+        Keyframe* frame = new Keyframe(state.timestamp, state);
+        mKeyframes.push_front(frame);
+    }
+    // Otherwise, just update the statedump on the first keyframes
+    else
+        (*mKeyframes.begin())->state = state;
+
+    // Rectify, starting at the front
+    Rectify(mKeyframes.begin());
 }
 
 void
@@ -155,7 +214,6 @@ Timeline::Prune(unsigned timestamp)
 KeyframeIterator
 Timeline::FindKeyframe(unsigned timestamp)
 {
-    assert(mKeyframes.size() > 0);
     KeyframeIterator lastGood = mKeyframes.end();
     for (KeyframeIterator it = mKeyframes.begin();
          it != mKeyframes.end(); ++it) {

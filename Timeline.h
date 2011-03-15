@@ -7,8 +7,14 @@
 #include <list>
 #include <vector>
 
-// The number of steps between keyframes
-#define KEYFRAME_STEP 30
+// The minimum number of ticks between authoritative updates
+#define STATE_UPDATE_THRESHOLD 15
+
+// The youngest state dump we're allowed to send as authoritative
+#define MIN_STATEUPDATE_AGE 10
+
+// Minimum seperation between statedumps
+#define MIN_STATEDUMP_SEPARATION 5
 
 /*
  * A keyframe is an item in our timeline. It contains a snapshot of the
@@ -55,9 +61,20 @@ class Timeline {
     void Init(WorldModel& model, CommunicatorMode mode);
 
     /*
+     * Currently, this just sends authoritative state for the server
+     * on occasion.
+     */
+    void SendUpdates(Communicator& communicator);
+
+    /*
      * Adds an input to the timeline.
      */
     void AddInput(UserInput& input);
+
+    /*
+     * Adds authoritative server state to the timeline.
+     */
+    void AddAuthoritativeState(WorldState& state);
 
     protected:
 

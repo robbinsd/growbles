@@ -2,6 +2,7 @@
 #define USERINPUT_H
 
 #include "Framework.h"
+#include "Vector.h"
 #include <stdint.h>
 
 class RenderContext;
@@ -39,11 +40,24 @@ struct UserInput {
      * applied immediately. All other inputs are stored as instance data
      * for later application.
      */
-    void LoadInput(RenderContext& context, Communicator& communicator);
+    void LoadInput(RenderContext& context, Communicator& communicator,
+	    WorldModel &world);
+
+#ifdef FALCON
+    /*
+     * Helper function. Converts the falcon's position into key presses/releases.
+     * Stores these in the input bit array.
+     */
+    void SetFalconInputs(Vector positionOffset, Vector velocity);
+
+#endif
 
     // Bitfield of inputs
     uint32_t inputs;
 
+    // 3 floats indicating how much falcon wants to go left/right, up/down, or
+    // grow/shrink
+    Vector falconInputs;
     // Worldspace timestamp when the input was applied
     uint32_t timestamp;
 
