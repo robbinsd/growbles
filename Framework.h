@@ -35,7 +35,7 @@
 //#define NETWORKING
 
 // Falcon Haptics Library
-//#define FALCON
+#define FALCON
 #ifdef FALCON
 #include "chai3d.h"
 #endif

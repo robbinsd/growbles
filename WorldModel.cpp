@@ -397,7 +397,7 @@ void WorldModel::ApplyHapticGravityForce(){
     btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
     assert(playerRigidBody);
     bool isFalling = false;
-    if(playerRigidBody->getLinearVelocity().y() < -.01 || playerRigidBody->getLinearVelocity().y() > .01){
+    if(playerRigidBody->getLinearVelocity().y() < -.2 || playerRigidBody->getLinearVelocity().y() > .2){
         isFalling = true;
     }
     mFalcon->setVerticalForce(isFalling);
