@@ -9,6 +9,7 @@ using namespace std;
 const double FALCON_IMPULSE_STRENGTH = 1;
 const double FALCON_IMPULSE_LENGTH = 1; //length of time in seconds that the impulse lasts
 static const double FALCON_VERTICAL_STIFFNESS = 1000;
+static const double FALCON_HORIZONTAL_STIFFNESS = 120;
 static const double FALCON_DAMPENING = 5;
 
 enum FalconInputIndex{ FALCON_INPUT_FORWARD, FALCON_INPUT_RIGHT, FALCON_INPUT_UP };
@@ -70,6 +71,8 @@ protected:
 #ifdef FALCON
     //saves the horizontal forces being applied
     vector<cVector3d> forcesToApply; //x is back, y is right, z is time remaining
+    cVector3d force;
+    int forceCount;
     
     //saves whether or not the FalconDevice is currently falling.
     //used to compute the vertical force.
@@ -82,6 +85,7 @@ protected:
     cHapticDeviceInfo mHapticDeviceInfo;
     bool mSimulationRunning;
     bool mSimulationFinished;
+    bool beingUsed;
 #endif 
     bool isReady;
 

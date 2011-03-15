@@ -13,7 +13,8 @@ Installation Instructions (Mac):
     3. Install assimp via macports
     4. Install bullet via macports
     5. Install libsockets via macports
-    6. $ make -f Makefile.osx
+    6. (Optional) Install chai3d via their website
+    7. $ make -f Makefile.osx
 
     NB - These instructions assume that your macports prefix is /opt/local. If
     not, you'll need to modify Makefile.osx.
@@ -61,6 +62,23 @@ minimum clock time.
 
 Because Growbles is a quick game, we don't anticipate player it over high-latency
 connections, and thus opted for TCP over UDP for simplicity.
+
+
+Haptics Functionality
+
+Growbles offers two ways for players to interact with the game: through the keyboard, or through the Novint Falcon Haptic Device. The Novint Falcon offers a much richer gameplay experience to the user, since it offers much more precise control of the player's movement and also renders forces back to the user. The Falcon is essentially a 3d joystick with force feedback. We interfaced with the Falcon through the chai3d libraries.
+
+In order to do good-feeling force rendering, the Falcon had to have its own haptic rendering loop, which would run at about 1000Hz on Windows. It was sufficient to receive updates from the Game at 32Hz, since most of the values needed to calculate output forces came from the device itself.
+
+The Falcon's input/output was divided into two areas: vertical and horizontal. In the horizontal direction, the Falcon's position input is used to calculate the force to apply to the player's ball. The farther the position is from the center, the more force is applied. The Falcon's vertical position input was not used.
+The Falcon's horizontal force output was used for two purposes: 
+    1. to give the user a sense of how far he is from the center of the playing field. We achieved this through applying a weak spring force to the falcon (F=-kx), where x is the distance from the center of the Falcon's workspace to the position of the Falcon.
+    2. to allow the user to feel collisions with other players. We achieved this through calculating the impulse the user should feel as a result of each collision. This impulse was applied to the falcon over the course of 5 haptic loops, after which it decayed to 0.
+
+The Falcon's vertical force output had one purpose:
+    1. to have the user follow the horizontal position of the ball. We modeled a really strong virtual spring between the falcon position and the vertical position of the ball. Of course, we had to transform the position of the ball into the coordinate space of the falcon for this to work.
+
+The Falcon also had four buttons on it, which we used to allow the player to use the GROW, SHRINK, JUMP, and DASH abilities. The player can also press keys on the keyboard to use these abilities.
 
 
 References:

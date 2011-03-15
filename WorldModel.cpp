@@ -457,12 +457,12 @@ WorldModel::HandleKinematicInputForPlayer(unsigned playerID)
     // Get the inputs
     Vector activeFalconInputs = player->GetActiveFalconInputs();
     uint32_t activeInputs = player->GetActiveInputs();
-    if(activeFalconInputs.x != 0 || activeFalconInputs.y != 0 || activeFalconInputs.z != 0){
+    //if(activeFalconInputs.x != 0 || activeFalconInputs.y != 0 || activeFalconInputs.z != 0){
         //if we have falcon input, use that. the maximum force magnitude
         //we will have is 1.        
         //forceVector.setX(activeFalconInputs[FALCON_INPUT_FORWARD]);
         //forceVector.setZ(activeFalconInputs[FALCON_INPUT_RIGHT]);
-    }else{
+    //}else{
         //otherwise, use keyboard input and make sure the resulting force
         //always has the same length (or 0 length)
         //if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, true))
@@ -475,7 +475,7 @@ WorldModel::HandleKinematicInputForPlayer(unsigned playerID)
         //float len = forceVector.length();
         //if(len != 0)
             //forceVector /= len;
-    }
+    //}
     
     //playerRigidBody->applyForce(forceVector*PLAYER_MAX_FORCE, btVector3(1.0, 1.0, 1.0)); IMPORTANT
 }
