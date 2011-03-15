@@ -71,6 +71,8 @@ Platform::update()
 	}
 	if(dropState == FALLING)
     {
+        // Play sound here
+        
 		dropVelocity += GRAVITY;
 		dropY+=dropVelocity;
 		if(dropY > 30.0) // If done dropping, go back to being idle

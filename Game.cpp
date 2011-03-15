@@ -170,10 +170,12 @@ Game::Step()
         }
         
         // If enough players have lost the game
-        if (numPlayersLost >= world->mPlayers.size()-1) {
-            renderContext->RenderString("You Win!", 100000);
-            // Go to next state
-            state = END;
+        if (world->mPlayers.size() > 1) {
+            if (numPlayersLost >= world->mPlayers.size()-1) {
+                renderContext->RenderString("You Win!", 100000);
+                // Go to next state
+                state = END;
+            }
         }
 
         // Render all strings

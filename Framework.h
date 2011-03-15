@@ -76,8 +76,16 @@
 
 #define IN_RANGE(val, low, high) ((low <= val) && (val <= high))
 
-#ifndef PRINTD
-#define PRINTD(a) printf("value = %d\n", a);
+#ifndef DPD
+#define DPD(a) printf("value = %d\n", a);
+#endif
+
+#ifndef DPF
+#define DPF(a) printf("value = %f\n", a);
+#endif
+
+#ifndef DPS
+#define DPS(a) printf("value = %s\n", a);
 #endif
 
 #endif
