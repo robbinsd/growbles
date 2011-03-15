@@ -97,6 +97,12 @@ Timeline::AddAuthoritativeState(WorldState& state)
     // We should be a client
     assert(mMode == COMMUNICATOR_MODE_CLIENT);
 
+    // Make sure we have an up to date keyframe. This will get blown
+    // away by whatever state update we receive, but we need the marker
+    // there to propagate our state forward appropriately.
+    if (!UpToDate())
+        GenerateCurrentKeyframe();
+
     // Prune everything before the given state
     Prune(state.timestamp);
 
