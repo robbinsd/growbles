@@ -164,6 +164,7 @@ class WorldModel {
      * Applies forces for the current inputs.
      */
     void HandleInputForPlayer(unsigned playerID);
+    void HandleKinematicInputForPlayer(unsigned playerID);
 
     // The scenegraph associated with this world
     SceneGraph* mSceneGraph;

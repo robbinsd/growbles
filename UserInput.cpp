@@ -138,8 +138,17 @@ UserInput::LoadInput(RenderContext& context, Communicator& communicator,
                     case sf::Key::I:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_GROW, isPress);
                         break;
-                    case sf::Key::K:
+                    case sf::Key::U:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_SHRINK, isPress);
+                        break;
+                    case sf::Key::K:
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_DASH, isPress);
+                        break;
+                    case sf::Key::J:
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, isPress);
+                        break;
+                    case sf::Key::L:
+                        inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_BRAKE, isPress);
                         break;
                     case sf::Key::W:
                         inputs |= GEN_INPUT_MASK(USERINPUT_INDEX_UP, isPress);

@@ -16,7 +16,10 @@ typedef enum {
     USERINPUT_INDEX_DOWN,
     USERINPUT_INDEX_LEFT,
     USERINPUT_INDEX_RIGHT,
-    USERINPUT_INDEX_COUNT
+    USERINPUT_INDEX_COUNT,
+    USERINPUT_INDEX_DASH,
+    USERINPUT_INDEX_JUMP,
+    USERINPUT_INDEX_BRAKE
 } UserInputIndex;
 
 // The actual bitmask uses 2 bits for each item (one to signal the start

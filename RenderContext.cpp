@@ -177,7 +177,7 @@ RenderContext::RenderSkybox()
 
     // Reset and transform the matrix.
     glLoadIdentity();
-    gluLookAt(0, 0, 0, mCameraPos.x-8, mCameraPos.y, mCameraPos.z, 0, 1, 0);
+    gluLookAt(0, 0, 0, mCameraPos.x-10, mCameraPos.y, mCameraPos.z, 0, 1, 0);
 
     // Enable/Disable features
     glPushAttrib(GL_ENABLE_BIT);

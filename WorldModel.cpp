@@ -129,6 +129,8 @@ WorldModel::Step(unsigned numTicks)
 void
 WorldModel::SingleStep()
 {
+    for(unsigned j = 0; j < mPlayers.size(); ++j) HandleKinematicInputForPlayer(mPlayers[j]->GetPlayerID());
+    
     // BOF step physics
     for (unsigned i = 0; i < BULLET_STEPS_PER_GROWBLE_STEP; ++i) {
         for(unsigned j = 0; j < mPlayers.size(); ++j)
@@ -154,8 +156,8 @@ WorldModel::SingleStep()
                 if (!strcmp(obA->getCollisionShape()->getName(), obB->getCollisionShape()->getName())) {
                     
                     // A collision just happened
-                    DPS("COLLISION");
-                    DPF(pt.getDistance());
+                    //DPS("COLLISION");
+                    //DPF(pt.getDistance());
                 }
 				//const btVector3& ptA = pt.getPositionWorldOnA();
 				//const btVector3& ptB = pt.getPositionWorldOnB();
@@ -164,7 +166,7 @@ WorldModel::SingleStep()
 		}
         
     }
-    //
+    // EOF Determine if a collision has taken place
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
@@ -319,7 +321,7 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
     mPlayerShapes[player] = playerShape;
 
 	btScalar playerScale = 1;
-    btScalar playerMass = PLAYER_MASS_DENSITY *playerScale*playerScale*playerScale;
+    btScalar playerMass = PLAYER_MASS_DENSITY *playerScale*playerScale;
     btVector3 playerInertia(0, 0, 0);
     playerShape->calculateLocalInertia(playerMass,playerInertia);
 
@@ -328,7 +330,7 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
                                                                                            initialPosition.y,
                                                                                            initialPosition.z));
     playerRigidBodyCI.m_friction = 0.5;
-    playerRigidBodyCI.m_restitution = 0.6;
+    playerRigidBodyCI.m_restitution = 0.9;
     playerRigidBodyCI.m_angularDamping = 0.5;
     btRigidBody *playerRigidBody = new btRigidBody(playerRigidBodyCI);
     mPlayerRigidBodies[player] = playerRigidBody;
@@ -371,6 +373,40 @@ WorldModel::ApplyInput(UserInput& input)
 }
 
 void
+WorldModel::HandleKinematicInputForPlayer(unsigned playerID)
+{
+    // Get the referenced player
+    Player* player = GetPlayer(playerID);
+    assert(player);
+    btRigidBody* playerRigidBody = mPlayerRigidBodies[player];
+    
+    // Get the inputs
+    Vector activeFalconInputs = player->GetActiveFalconInputs();
+    uint32_t activeInputs = player->GetActiveInputs();
+    if(activeFalconInputs.x != 0 || activeFalconInputs.y != 0 || activeFalconInputs.z != 0){
+        //if we have falcon input, use that. the maximum force magnitude
+        //we will have is 1.        
+        //forceVector.setX(activeFalconInputs[FALCON_INPUT_FORWARD]);
+        //forceVector.setZ(activeFalconInputs[FALCON_INPUT_RIGHT]);
+    }else{
+        //otherwise, use keyboard input and make sure the resulting force
+        //always has the same length (or 0 length)
+        //if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, true))
+            //forceVector += btVector3(0,1.5,0);
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_DASH, true))
+            playerRigidBody->setLinearVelocity(1.2*(playerRigidBody->getLinearVelocity()));
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_BRAKE, true))
+            playerRigidBody->setLinearVelocity(0.6*(playerRigidBody->getLinearVelocity()));
+            //forceVector += btVector3(0,1.5,0);
+        //float len = forceVector.length();
+        //if(len != 0)
+            //forceVector /= len;
+    }
+    
+    //playerRigidBody->applyForce(forceVector*PLAYER_MAX_FORCE, btVector3(1.0, 1.0, 1.0)); IMPORTANT
+}
+
+void
 WorldModel::HandleInputForPlayer(unsigned playerID)
 {
     // Get the referenced player
@@ -402,12 +438,17 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
         float len = forceVector.length();
         if(len != 0)
             forceVector /= len;
+        if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_JUMP, true)) { // Jump
+            if (playerRigidBody->getWorldTransform().getOrigin().getY() <= 6.0) {
+                forceVector += btVector3(0,20,0);
+            }
+        }
     }
     if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_GROW, true))
         growthFactor += 1;
     if (activeInputs & GEN_INPUT_MASK(USERINPUT_INDEX_SHRINK, true))
         growthFactor += -1;
-    playerRigidBody->applyForce(forceVector*PLAYER_MAX_FORCE, btVector3(1.0, 1.0, 1.0));
+    playerRigidBody->applyForce(forceVector*PLAYER_MAX_FORCE, btVector3(0, 1.0, 0));
     btCollisionShape *collShape = mPlayerShapes[player];
     if(growthFactor != 0){
         float newScale = collShape->getLocalScaling().x() + growthFactor*PLAYER_SCALING_RATE;
