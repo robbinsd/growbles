@@ -340,6 +340,8 @@ Communicator::Synchronize()
     if (mSimulatingOutage)
         return;
 
+    if (mSocketHandler.GetNumActiveSockets() == 0)
+        return;
     // Queue up any input we might have, but don't wait
     mSocketHandler.Select(0, 0);
 
