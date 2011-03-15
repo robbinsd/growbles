@@ -97,37 +97,37 @@ RenderContext::Init()
     SetViewToCamera();
     
     // BOF load skybox textures
-    std::string fullPath0 = "scenefiles/skyft.bmp";
+    std::string fullPath0 = "scenefiles/space_back.jpg";
     // If the file exists, initialize the appropriate texture
     std::ifstream file0(fullPath0.c_str(), std::ifstream::in);
     if (file0)
         skyboxTextures[0].Init(fullPath0);
     
-    std::string fullPath1 = "scenefiles/skylf.bmp";
+    std::string fullPath1 = "scenefiles/space_right.jpg";
     // If the file exists, initialize the appropriate texture
     std::ifstream file1(fullPath1.c_str(), std::ifstream::in);
     if (file1)
         skyboxTextures[1].Init(fullPath1);
     
-    std::string fullPath2 = "scenefiles/skybk.bmp";
+    std::string fullPath2 = "scenefiles/space_front.jpg";
     // If the file exists, initialize the appropriate texture
     std::ifstream file2(fullPath2.c_str(), std::ifstream::in);
     if (file2)
         skyboxTextures[2].Init(fullPath2);
     
-    std::string fullPath3 = "scenefiles/skyrt.bmp";
+    std::string fullPath3 = "scenefiles/space_left.jpg";
     // If the file exists, initialize the appropriate texture
     std::ifstream file3(fullPath3.c_str(), std::ifstream::in);
     if (file3)
         skyboxTextures[3].Init(fullPath3);
     
-    std::string fullPath4 = "scenefiles/skyup.bmp";
+    std::string fullPath4 = "scenefiles/space_bottom.jpg";
     // If the file exists, initialize the appropriate texture
     std::ifstream file4(fullPath4.c_str(), std::ifstream::in);
     if (file4)
         skyboxTextures[4].Init(fullPath4);
     
-    std::string fullPath5 = "scenefiles/skydn.bmp";
+    std::string fullPath5 = "scenefiles/space_top.jpg";
     // If the file exists, initialize the appropriate texture
     std::ifstream file5(fullPath5.c_str(), std::ifstream::in);
     if (file5)

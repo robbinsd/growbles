@@ -16,6 +16,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/Audio.hpp>
 
 // Open Asset Import Library
 #if defined __linux__ || defined _WIN32
