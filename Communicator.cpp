@@ -43,7 +43,9 @@ Payload::GetDataSize()
  * GrowblesSocket Methods.
  */
 
-GrowblesSocket::GrowblesSocket(ISocketHandler& h) : TcpSocket(h)
+GrowblesSocket::GrowblesSocket(ISocketHandler& h) : TcpSocket(h,
+                                                              TCP_INPUT_BUFFER_SIZE,
+                                                              TCP_OUTPUT_BUFFER_SIZE)
                                                   , mRemoteID(0)
 {
     // We don't want TCP to buffer things up
