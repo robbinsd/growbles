@@ -122,6 +122,7 @@ WorldModel::~WorldModel()
 void
 WorldModel::Step(unsigned numTicks)
 {
+    printf("numticks: %u\n", numTicks);
     for (unsigned i = 0; i < numTicks; ++i)
         SingleStep();
 }
@@ -328,7 +329,7 @@ WorldModel::AddPlayer(unsigned playerID, Vector initialPosition)
                                                                                            initialPosition.y,
                                                                                            initialPosition.z));
     playerRigidBodyCI.m_friction = 0.5;
-    playerRigidBodyCI.m_restitution = 0.6;
+    playerRigidBodyCI.m_restitution = 0.9;
     playerRigidBodyCI.m_angularDamping = 0.5;
     btRigidBody *playerRigidBody = new btRigidBody(playerRigidBodyCI);
     mPlayerRigidBodies[player] = playerRigidBody;
@@ -424,13 +425,7 @@ WorldModel::HandleInputForPlayer(unsigned playerID)
 void WorldModel::ApplyHapticGravityForce(){
     Player *player = GetPlayer(mPlayerID);
     assert(player);
-    btRigidBody *playerRigidBody = mPlayerRigidBodies[player];
-    assert(playerRigidBody);
-    bool isFalling = false;
-    if(playerRigidBody->getLinearVelocity().y() < -.2 || playerRigidBody->getLinearVelocity().y() > .2){
-        isFalling = true;
-    }
-    mFalcon->setVerticalForce(isFalling);
+    mFalcon->setVerticalForce((GetPlayerPosition(mPlayerID).y-4)/10);
 }
 
 void WorldModel::ApplyHapticCollisionForce(){

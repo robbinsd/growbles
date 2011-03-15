@@ -10,7 +10,8 @@ enum SwitchIndexT{  SWITCH_INDEX_JUMP=0, SWITCH_INDEX_SHRINK, SWITCH_INDEX_DASH,
 FalconDevice::FalconDevice(){
     isReady = false;
 #ifdef FALCON
-    isFalling = false;
+    //prevHeight = 0;
+    height = 0;
     mSimulationRunning = false;
     mSimulationFinished = false;
     mHapticHandler = new cHapticDeviceHandler();
@@ -96,9 +97,14 @@ void FalconDevice::getForce(float &up, float &right, float &forward){
 #endif
 }
 
-void FalconDevice::setVerticalForce(bool _isFalling){
+void FalconDevice::setVerticalForce(float _height){
 #ifdef FALCON
-    isFalling = _isFalling;
+    if(_height > 1)
+        _height = 1;
+    else if(_height < -1)
+        _height = -1;
+    //prevHeight = height;
+    height = _height*mHapticDeviceInfo.m_workspaceRadius;
 #endif
 }
 
@@ -213,16 +219,16 @@ void FalconDevice::hapticsLoop(){
         cVector3d pos(0,0,0);
         cVector3d vel(0,0,0);
         cVector3d totalForce(0,0,0);
-        if(!isFalling){
-            mHapticDevice->getPosition(pos);
-            totalForce.z += -FALCON_VERTICAL_STIFFNESS*pos.z;
-            mHapticDevice->getLinearVelocity(vel);
-            float dampenTerm = -FALCON_DAMPENING*vel.z;
-            if((totalForce.z+dampenTerm)*totalForce.z < 0)
-                totalForce.z = 0;
-            else
-                totalForce.z += dampenTerm;
-        }
+        
+        mHapticDevice->getPosition(pos);
+        totalForce.z += -FALCON_VERTICAL_STIFFNESS*(pos.z-height);
+        mHapticDevice->getLinearVelocity(vel);
+        float dampenTerm = -FALCON_DAMPENING*vel.z;
+        if((totalForce.z+dampenTerm)*totalForce.z < 0)
+            totalForce.z = 0;
+        else
+            totalForce.z += dampenTerm;
+        
         for(int i = 0; i < forcesToApply.size(); ++i){
             cVector3d currForce = forcesToApply[i];
             cVector3d currForceXY(currForce.x, currForce.y, 0);
