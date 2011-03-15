@@ -389,7 +389,7 @@ Communicator::SendAuthoritativeState(WorldState& state)
 }
 
 void
-Communicator::Bootstrap(WorldModel& world)
+Communicator::Bootstrap(WorldModel& world, Gameclock& clock)
 {
     // If we're the server
     if (mMode == COMMUNICATOR_MODE_SERVER) {
@@ -421,7 +421,7 @@ Communicator::Bootstrap(WorldModel& world)
     }
 
     // Start our timeline
-    mTimeline->Init(world, mMode);
+    mTimeline->Init(world, clock, mMode);
 }
 
 void

@@ -75,7 +75,7 @@ Game::Step()
         communicator->Connect();
         
         // Put the players on the map and get people on the same page
-        communicator->Bootstrap(*world);
+        communicator->Bootstrap(*world, *clock);
 
         world->SetFalcon(renderContext->falcon);
         world->SetThisPlayer(communicator->GetPlayerID());

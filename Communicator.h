@@ -16,6 +16,7 @@ class GrowblesSocket;
 struct SceneGraph;
 class Communicator;
 class Timeline;
+class Gameclock;
 
 typedef enum {
     PAYLOAD_TYPE_NONE = 0,
@@ -180,7 +181,7 @@ class Communicator {
     /*
      * Bootstraps the client and server and gets everyone on the same page.
      */
-    void Bootstrap(WorldModel& world);
+    void Bootstrap(WorldModel& world, Gameclock& clock);
 
     /*
      * Gets our player ID.

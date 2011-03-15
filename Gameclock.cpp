@@ -24,6 +24,15 @@ Gameclock::Then() const
 }
 
 void
+Gameclock::Set(unsigned timestamp)
+{
+    mTimestamp = timestamp;
+    mLastStep = 0;
+    mClockRemainder = 0.0f;
+    mClock.Reset();
+}
+
+void
 Gameclock::Tick()
 {
     // Busywait until a tick has passed

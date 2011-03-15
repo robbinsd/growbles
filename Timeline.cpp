@@ -20,10 +20,11 @@ Timeline::~Timeline()
 }
 
 void
-Timeline::Init(WorldModel& model, CommunicatorMode mode)
+Timeline::Init(WorldModel& model, Gameclock& clock, CommunicatorMode mode)
 {
     // Store parameters
     mWorld = &model;
+    mGameclock = &clock;
     mMode = mode;
 
     // Generate an initial keyframe
