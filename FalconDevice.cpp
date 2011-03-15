@@ -99,9 +99,6 @@ void FalconDevice::getForce(float &up, float &right, float &forward){
 void FalconDevice::setVerticalForce(bool _isFalling){
 #ifdef FALCON
     isFalling = _isFalling;
-    if(_isFalling){
-        printf("oops\n");
-    }
 #endif
 }
 
