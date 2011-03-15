@@ -51,12 +51,29 @@ int main(int argc, char** argv) {
         communicator.SetNumClientsExpected((unsigned) numClients);
     }
     
-    // Test load sound
+    // Load sound file into sound buffer, sound cannot be used for music
+    /*
     sf::SoundBuffer Buffer;
-    if (!Buffer.LoadFromFile("scenefiles/sound.wav"))
+    if (!Buffer.LoadFromFile("scenefiles/bgm.ogg"))
     {
-        // Error...
+        std::cout << "Error loading sound file\n";
     }
+    // Bind sound buffer to sound
+    sf::Sound Sound;
+    Sound.SetBuffer(Buffer);
+    //Sound.SetLoop(true);
+    //Sound.SetPitch(1.5f);
+    //Sound.SetVolume(75.f);
+    Sound.Play();
+     */
+    
+    sf::Music Music;
+    if (!Music.OpenFromFile("scenefiles/bgm.ogg"))
+    {
+        std::cout << "Error loading music file\n";
+    }    
+    Music.Play();
+
     
 
     Game growblesGame(timeline, communicator);
