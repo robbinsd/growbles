@@ -135,6 +135,36 @@ WorldModel::SingleStep()
             HandleInputForPlayer(mPlayers[j]->GetPlayerID());
         dynamicsWorld->stepSimulation(BULLET_STEP_INTERVAL, 1, BULLET_STEP_INTERVAL);
     }
+    
+    // Determine if a collision has taken place
+    int numManifolds = dispatcher->getNumManifolds();
+    for (int i=0;i<numManifolds;i++)
+    {
+        btPersistentManifold* contactManifold =  dispatcher->getManifoldByIndexInternal(i);
+        btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+        btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+        
+		int numContacts = contactManifold->getNumContacts();
+		for (int j=0;j<numContacts;j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance()<0.1)
+			{
+                // If both collision shapes are 'SPHERE'
+                if (!strcmp(obA->getCollisionShape()->getName(), obB->getCollisionShape()->getName())) {
+                    
+                    // A collision just happened
+                    DPS("COLLISION");
+                    DPF(pt.getDistance());
+                }
+				//const btVector3& ptA = pt.getPositionWorldOnA();
+				//const btVector3& ptB = pt.getPositionWorldOnB();
+				//const btVector3& normalOnB = pt.m_normalWorldOnB;
+			}
+		}
+        
+    }
+    //
 
     // Loop over players
     for(unsigned i = 0; i < mPlayers.size(); ++i){
